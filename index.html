@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>생각을 쓰는 캠프 - 과학</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gothic+A1:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 한 줄짜리 헤더 + 순서대로 번호 붙은 링크 카드 격자(넓으면 2열, 폰은 1열) */
+:root{
+  --bg:#eef3f4; --paper:#ffffff; --ink:#15323a; --muted:#5b7279; --line:#cfdcdf;
+  --accent:#0f7d8c; --accent-soft:#d8eef0; --warm:#b4561f; --warm-soft:#f8e6da; --violet:#6a4bb0; --violet-soft:#ebe5f7; --green:#3d7a2e; --green-soft:#e2f0dc;
+  --f-display:"Do Hyeon","Gothic A1",system-ui,sans-serif;
+  --f-body:"Gothic A1",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1b1e; --paper:#162a2f; --ink:#e3eef0; --muted:#93abb1; --line:#28434a;
+  --accent:#5cc6d2; --accent-soft:#1d3d43; --warm:#f0a070; --warm-soft:#3d2a1f; --violet:#bba6f0; --violet-soft:#2e2647; --green:#9fd38a; --green-soft:#223a1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1b1e; --paper:#162a2f; --ink:#e3eef0; --muted:#93abb1; --line:#28434a;
+  --accent:#5cc6d2; --accent-soft:#1d3d43; --warm:#f0a070; --warm-soft:#3d2a1f; --violet:#bba6f0; --violet-soft:#2e2647; --green:#9fd38a; --green-soft:#223a1d; color-scheme:dark}
+
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding-block:40px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;
+  padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,5vw,3rem);line-height:1.1;margin:0;text-wrap:balance}
+.sub{margin:6px 0 0;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px}
+ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:12px}
+li{min-width:0}
+a.card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;
+  padding:16px 18px;background:var(--paper);border:1px solid var(--line);border-radius:10px;
+  color:inherit;text-decoration:none;transition:border-color .15s,transform .15s}
+a.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+a.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.no{font-family:var(--f-mono);font-size:1.7rem;line-height:1;color:var(--accent);width:2.2ch;text-align:right;font-variant-numeric:tabular-nums}
+.body{min-width:0}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.name{font-weight:700;font-size:1.08rem}
+.desc{margin:3px 0 0;color:var(--muted);font-size:.93rem}
+.host{margin:3px 0 0;font-family:var(--f-mono);font-size:.66rem;color:var(--muted);overflow-wrap:anywhere;opacity:.85}
+.chip{font-size:.72rem;font-weight:600;letter-spacing:.02em;padding:2px 8px;border-radius:99px;
+  background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.chip.safe{background:var(--warm-soft);color:var(--warm)}
+.chip.doc{background:var(--violet-soft);color:var(--violet)}
+.chip.note{background:var(--green-soft);color:var(--green)}
+.go{color:var(--muted);font-size:1.2rem}
+a.card:hover .go{color:var(--accent)}
+@media (prefers-reduced-motion:reduce){a.card{transition:none}a.card:hover{transform:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>생각을 쓰는 캠프 - 과학</h1>
+    </div>
+    <div class="legend" aria-label="자료 종류">
+      <span class="chip safe">안전교육</span><span class="chip doc">자료</span><span class="chip">시뮬레이션</span><span class="chip note">기록</span>
+    </div>
+  </header>
+
+  <ol>
+    <li><a class="card" href="https://sojungssam.github.io/camp-science-lab/soda#safety" target="_blank" rel="noopener">
+      <span class="no">1</span>
+      <span class="body"><span class="top"><span class="name">기체의 용해도 실험 안전수칙</span><span class="chip safe">안전교육</span></span>
+        <p class="host">sojungssam.github.io</p></span>
+      <span class="go" aria-hidden="true">↗</span></a></li>
+
+    <li><a class="card" href="https://youtu.be/oUY_2oCNCsk?si=N1FWpU7_hyssdI-9" target="_blank" rel="noopener">
+      <span class="no">2</span>
+      <span class="body"><span class="top"><span class="name">영화 투모로우</span><span class="chip doc">자료</span></span>
+        <p class="host">youtube.com</p></span>
+      <span class="go" aria-hidden="true">↗</span></a></li>
+
+    <li><a class="card" href="https://ice-core-charts.lovable.app/" target="_blank" rel="noopener">
+      <span class="no">3</span>
+      <span class="body"><span class="top"><span class="name">빙하 코어(ice core) 분석</span><span class="chip">시뮬레이션</span></span>
+        <p class="host">ice-core-charts.lovable.app</p></span>
+      <span class="go" aria-hidden="true">↗</span></a></li>
+
+    <li><a class="card" href="https://sojungssam.github.io/camp-science-lab/hydrogen" target="_blank" rel="noopener">
+      <span class="no">4</span>
+      <span class="body"><span class="top"><span class="name">수소 연소 실험 안전수칙</span><span class="chip safe">안전교육</span></span>
+        <p class="host">sojungssam.github.io</p></span>
+      <span class="go" aria-hidden="true">↗</span></a></li>
+
+    <li><a class="card" href="https://phet.colorado.edu/sims/html/balancing-chemical-equations/1.2.9/balancing-chemical-equations_ko.html" target="_blank" rel="noopener">
+      <span class="no">5</span>
+      <span class="body"><span class="top"><span class="name">화학 반응식 완성하기</span><span class="chip">시뮬레이션</span></span>
+        <p class="host">phet.colorado.edu</p></span>
+      <span class="go" aria-hidden="true">↗</span></a></li>
+
+    <li><a class="card" href="https://claude.ai/artifact/X5ENdjj1uJ9uqNX3yqdMJs" target="_blank" rel="noopener">
+      <span class="no">6</span>
+      <span class="body"><span class="top"><span class="name">지구 복사 평형 이해하기</span><span class="chip">시뮬레이션</span></span>
+        <p class="host">claude.ai</p></span>
+      <span class="go" aria-hidden="true">↗</span></a></li>
+
+    <li><a class="card" href="https://claude.ai/artifact/J1UEt1wf5MTBLN1XomyALT" target="_blank" rel="noopener">
+      <span class="no">7</span>
+      <span class="body"><span class="top"><span class="name">지구 온난화에 영향을 주는 요인</span><span class="chip">시뮬레이션</span></span>
+        <p class="host">claude.ai</p></span>
+      <span class="go" aria-hidden="true">↗</span></a></li>
+
+    <li><a class="card" href="https://artsexperiments.withgoogle.com/impactfilter/" target="_blank" rel="noopener">
+      <span class="no">8</span>
+      <span class="body"><span class="top"><span class="name">지구 온난화에 따른 생태계 변화</span><span class="chip doc">자료</span></span>
+        <p class="host">artsexperiments.withgoogle.com</p></span>
+      <span class="go" aria-hidden="true">↗</span></a></li>
+
+    <li><a class="card" href="https://chakfzk.github.io/geoengineering-lab/" target="_blank" rel="noopener">
+      <span class="no">9</span>
+      <span class="body"><span class="top"><span class="name">지구공학 체험실</span><span class="chip">시뮬레이션</span></span>
+        <p class="host">chakfzk.github.io</p></span>
+      <span class="go" aria-hidden="true">↗</span></a></li>
+
+    <li><a class="card" href="https://script.google.com/macros/s/AKfycbz9njmwLKxKIKjRYvjxC0IQJ-UJ9lMAk8lmsf7kRmVq53u-bQGmezVQ9hfEWZfTx7O5/exec" target="_blank" rel="noopener">
+      <span class="no">10</span>
+      <span class="body"><span class="top"><span class="name">지구공학 생각 노트</span><span class="chip note">기록</span></span>
+        <p class="host">script.google.com</p></span>
+      <span class="go" aria-hidden="true">↗</span></a></li>
+  </ol>
+</div>
+</body>
+</html>
