@@ -101,8 +101,8 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 
 details.q{background:var(--q-soft);border-color:var(--q-line)}
 details.q summary{cursor:pointer;font-weight:700;color:var(--q)}
-details.q p,details.q ol{margin:8px 0 0}
-details.q ol{padding-left:20px}
+details.q p,details.q ol,details.q ul{margin:8px 0 0}
+details.q ol,details.q ul{padding-left:20px}
 details.q li{margin:4px 0}
 
 /* 도식 애니메이션: 순서대로 보기(재생·일시정지) */
@@ -186,7 +186,7 @@ details.q li{margin:4px 0}
 
       <div class="box bal" id="bal"></div>
 
-      <details class="box q"><summary>생각해 보기</summary><p id="question"></p></details>
+      <details class="box q"><summary>생각해 보기</summary><ul id="question"></ul></details>
     </div>
   </div>
 </div>
@@ -420,9 +420,11 @@ function render(){
   var g, gc="";
   if(ppm===0) g="온실효과 없음"; else if(ppm<PRE) g="온실효과 약함"; else if(ppm===PRE) g="일반적 온실효과"; else {g="온실효과 가속화"; gc="warm";}
   $("bal").innerHTML=balHtml(ABS,ABS,f.none?ABS:f.em,g,gc,"복사 평형","ok");
-  $("question").textContent = ppm===0
-    ? "지표 복사와 우주로 나가는 지구 복사를 비교해 보세요. 두 값은 어떤 관계인가요?"
-    : "온실 기체 농도를 높이면 지표 쪽 대기 방출과 지표 복사는 어떻게 변하나요? 우주로 나가는 지구 복사는 그대로인데도 기온이 높아지는 까닭은 무엇일까요?";
+  $("question").innerHTML = (ppm===0
+    ? ["지표 복사와 우주로 나가는 지구 복사를 비교해 보세요. 두 값은 어떤 관계인가요?"]
+    : ["온실 기체 농도를 높이면 지표 쪽 대기 방출과 지표 복사는 어떻게 변하나요?",
+       "우주로 나가는 지구 복사는 그대로인데도 기온이 높아지는 까닭은 무엇일까요?"]
+  ).map(function(q){return "<li>"+q+"</li>";}).join("");
   var pbs=document.querySelectorAll(".pb");
   for(var i=0;i<pbs.length;i++) pbs[i].setAttribute("aria-pressed", +pbs[i].dataset.p===ppm?"true":"false");
 }
