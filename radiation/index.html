@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>지구 복사 평형 이해하기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gothic+A1:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+html,body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+/* Layout: 제목 줄(오른쪽에 톱니 설정 버튼) / 왼쪽 에너지 흐름 도식, 오른쪽 조작판과 결과. 좁으면 한 열. 설정·수치 근거는 오른쪽에서 열리는 패널 */
+:root{
+  --bg:#eef3f4; --paper:#ffffff; --ink:#15323a; --muted:#5b7279; --line:#cfdcdf;
+  --accent:#0f7d8c; --accent-soft:#d8eef0; --warm:#b4561f; --warm-soft:#f8e6da;
+  --ok:#2f7d4f; --ok-soft:#dff0e5; --q:#7a5a00; --q-soft:#fbf1cf; --q-line:#ecd68a;
+  --scrim:rgba(10,25,30,.42);
+  --f-display:"Do Hyeon","Gothic A1",system-ui,sans-serif;
+  --f-body:"Gothic A1",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1b1e; --paper:#162a2f; --ink:#e3eef0; --muted:#93abb1; --line:#28434a;
+  --accent:#5cc6d2; --accent-soft:#1d3d43; --warm:#f0a070; --warm-soft:#3d2a1f;
+  --ok:#8fd3a6; --ok-soft:#1f3a2b; --q:#f1d27a; --q-soft:#33300f; --q-line:#5c5320;
+  --scrim:rgba(0,0,0,.55); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1b1e; --paper:#162a2f; --ink:#e3eef0; --muted:#93abb1; --line:#28434a;
+  --accent:#5cc6d2; --accent-soft:#1d3d43; --warm:#f0a070; --warm-soft:#3d2a1f;
+  --ok:#8fd3a6; --ok-soft:#1f3a2b; --q:#f1d27a; --q-soft:#33300f; --q-line:#5c5320;
+  --scrim:rgba(0,0,0,.55); color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+button{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0;text-wrap:balance;min-width:0}
+.btn{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:600;font-size:.88rem}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible,.pb:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.ibtn{display:inline-grid;place-items:center;width:40px;height:40px;padding:0;border-radius:50%;flex:none}
+.ibtn svg{width:20px;height:20px;fill:currentColor}
+.ibtn .i-pause{display:none}
+.ibtn[data-state="playing"] .i-play{display:none}
+.ibtn[data-state="playing"] .i-pause{display:block}
+
+.main{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
+.stagecol{position:relative;display:flex;flex-direction:column;gap:8px;min-width:0}
+.stage{border-radius:14px;overflow:hidden;background:#060b1a}
+.stage svg{display:block;width:100%;height:auto}
+.stage [data-key]{cursor:help}
+.stage [data-key]:focus{outline:none}
+.stage [data-key]:focus-visible rect{stroke:#fff;stroke-width:3}
+.stagebar{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.8rem}
+.tip{position:absolute;z-index:5;max-width:min(260px,90%);background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:8px;
+  padding:8px 11px;font-size:.84rem;line-height:1.45;box-shadow:0 6px 18px rgba(0,0,0,.18);pointer-events:none}
+.tip b{display:block;font-size:.8rem;color:var(--accent);margin-bottom:2px}
+.panel{display:flex;flex-direction:column;gap:12px;min-width:0}
+.box{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.lab{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:700}
+.lab output{font-family:var(--f-mono);font-size:1.25rem;color:var(--accent);font-variant-numeric:tabular-nums;min-width:8.5ch;text-align:right}
+.rng{display:flex;align-items:center;gap:8px;margin-top:8px}
+.rng input{flex:1;min-width:0;accent-color:var(--accent)}
+.step{flex:none;width:44px;border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:4px 0;cursor:pointer;font-family:var(--f-mono);font-size:.8rem}
+.scale{position:relative;height:16px;margin:2px 52px 0;font-family:var(--f-mono);font-size:.68rem;color:var(--muted)}
+.scale span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:12px}
+.pb{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0}
+.pb b{font-size:.82rem}
+.pb small{font-family:var(--f-mono);font-size:.7rem;color:var(--muted)}
+.pb[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.pb[aria-pressed="true"] small{color:var(--accent)}
+@media (min-width:420px){.presets{grid-template-columns:repeat(6,minmax(0,1fr))}.presets .pb{grid-column:span 2}.presets .w{grid-column:span 3}}
+
+.temp{display:grid;grid-template-columns:8rem minmax(0,1fr);gap:4px 16px;align-items:center}
+.temp .k{grid-column:1/-1;font-size:.82rem;color:var(--muted);font-weight:600}
+.temp .v{font-family:var(--f-mono);font-size:2.1rem;font-weight:600;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.temp .v small{font-size:1rem;margin-left:2px}
+.gauge{min-width:0}
+.gauge .bar{position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,#4f8fd8,#9cc9e8 50%,#f3b26b 75%,#e0573a)}
+.gauge .mk{position:absolute;top:-4px;width:4px;height:18px;margin-left:-2px;border-radius:2px;background:var(--ink)}
+.gauge .lb{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:.68rem;color:var(--muted);margin-top:3px}
+.deltas{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:6px;margin-top:12px}
+.deltas div{background:var(--bg);border-radius:8px;padding:6px 8px;min-width:0}
+.deltas small{display:block;font-size:.72rem;color:var(--muted);line-height:1.3}
+.deltas b{font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+
+.bal{display:flex;flex-direction:column;gap:8px}
+.bal .row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;text-align:center}
+.bal .side small{display:block;font-size:.74rem;color:var(--muted);line-height:1.3}
+.bal .side b{font-family:var(--f-mono);font-size:1.1rem;font-variant-numeric:tabular-nums}
+.bal .sg{font-family:var(--f-mono);font-size:1.4rem;font-weight:600;color:var(--accent)}
+.tag{align-self:center;font-size:.76rem;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.warm{background:var(--warm-soft);color:var(--warm)}
+.bal hr{border:0;border-top:1px dashed var(--line);margin:2px 0;width:100%}
+
+details.q{background:var(--q-soft);border-color:var(--q-line)}
+details.q summary{cursor:pointer;font-weight:700;color:var(--q)}
+details.q p,details.q ol{margin:8px 0 0}
+details.q ol{padding-left:20px}
+details.q li{margin:4px 0}
+
+/* 도식 애니메이션: 순서대로 보기(재생·일시정지) */
+.stage .ar line{stroke-dasharray:1;stroke-dashoffset:0}
+.stage.play .ar line{animation:draw .9s ease-out both;animation-delay:calc(var(--i) * 1s)}
+.stage.play .ar polygon,.stage.play .bd{animation:fade .35s ease-out both;animation-delay:calc(var(--i) * 1s + .75s)}
+.stage.paused .ar line,.stage.paused .ar polygon,.stage.paused .bd{animation-play-state:paused}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.stage.play .ar line,.stage.play .ar polygon,.stage.play .bd{animation:none}}
+
+/* 설정·수치 근거 패널 */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
+.sheet{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--paper);z-index:21;overflow-y:auto;
+  border-left:1px solid var(--line);
+  padding-top:max(18px,env(safe-area-inset-top,0px));padding-bottom:max(24px,env(safe-area-inset-bottom,0px));
+  padding-left:20px;padding-right:max(20px,env(safe-area-inset-right,0px))}
+.sheet header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.sheet h2{font-family:var(--f-display);font-weight:400;font-size:1.4rem;margin:0}
+.sheet h3{font-size:.92rem;margin:18px 0 4px;color:var(--accent)}
+.sheet p,.sheet li{font-size:.86rem;color:var(--ink);margin:4px 0}
+.sheet ul{padding-left:18px;margin:4px 0}
+.sheet .opt{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;margin-top:6px;cursor:pointer;font-weight:600;font-size:.88rem}
+.sheet .opt input{width:18px;height:18px;accent-color:var(--accent)}
+.sheet .wide{width:100%;margin-top:6px;padding:10px 12px;text-align:left}
+.sheet .num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap" id="root">
+  <div class="top">
+    <h1>지구 복사 평형 이해하기</h1>
+    <button type="button" class="btn ibtn" id="openSheet" aria-haspopup="dialog" aria-label="설정 · 수치 근거" title="설정 · 수치 근거">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.5 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+    </button>
+  </div>
+
+  <div class="main">
+    <div class="stagecol" id="stagecol">
+      <div class="stage" id="stage"></div>
+      <div class="stagebar">
+        <button type="button" class="btn ibtn" id="replay" data-state="idle" aria-label="순서대로 재생" title="순서대로 보기">
+          <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+          <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
+        </button>
+        <span>이름에 마우스를 올리거나 누르면 설명이 나옵니다.</span>
+      </div>
+      <div class="tip" id="tip" role="tooltip" hidden></div>
+    </div>
+
+    <div class="panel">
+      <div class="box">
+        <label class="lab" for="ppm"><span>대기 중 이산화 탄소 농도</span><output id="ppmOut" for="ppm">424 ppm</output></label>
+        <div class="rng">
+          <button type="button" class="step" id="dec" aria-label="10 ppm 줄이기">−10</button>
+          <input type="range" id="ppm" min="0" max="1120" step="1" value="424">
+          <button type="button" class="step" id="inc" aria-label="10 ppm 늘리기">+10</button>
+        </div>
+        <div class="scale" aria-hidden="true"><span style="left:0%">0</span><span style="left:25%">280</span><span style="left:50%">560</span><span style="left:75%">840</span><span style="left:100%">1120</span></div>
+        <div class="presets" role="group" aria-label="기준 농도">
+          <button type="button" class="pb" data-p="0"><b>대기 없음</b><small>0 ppm</small></button>
+          <button type="button" class="pb" data-p="280"><b>산업화 이전</b><small>280 ppm</small></button>
+          <button type="button" class="pb" data-p="424"><b>2024년</b><small>424 ppm</small></button>
+          <button type="button" class="pb w" id="pb15"><b>파리협정 1.5℃</b><small></small></button>
+          <button type="button" class="pb w" id="pb20"><b>파리협정 2℃</b><small></small></button>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="temp">
+          <div class="k">평균 기온</div>
+          <div class="v" id="tVal">14.9<small>℃</small></div>
+          <div class="gauge" aria-hidden="true"><div class="bar"><span class="mk" id="tMk"></span></div><div class="lb"><span>−20</span><span>0</span><span>20℃</span></div></div>
+        </div>
+        <div class="deltas">
+          <div><small>대기가 없을 때보다</small><b id="d0"></b></div>
+          <div><small>산업화 이전보다</small><b id="d1"></b></div>
+          <div><small>2024년보다</small><b id="d2"></b></div>
+        </div>
+      </div>
+
+      <div class="box bal" id="bal"></div>
+
+      <details class="box q"><summary>생각해 보기</summary><p id="question"></p></details>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <header><h2 id="sheetTitle">설정 · 수치 근거</h2><button type="button" class="btn" id="closeSheet">닫기</button></header>
+
+  <h3>설정</h3>
+  <label class="opt"><input type="checkbox" id="hideNum"> 에너지 값 숨기기 <span style="font-weight:400;color:var(--muted)">(농도와 기온은 그대로)</span></label>
+  <button type="button" class="btn wide" id="reset">초기화 (2024년 424 ppm으로)</button>
+
+  <h3>에너지 값</h3>
+  <p>지구에 들어오는 태양 복사 340 W/m²를 100으로 놓고 환산하였다(×100÷340, 반올림).</p>
+  <ul>
+    <li>IPCC AR6 1실무그룹 제7장 그림 7.2의 전 지구 연평균: 입사 340, 반사 약 100, 흡수 약 240, 우주로 나가는 지구 복사 약 239 W/m². 화면 값은 흡수 71, 반사 29이다.</li>
+    <li>21세기 초의 대표값이며 특정 연도의 관측값이 아니다.</li>
+    <li>반사 29는 구름·대기·지표를 모두 합친 행성 반사율이다. 구름이 없는 맑은 하늘에서는 반사가 약 53 W/m²이다.</li>
+    <li>온실 기체는 햇빛을 반사하지 않는다. 지표 복사(적외선)를 흡수했다가 다시 방출한다.</li>
+  </ul>
+
+  <h3>용어</h3>
+  <ul>
+    <li><b>지표 복사</b>: 지표가 내보내는 적외선.</li>
+    <li><b>지구 복사</b>: 지구 전체(지표와 대기)가 우주로 내보내는 적외선 = 통과 + 위로 향한 대기 방출.</li>
+    <li><b>대기 방출</b>: 온실 기체가 흡수한 에너지를 다시 내보내는 것. 아래로 향한 몫은 흔히 '되돌아오는 복사(역복사)'라고 부른다.</li>
+  </ul>
+
+  <h3>대기 없음 (0 ppm)</h3>
+  <ul>
+    <li>평균 기온은 (240 ÷ σ)<sup>1/4</sup> = 255.1 K, 즉 −18.1℃이다(σ: 스테판-볼츠만 상수). 교과서는 약 −18℃를 쓴다.</li>
+    <li>현재 반사율을 그대로 둔 유효복사온도이므로, 구름·대기가 실제로 없는 지구의 기온과는 다르다.</li>
+    <li>NASA GISS 모형 실험(Lacis 등, 2010)에서는 비응결성 온실 기체를 모두 없애자 50년 뒤 약 −21℃까지 내려갔다. 0 ppm은 비교 기준이며 예측값이 아니다.</li>
+  </ul>
+
+  <h3>농도와 기온</h3>
+  <ul>
+    <li>2024년 농도: 전 지구 평균 423.9 ppm(WMO), NOAA 전 지구 연평균 약 423 ppm, 마우나로아 연평균 424.61 ppm. 모형은 기준을 424 ppm으로 두고 이때 약 15℃가 되도록 맞췄다(계산값 <span class="num" id="sNow"></span>℃).</li>
+    <li>산업화 이전 농도: 280 ppm(NOAA). IPCC AR6은 1750년 값을 약 278 ppm으로 제시한다.</li>
+    <li>이산화 탄소 2배일 때 복사 강제력 3.93 ± 0.47 W/m², 평형 기후 민감도 약 3℃(가능성이 높은 범위 2.5~4℃): IPCC AR6 1실무그룹 제7장.</li>
+    <li>모형은 280→424 ppm의 기온 상승이 관측된 장기 온난화 약 1.4℃(WMO 2024, 1850~1900년 대비 1.34~1.41℃)와 같도록 맞췄다(계산값 +<span class="num" id="sDel"></span>℃). 이 경우 2배일 때 상승은 약 2.4℃로 평형 기후 민감도보다 작다. 현재 관측과 같은 비율로 반응한다고 가정한 값이기 때문이다. 7번 시뮬레이션도 같은 모형을 쓴다.</li>
+  </ul>
+
+  <h3>파리협정 버튼</h3>
+  <ul>
+    <li>280 ppm일 때의 기온(<span class="num" id="sPre"></span>℃)보다 1.5℃, 2℃ 높아지는 농도(약 <span class="num" id="s15"></span> ppm, <span class="num" id="s20"></span> ppm)이다.</li>
+    <li>기온 목표는 1850~1900년 평균 대비 수십 년 장기 평균을 기준으로 한다(WMO). 2024년 한 해 평균은 1.55 ± 0.13℃ 높았으나 이것만으로 목표를 넘었다고 보지 않는다.</li>
+    <li>파리협정 제2조 1항(a): 2℃보다 훨씬 낮게 유지(기본 목표), 1.5℃로 제한 노력(노력 목표).</li>
+    <li>이산화 탄소 외 온실 기체와 에어로졸의 영향을 따로 다루지 않았다. 이 농도는 모형 계산값이며 탄소 예산이나 예측값이 아니다.</li>
+  </ul>
+
+  <h3>모형의 가정</h3>
+  <ul>
+    <li>화면의 기온은 교육용 단순 모형의 계산값이다.</li>
+    <li>대기를 한 겹으로 두고, 태양 복사는 모두 지표가 흡수하며, 반사율은 농도와 관계없이 같다고 가정하였다. 증발·대류로 전달되는 에너지는 생략하였다.</li>
+    <li>한 겹 대기는 온도가 하나이므로 흡수한 에너지를 위아래로 같은 양씩 방출한다. 실제 대기는 아래쪽이 더 따뜻하고 수증기가 많아 지표로 향하는 대기 방출(약 342 W/m²)이 우주로 나가는 지구 복사 전체(약 239 W/m²)보다도 크다(IPCC AR6 그림 7.2).</li>
+    <li>424 ppm에서 대기의 지표 복사 흡수 비율은 77%로, 수증기·구름 되먹임을 합친 값이다.</li>
+    <li>140 ppm 이상은 복사 강제력이 농도의 로그에 비례한다고 보고 계산하였다. 140 ppm 미만은 0 ppm과 부드럽게 이어 붙인 보간값이다.</li>
+    <li>시간에 따른 변화는 나타내지 않는다. 표시 정수는 반올림값이며 통과 = 흡수 − 대기 방출로 맞췄다.</li>
+    <li>대기가 한 겹이므로 지표 복사를 모두 흡수해도 약 30℃까지만 오른다.</li>
+    <li>대각선 햇빛은 태양의 방향을 나타낸 그림이며, 입사 에너지는 지구 전체·1년 평균값이다.</li>
+  </ul>
+</aside>
+
+<script>
+(function(){
+"use strict";
+/*SHARED-JS-START*/
+var $=function(id){return document.getElementById(id);};
+var hide=false, TIPS={};
+var reduce=false; try{reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){}
+var SIG=5.670374e-8, ASR=240, TE=Math.pow(ASR/SIG,0.25);
+var F100=100/340; function P(v){return Math.round(v*F100);}
+var ABS=P(ASR), REF=100-ABS;
+
+/* 도식 공통 (viewBox 700×440) */
+var VW=700, VH=440, SURF=372, TOP=22, SCX=44, SCY=42, HX=214;
+var K=(HX-SCX)/(SURF-SCY);
+function xRef(y){return HX+K*(SURF-y);}
+var UL=Math.hypot(HX-SCX,SURF-SCY), SX=SCX+34*(HX-SCX)/UL, SY=SCY+34*(SURF-SCY)/UL;
+var EM=480, SP=550, BK=620, SUN="#FFC247", IR="#FF7A9C";
+function wd(v){return Math.max(1.5,v/40);}
+function arrow(x1,y1,x2,y2,w,c,i){
+  var dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy), ux=dx/L, uy=dy/L;
+  var hl=Math.max(14,w*1.7), hw=Math.max(9,w*1.1), ex=x2-ux*hl*.85, ey=y2-uy*hl*.85;
+  var bx=x2-ux*hl, by=y2-uy*hl, px=-uy, py=ux;
+  return '<g class="ar" style="--i:'+i+'" filter="url(#glow)"><line pathLength="1" x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+ex.toFixed(1)+'" y2="'+ey.toFixed(1)+'" stroke="'+c+'" stroke-width="'+w.toFixed(1)+'"/>'+
+    '<polygon points="'+(bx+px*hw).toFixed(1)+','+(by+py*hw).toFixed(1)+' '+(bx-px*hw).toFixed(1)+','+(by-py*hw).toFixed(1)+' '+x2.toFixed(1)+','+y2.toFixed(1)+'" fill="'+c+'"/></g>';
+}
+function tw(t){var w=22; for(var i=0;i<t.length;i++) w+=t.charCodeAt(i)>=0xAC00?17:10.2; return w;}
+function keyAttr(k){ return k?' data-key="'+k+'" tabindex="0" aria-label="'+TIPS[k][0]+': '+TIPS[k][1]+'"':''; }
+function badge(x,y,lab,val,c,anchor,i,k){
+  var t=(hide||val===null)?lab:lab+" "+val, w=tw(t), x0=anchor==="end"?x-w:anchor==="middle"?x-w/2:x;
+  return '<g class="bd" style="--i:'+i+'"'+keyAttr(k)+'><rect x="'+x0.toFixed(1)+'" y="'+(y-15)+'" width="'+w.toFixed(1)+'" height="30" rx="15" fill="rgba(7,12,31,.86)" stroke="'+c+'" stroke-width="1.5"/>'+
+    '<text x="'+(x0+w/2).toFixed(1)+'" y="'+y+'" fill="#fff" font-size="17" font-weight="700" text-anchor="middle" dominant-baseline="central">'+t+'</text></g>';
+}
+function label(x,y,t,size,fill,k){
+  var w=t.length*size*0.95+16;
+  return '<g'+keyAttr(k)+'><rect x="'+(x-w/2).toFixed(1)+'" y="'+(y-size*0.9)+'" width="'+w.toFixed(1)+'" height="'+(size*1.8)+'" fill="transparent"/>'+
+    '<text x="'+x+'" y="'+y+'" fill="'+fill+'" font-size="'+size+'" font-weight="700" text-anchor="middle" dominant-baseline="central">'+t+'</text></g>';
+}
+var STARS=(function(){ var s="", seed=7; function r(){seed=(seed*9301+49297)%233280; return seed/233280;}
+  for(var i=0;i<46;i++){ var x=r()*660+20, y=r()*120+6, rad=r()*1.2+.5; if(x<110&&y<100) continue; s+='<circle cx="'+x.toFixed(0)+'" cy="'+y.toFixed(0)+'" r="'+rad.toFixed(1)+'" fill="#DDE6FF" opacity="'+(.35+r()*.5).toFixed(2)+'"/>'; } return s; })();
+function svgHead(aria){
+  return '<svg viewBox="0 0 '+VW+' '+VH+'" role="img" aria-label="'+aria+'">'+
+    '<defs><linearGradient id="sp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#04070F"/><stop offset="1" stop-color="#0B1738"/></linearGradient>'+
+    '<linearGradient id="gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3F8062"/><stop offset="1" stop-color="#1B4636"/></linearGradient>'+
+    '<radialGradient id="sg" cx="'+SCX+'" cy="'+SCY+'" r="140" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFE2A0" stop-opacity=".95"/><stop offset=".35" stop-color="#FFC247" stop-opacity=".4"/><stop offset="1" stop-color="#FFC247" stop-opacity="0"/></radialGradient>'+
+    '<filter id="glow" filterUnits="userSpaceOnUse" x="-20" y="-20" width="'+(VW+40)+'" height="'+(VH+40)+'"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
+    '<rect width="'+VW+'" height="'+VH+'" fill="url(#sp)"/>'+STARS+
+    '<circle cx="'+SCX+'" cy="'+SCY+'" r="140" fill="url(#sg)"/><circle cx="'+SCX+'" cy="'+SCY+'" r="19" fill="#FFD66B"/>'+
+    '<text x="72" y="24" fill="#FFE2A0" font-size="14" font-weight="700" dominant-baseline="central">태양</text>';
+}
+function ground(){ return '<rect x="0" y="'+SURF+'" width="'+VW+'" height="'+(VH-SURF)+'" fill="url(#gd)"/><rect x="0" y="'+SURF+'" width="'+VW+'" height="2.5" fill="#8FD6AE" opacity=".7"/>'; }
+/* 공통 화살표: 태양 복사, 반사, 지표 흡수, 지표 복사, 통과, 대기 방출(아래·위) */
+function flowArrows(f,bt,bb,eps){
+  var s=arrow(SX,SY,HX,SURF,wd(340),SUN,0)+badge(66,72,"태양 복사",100,SUN,"start",0,"sun");
+  s+=arrow(HX,SURF,xRef(TOP),TOP,wd(100),SUN,1)+badge(xRef(72)-12,72,"반사",REF,SUN,"end",1,"ref");
+  s+='<g class="bd" style="--i:2"'+keyAttr("abs")+'><ellipse cx="'+HX+'" cy="'+SURF+'" rx="70" ry="9" fill="'+SUN+'" opacity=".55" filter="url(#glow)"/>'+
+     '<rect x="'+(HX-90)+'" y="392" width="180" height="32" fill="transparent"/>'+
+     '<text x="'+HX+'" y="408" fill="#fff" font-size="16" font-weight="700" text-anchor="middle" dominant-baseline="central">지표가 흡수'+(hide?"":" "+ABS)+'</text></g>';
+  if(f.none){
+    s+=arrow(EM,SURF,EM,TOP,wd(f.Es),IR,3)+badge(EM-14,318,"지표 복사",f.em,IR,"end",3,"surf")+badge(EM+14,96,"모두 우주로",null,IR,"start",3,"pass");
+    return s;
+  }
+  s+=arrow(EM,SURF,EM,bb+4,wd(f.Es),IR,3)+badge(EM-14,318,"지표 복사",f.em,IR,"end",3,"surf");
+  if(f.pass>0) s+=arrow(EM,bt-4,EM,TOP,wd((1-eps)*f.Es),IR,4)+badge(EM-12,96,"통과",f.pass,IR,"end",4,"pass");
+  s+=arrow(BK,bb+4,BK,SURF,wd(eps*f.Es/2),IR,5)+badge((EM+BK)/2,318,"대기 방출",f.up,IR,"middle",5,"down");
+  s+=arrow(SP,bt-4,SP,TOP,wd(eps*f.Es/2),IR,6)+badge(SP+12,96,"대기 방출",f.up,IR,"start",6,"upa");
+  return s;
+}
+function balHtml(absV,outV,emV,ghTag,ghCls,absTag,absCls){
+  function side(lab,v){return '<div class="side"><small>'+lab+'</small>'+(hide?'':'<b>'+v+'</b>')+'</div>';}
+  function sign(a,b){return a>b?"&gt;":a<b?"&lt;":"=";}
+  return '<div class="row">'+side("지구가 흡수한<br>태양 에너지",absV)+'<div class="sg">'+sign(absV,outV)+'</div>'+side("우주로 나가는<br>지구 복사",outV)+'</div>'+
+    '<span class="tag '+absCls+'">'+absTag+'</span><hr>'+
+    '<div class="row">'+side("지표 복사",emV)+'<div class="sg">'+sign(emV,outV)+'</div>'+side("우주로 나가는<br>지구 복사",outV)+'</div>'+
+    '<span class="tag '+ghCls+'">'+ghTag+'</span>';
+}
+
+/* 그림 그리기와 툴팁 */
+var stage=$("stage"), col=$("stagecol"), tip=$("tip"), tipKey=null;
+function paint(svg){
+  stage.innerHTML=svg;
+  var bds=stage.querySelectorAll(".bd"), last=null, mi=-1;
+  for(var i=0;i<bds.length;i++){ var n=+bds[i].style.getPropertyValue("--i"); if(n>=mi){mi=n; last=bds[i];} }
+  if(last) last.setAttribute("data-last","1");
+  if(tipKey) showTip(tipKey);
+}
+function showTip(k){
+  var el=stage.querySelector('[data-key="'+k+'"]'); if(!el||!TIPS[k]){ hideTip(); return; }
+  tipKey=k; tip.innerHTML='<b>'+TIPS[k][0]+'</b>'+TIPS[k][1]; tip.hidden=false;
+  var r=el.getBoundingClientRect(), h=col.getBoundingClientRect(), sr=stage.getBoundingClientRect();
+  var tw_=tip.offsetWidth, th=tip.offsetHeight;
+  var left=Math.max(4,Math.min(h.width-tw_-4, r.left-h.left+r.width/2-tw_/2));
+  var top=r.bottom-h.top+6;
+  if(top+th>sr.bottom-h.top) top=r.top-h.top-th-6;
+  tip.style.left=left+"px"; tip.style.top=Math.max(0,top)+"px";
+}
+function hideTip(){ tipKey=null; tip.hidden=true; }
+stage.addEventListener("pointermove",function(e){ var k=e.target.closest&&e.target.closest("[data-key]"); if(k){ if(k.dataset.key!==tipKey) showTip(k.dataset.key); } else if(e.pointerType==="mouse") hideTip(); });
+stage.addEventListener("pointerleave",function(e){ if(e.pointerType==="mouse") hideTip(); });
+stage.addEventListener("click",function(e){ var k=e.target.closest("[data-key]"); if(k) showTip(k.dataset.key); else hideTip(); });
+stage.addEventListener("focusin",function(e){ var k=e.target.closest("[data-key]"); if(k) showTip(k.dataset.key); });
+stage.addEventListener("focusout",hideTip);
+document.addEventListener("pointerdown",function(e){ if(!stage.contains(e.target)) hideTip(); });
+
+/* 순서대로 보기: 재생·일시정지 */
+var pbtn=$("replay");
+function setPS(s){ pbtn.dataset.state=s; pbtn.setAttribute("aria-label", s==="playing"?"일시정지":"순서대로 재생"); }
+function startPlay(){ stage.classList.remove("play","paused"); void stage.offsetWidth; stage.classList.add("play"); setPS(reduce?"idle":"playing"); }
+function stopPlay(){ stage.classList.remove("play","paused"); setPS("idle"); }
+pbtn.addEventListener("click",function(){
+  var s=pbtn.dataset.state;
+  if(s==="playing"){ stage.classList.add("paused"); setPS("paused"); }
+  else if(s==="paused"){ stage.classList.remove("paused"); setPS("playing"); }
+  else { if(typeof beforePlay==="function") beforePlay(); startPlay(); }
+});
+stage.addEventListener("animationend",function(e){ if(e.target.getAttribute&&e.target.getAttribute("data-last")) setPS("idle"); });
+
+/* 설정 패널 */
+var sheet=$("sheet"), scrim=$("scrim"), opener=$("openSheet");
+function openS(){ sheet.hidden=false; scrim.hidden=false; $("closeSheet").focus(); }
+function closeS(){ sheet.hidden=true; scrim.hidden=true; opener.focus(); }
+opener.addEventListener("click",openS); $("closeSheet").addEventListener("click",closeS); scrim.addEventListener("click",closeS);
+document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&!sheet.hidden) closeS(); });
+function f1(x){var r=x.toFixed(1); if(r==="-0.0") r="0.0"; return r.replace("-","−");}
+function sd(d){return (d>=0.05?"+":d<=-0.05?"−":"")+Math.abs(d).toFixed(1);}
+/*SHARED-JS-END*/
+
+TIPS={
+  sun:["태양 복사","태양에서 지구로 들어오는 에너지입니다. 들어오는 양을 100으로 놓고 다른 값을 나타냈습니다."],
+  ref:["반사","구름·대기·지표에서 반사되어 곧바로 우주로 나가는 태양 복사입니다. 농도를 바꿔도 변하지 않습니다."],
+  abs:["지표가 흡수","반사되지 않은 태양 복사를 지표가 흡수한 양입니다."],
+  surf:["지표 복사","데워진 지표가 내보내는 적외선 에너지입니다. 지표가 따뜻할수록 커집니다."],
+  pass:["통과","지표 복사 중 대기에 흡수되지 않고 곧바로 우주로 나가는 몫입니다."],
+  down:["대기 방출 (지표 쪽)","온실 기체가 흡수한 에너지를 다시 내보낸 것 중 지표로 향하는 몫입니다. 지표를 더 데웁니다."],
+  upa:["대기 방출 (우주 쪽)","온실 기체가 흡수한 에너지를 다시 내보낸 것 중 우주로 향하는 몫입니다. 통과한 몫과 합한 것이 지구 복사입니다."],
+  air:["대기","온실 기체가 많을수록 지표 복사를 더 많이 흡수합니다."]
+};
+
+/* ---------- 모형 (원본과 동일) ---------- */
+var PMAX=1120, PRE=280, NOW=424;
+var EPS0=0.77, C0=424, F2X=3.93, GFB=2.0077, CB=140;
+var SB=GFB*2*(F2X/Math.LN2)/(ASR/(1-EPS0/2));
+function epsLog(c){return EPS0+SB*Math.log(c/C0);}
+var EB=epsLog(CB), QA=2-SB/EB;
+function epsOf(c){ if(c<=0) return 0; if(c>=CB) return epsLog(c); var u=c/CB; return EB*(QA*u+(1-QA)*u*u); }
+function tempK(c){return TE*Math.pow(1-epsOf(c)/2,-0.25);}
+function solve(dT){ var b=tempK(PRE), lo=PRE, hi=PMAX; for(var i=0;i<60;i++){ var m=(lo+hi)/2; if(tempK(m)-b<dT) lo=m; else hi=m; } return Math.round((lo+hi)/2); }
+var L15=solve(1.5), L20=solve(2);
+function flows(eps){ var Es=ASR/(1-eps/2); var up=eps>=0.01?Math.max(1,P(eps*Es/2)):0; return {Es:Es, up:up, pass:ABS-up, em:ABS+up, none:eps<0.01}; }
+
+var ppm=NOW;
+var BT=150, BB=238;
+function scene(){
+  var eps=epsOf(ppm), f=flows(eps);
+  var s=svgHead("지구 에너지 흐름 도식, 이산화 탄소 "+ppm+" ppm");
+  s+='<rect x="12" y="'+BT+'" width="'+(VW-24)+'" height="'+(BB-BT)+'" rx="12" fill="#4CC3C9" fill-opacity="'+(0.08+0.32*eps).toFixed(2)+'" stroke="#7AE3E8" stroke-opacity="'+(f.none?0.5:Math.max(0.35,eps)).toFixed(2)+'" stroke-width="1.5"'+(f.none?' stroke-dasharray="6 5"':'')+'/>';
+  s+=label(SP,(BT+BB)/2,ppm===0?"대기 없음":"대기 · CO₂ "+ppm+" ppm",16,"#CFF7F9","air");
+  s+=ground()+flowArrows(f,BT,BB,eps);
+  return s+'</svg>';
+}
+
+function render(){
+  paint(scene());
+  var eps=epsOf(ppm), f=flows(eps), Ts=tempK(ppm), tC=Ts-273.15;
+  $("tVal").innerHTML=f1(tC)+"<small>℃</small>";
+  $("tMk").style.left=Math.max(0,Math.min(100,(tC+20)/40*100)).toFixed(1)+"%";
+  $("d0").textContent=sd(Ts-TE)+"℃"; $("d1").textContent=sd(Ts-tempK(PRE))+"℃"; $("d2").textContent=sd(Ts-tempK(NOW))+"℃";
+  var g, gc="";
+  if(ppm===0) g="온실효과 없음"; else if(ppm<PRE) g="온실효과 약함"; else if(ppm===PRE) g="일반적 온실효과"; else {g="온실효과 가속화"; gc="warm";}
+  $("bal").innerHTML=balHtml(ABS,ABS,f.none?ABS:f.em,g,gc,"복사 평형","ok");
+  $("question").textContent = ppm===0
+    ? "지표 복사와 우주로 나가는 지구 복사를 비교해 보세요. 두 값은 어떤 관계인가요?"
+    : "온실 기체 농도를 높이면 지표 쪽 대기 방출과 지표 복사는 어떻게 변하나요? 우주로 나가는 지구 복사는 그대로인데도 기온이 높아지는 까닭은 무엇일까요?";
+  var pbs=document.querySelectorAll(".pb");
+  for(var i=0;i<pbs.length;i++) pbs[i].setAttribute("aria-pressed", +pbs[i].dataset.p===ppm?"true":"false");
+}
+
+var slider=$("ppm");
+function setPpm(v){
+  v=Math.max(0,Math.min(PMAX,Math.round(v))); ppm=v; slider.value=v; $("ppmOut").textContent=v+" ppm";
+  stopPlay(); render();
+}
+slider.addEventListener("input",function(){setPpm(+slider.value);});
+$("dec").addEventListener("click",function(){setPpm(ppm-10);});
+$("inc").addEventListener("click",function(){setPpm(ppm+10);});
+$("pb15").dataset.p=L15; $("pb15").querySelector("small").textContent=L15+" ppm";
+$("pb20").dataset.p=L20; $("pb20").querySelector("small").textContent=L20+" ppm";
+document.querySelector(".presets").addEventListener("click",function(e){var b=e.target.closest(".pb"); if(b) setPpm(+b.dataset.p);});
+$("hideNum").addEventListener("change",function(e){ hide=e.target.checked; render(); });
+$("reset").addEventListener("click",function(){ hide=false; $("hideNum").checked=false; setPpm(NOW); closeS(); });
+
+$("sNow").textContent=f1(tempK(NOW)-273.15); $("sPre").textContent=f1(tempK(PRE)-273.15);
+$("sDel").textContent=f1(tempK(NOW)-tempK(PRE)); $("s15").textContent=L15; $("s20").textContent=L20;
+
+render(); startPlay();
+})();
+</script>
+
+</body>
+</html>
