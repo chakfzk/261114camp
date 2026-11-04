@@ -550,9 +550,9 @@ function readouts(){
   $("tVal").innerHTML=fmt(cur,2,true)+"<small>℃</small>";
   $("tMk").style.left=Math.max(0,Math.min(100,cur/4*100)).toFixed(1)+"%";
   $("cVal").textContent=m.C.toFixed(1)+" ppm";
-  $("sVal").textContent=done?"새 평형 도달":"새 평형 "+fmt(m.Teq,2,true)+"℃로 가는 중";
+  $("sVal").textContent=done?"이 농도가 유지될 때의 평형":"새 평형 "+fmt(m.Teq,2,true)+"℃로 가는 중";
   var at, ac;
-  if(f.out===ABS){at="복사 평형"; ac="ok";} else if(f.out<ABS){at="흡수 > 방출 · 기온이 오르는 중"; ac="warm";} else {at="흡수 < 방출 · 기온이 내려가는 중"; ac="";}
+  if(f.out===ABS){at="복사 평형 (이 농도가 유지될 때)"; ac="ok";} else if(f.out<ABS){at="흡수 > 방출 · 기온이 오르는 중"; ac="warm";} else {at="흡수 < 방출 · 기온이 내려가는 중"; ac="";}
   var gt=m.C<=C0+0.05?"일반적 온실효과":"온실효과 가속화", gc=m.C<=C0+0.05?"":"warm";
   $("bal").innerHTML=balHtml(ABS,f.out,f.em,gt,gc,at,ac);
 }
