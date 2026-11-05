@@ -51,12 +51,16 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 .stage svg{display:block;width:100%;height:auto;cursor:crosshair;touch-action:none}
 .stage text{font-family:var(--f-mono);font-size:11px;fill:var(--muted)}
 .stage .lab{font-family:var(--f-body);font-weight:700;font-size:12px;fill:var(--ink)}
-.pick{display:flex;flex-direction:column;gap:4px}
-.pick .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.pick .row b{font-family:var(--f-mono);font-size:1.3rem;color:var(--accent);font-variant-numeric:tabular-nums}
-.pick .row span{font-size:.85rem;color:var(--muted)}
-.pick input{width:100%;accent-color:var(--accent)}
-#go{width:100%;padding:12px;font-size:1rem}
+.depthbar{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.depthbar span:first-child{font-weight:700}
+.depthbar b{font-family:var(--f-mono);font-size:1.4rem;color:var(--accent);font-variant-numeric:tabular-nums}
+.depthbar #ageLab{font-size:.88rem;color:var(--muted)}
+.hint{margin:0;font-size:.85rem;font-weight:700;color:var(--accent)}
+.stage svg{cursor:default}
+.stage svg.can{cursor:grab} .stage svg.dragging{cursor:grabbing}
+.ring{transform-box:fill-box;transform-origin:center;animation:ring 1.6s infinite ease-out}
+@keyframes ring{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+@media (prefers-reduced-motion:reduce){.ring{animation:none}}
 .panel{display:flex;flex-direction:column;gap:12px;min-width:0}
 .read{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:8px;margin-top:8px}
 @media (max-width:520px){.read{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -106,6 +110,10 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 /* 튜토리얼 영상(9초 반복) */
 .mv-drill{animation:mvDrill 9s infinite ease-in-out}
 @keyframes mvDrill{0%{transform:translateY(0)}25%{transform:translateY(150px)}31%{transform:translateY(150px)}55%{transform:translateY(0)}100%{transform:translateY(0)}}
+.mv-hand{animation:mvHand 9s infinite ease-in-out}
+@keyframes mvHand{0%{opacity:0;transform:translateY(-8px)}5%{opacity:1;transform:translateY(0)}25%{opacity:1;transform:translateY(150px)}27%,100%{opacity:0;transform:translateY(150px)}}
+.mv-rel{opacity:0;animation:mvRel 9s infinite}
+@keyframes mvRel{0%,25%{opacity:0}27%{opacity:1}40%{opacity:1}46%,100%{opacity:0}}
 .mv-core{animation:mvCore 9s infinite ease-in-out}
 @keyframes mvCore{0%,25%{opacity:0;transform:translateY(150px)}31%{opacity:1;transform:translateY(150px)}55%{opacity:1;transform:translateY(0)}62%,100%{opacity:0;transform:translateY(0)}}
 .mv-seg{opacity:0;animation:mvSeg 9s infinite}
@@ -117,7 +125,7 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 .mv-cap{opacity:0;animation:mvCap 9s infinite}
 .mv-cap.c2{animation-delay:-6s}.mv-cap.c3{animation-delay:-3s}
 @keyframes mvCap{0%,31%{opacity:1}34%,100%{opacity:0}}
-@media (prefers-reduced-motion:reduce){.mv-drill,.mv-core,.mv-seg,.mv-zoom,.mv-cap,.sc,.mv-bub{animation:none}.mv-seg,.mv-zoom{opacity:1}.mv-cap.c1{opacity:1}}
+@media (prefers-reduced-motion:reduce){.mv-drill,.mv-core,.mv-seg,.mv-zoom,.mv-cap,.sc,.mv-bub,.mv-hand,.mv-rel{animation:none}.mv-rel{opacity:0}.mv-seg,.mv-zoom{opacity:1}.mv-cap.c1{opacity:1}}
 
 /* 설정 패널 */
 .scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
@@ -148,13 +156,9 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
   <div class="main">
     <div class="box rig">
       <h2>시추 기지 <span id="stat">대기 중</span></h2>
-      <div class="stage"><svg id="scene" viewBox="0 0 360 600" role="img" aria-label="남극 빙상 단면과 시추 장치. 누르면 시추할 깊이를 고를 수 있습니다."></svg></div>
-      <div class="pick">
-        <div class="row"><label for="depth">시추 깊이</label><span id="ageLab"></span></div>
-        <div class="row"><b id="depthOut">1,500 m</b></div>
-        <input type="range" id="depth" min="10" max="3180" step="10" value="1500">
-      </div>
-      <button type="button" class="btn primary" id="go">이 깊이 시추하기</button>
+      <div class="stage"><svg id="scene" viewBox="0 0 360 600" role="slider" tabindex="0" aria-label="시추 드릴. 아래로 끌어내린 뒤 놓으면 그 깊이를 시추합니다. 키보드는 위아래 방향키로 내리고 Enter로 시추합니다." aria-valuemin="0" aria-valuemax="3180" aria-valuenow="0" aria-valuetext="0 m"></svg></div>
+      <div class="depthbar"><span>시추 깊이</span><b id="depthOut">0 m</b><span id="ageLab"></span></div>
+      <p class="hint">드릴을 잡고 원하는 깊이까지 끌어내린 뒤 손을 놓으세요</p>
     </div>
 
     <div class="panel">
@@ -223,6 +227,10 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
           <rect x="70" y="48" width="40" height="22" fill="#3b82f6"/>
           <!-- 드릴 -->
           <g class="mv-drill"><line x1="150" y1="10" x2="150" y2="74" stroke="#c7d3dd" stroke-width="2"/><rect x="143" y="70" width="14" height="18" rx="2" fill="#8fa3b3"/><path d="M143 88 l3 5 l4 -5 l4 5 l3 -5" fill="#8fa3b3"/></g>
+          <!-- 잡고 끌어내리는 손(터치 표시) -->
+          <g class="mv-hand"><circle cx="150" cy="80" r="17" fill="#ffffff" fill-opacity=".35" stroke="#ffffff" stroke-width="3"/><circle cx="150" cy="80" r="5" fill="#ffffff"/>
+            <text x="176" y="76" fill="#ffffff" font-size="14" font-weight="700" font-family="sans-serif">잡고 끌어내리기</text><path d="M176 86 v20 m-6 -7 l6 7 l6 -7" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>
+          <g class="mv-rel"><circle cx="150" cy="230" r="17" fill="none" stroke="#ffffff" stroke-width="3"/><text x="176" y="235" fill="#ffffff" font-size="14" font-weight="700" font-family="sans-serif">손을 놓으면 끌어올림</text></g>
           <!-- 끌어올리는 코어 -->
           <g class="mv-core"><rect x="145" y="88" width="10" height="40" rx="2" fill="#dff0fa" stroke="#7ea7c0"/></g>
           <!-- 나눈 얼음층 -->
@@ -237,14 +245,14 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
             <g class="mv-bub" fill="#fff" stroke="#7ea7c0"><circle cx="495" cy="150" r="9"/><circle cx="535" cy="140" r="6"/><circle cx="545" cy="185" r="10"/><circle cx="505" cy="195" r="7"/></g>
             <text x="520" y="268" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700" font-family="sans-serif">공기 방울 → CO₂ 측정</text>
           </g>
-          <text class="mv-cap c1" x="20" y="290" fill="#fff" font-size="15" font-weight="700" font-family="sans-serif">01 드릴로 얼음을 뚫고 코어를 끌어올린다</text>
-          <text class="mv-cap c2" x="20" y="290" fill="#fff" font-size="15" font-weight="700" font-family="sans-serif">02 코어를 깊이별로 잘라 나눈다</text>
+          <text class="mv-cap c1" x="20" y="290" fill="#fff" font-size="15" font-weight="700" font-family="sans-serif">01 드릴을 잡고 원하는 깊이까지 끌어내린다</text>
+          <text class="mv-cap c2" x="20" y="290" fill="#fff" font-size="15" font-weight="700" font-family="sans-serif">02 손을 놓으면 코어를 끌어올려 깊이별로 나눈다</text>
           <text class="mv-cap c3" x="20" y="290" fill="#fff" font-size="15" font-weight="700" font-family="sans-serif">03 얼음 속 공기 방울의 CO₂를 잰다</text>
         </svg>
       </div>
       <div class="stepcards">
-        <div class="sc"><b>01</b><strong>시추하기</strong><p>드릴로 얼음을 뚫고 지름 약 10 cm의 얼음 기둥(코어)을 위로 끌어올립니다.</p></div>
-        <div class="sc"><b>02</b><strong>얼음층 나누기</strong><p>코어를 깊이별로 잘라 나눕니다. 깊을수록 오래전에 쌓인 얼음입니다.</p></div>
+        <div class="sc"><b>01</b><strong>드릴 끌어내리기</strong><p>드릴을 마우스나 손가락으로 잡고, 원하는 깊이까지 끌어내립니다.</p></div>
+        <div class="sc"><b>02</b><strong>코어 끌어올리기</strong><p>손을 놓으면 지름 약 10 cm의 얼음 기둥(코어)이 끌어올려집니다. 깊을수록 오래전에 쌓인 얼음입니다.</p></div>
         <div class="sc"><b>03</b><strong>공기 방울 분석</strong><p>얼음 속에 갇힌 공기를 꺼내 이산화 탄소 농도를 잽니다.</p></div>
       </div>
       <div class="mbtns"><button type="button" class="btn" id="toS1">← 이전</button><button type="button" class="btn primary" data-close>시추 시작하기</button></div>
@@ -298,7 +306,7 @@ var PMIN=Math.min.apply(null,pre), PMAX=Math.max.apply(null,pre);
 $("sMin").textContent=Math.round(PMIN); $("sMax").textContent=Math.round(PMAX);
 var reduce=false; try{reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){}
 
-var samples=[], target=1500, busy=false, showFull=false, showObs=false, showT=false;
+var samples=[], busy=false, showFull=false, showObs=false, showT=false;
 
 /* ---------- 시추 기지 단면 (viewBox 360×600) ---------- */
 var SURF=120, BOT=540, HX=196;
@@ -329,22 +337,28 @@ var scene=$("scene");
   // 시추공, 목표선, 드릴, 코어(움직이는 요소)
   scene._hole=el("rect",{x:HX-6,y:SURF,width:12,height:0,style:"fill:var(--hole)","fill-opacity":.3},scene);
   scene._marks=el("g",{},scene);
-  scene._tline=el("line",{x1:30,x2:350,"stroke-dasharray":"5 4",style:"stroke:var(--accent)","stroke-width":2},scene);
-  scene._tlab=el("text",{x:350,"text-anchor":"end",style:"fill:var(--accent);font-family:var(--f-body);font-weight:700;font-size:12px"},scene);
+  scene._dlab=el("text",{x:HX-22,"text-anchor":"end",style:"fill:var(--accent);font-family:var(--f-body);font-weight:700;font-size:13px;paint-order:stroke;stroke:var(--paper);stroke-width:4px"},scene);
   scene._cable=el("line",{x1:HX,x2:HX,y1:20,style:"stroke:var(--steel)","stroke-width":1.6},scene);
   scene._core=el("rect",{x:HX-5,width:10,height:26,rx:2,style:"fill:var(--ice1);stroke:var(--hole)"},scene);
   scene._drill=el("g",{},scene);
-  el("rect",{x:HX-8,y:-18,width:16,height:18,rx:2,style:"fill:var(--steel)"},scene._drill);
-  el("path",{d:"M"+(HX-8)+" 0 l3 5 l5 -5 l5 5 l3 -5z",style:"fill:var(--steel)"},scene._drill);
+  scene._ring=el("circle",{cx:HX,cy:-10,r:20,class:"ring",style:"fill:none;stroke:var(--accent)","stroke-width":3},scene._drill);
+  el("rect",{x:HX-10,y:-22,width:20,height:22,rx:3,style:"fill:var(--steel)"},scene._drill);
+  el("path",{d:"M"+(HX-10)+" 0 l3 6 l4 -6 l3 6 l3 -6 l4 6 l3 -6z",style:"fill:var(--steel)"},scene._drill);
+  el("rect",{x:HX-5,y:-17,width:10,height:3,rx:1.5,style:"fill:var(--paper)","fill-opacity":.8},scene._drill);
+  el("rect",{x:HX-5,y:-11,width:10,height:3,rx:1.5,style:"fill:var(--paper)","fill-opacity":.8},scene._drill);
   // 지표에 놓인 코어 표본
   scene._tray=el("g",{},scene);
   scene._surfLab=el("text",{x:350,y:SURF-8,"text-anchor":"end",class:"lab"},scene);
 })();
-var drillY=SURF-2, coreOn=false;
-function drawTarget(){
-  var y=yOf(target); scene._tline.setAttribute("y1",y); scene._tline.setAttribute("y2",y);
-  scene._tlab.setAttribute("y",y-6); scene._tlab.textContent="목표 "+fmtD(target);
-  $("depthOut").textContent=fmtD(target); $("ageLab").textContent="얼음의 나이 "+fmtAge(ageAt(target)); $("depth").value=target;
+var drillY=SURF, coreOn=false;
+function curDepth(){ return Math.max(0,Math.min(DMAX,Math.round((drillY-SURF)/(BOT-SURF)*3200/10)*10)); }
+var pulling=null;
+function drawLive(){
+  var d=pulling!==null?pulling:curDepth(), below=d>=DMIN;
+  scene._dlab.setAttribute("y",drillY-4); scene._dlab.textContent=below?fmtD(d):"";
+  $("depthOut").textContent=fmtD(d); $("ageLab").textContent=below?"얼음의 나이 "+fmtAge(ageAt(d)):"";
+  scene.setAttribute("aria-valuenow",d); scene.setAttribute("aria-valuetext",fmtD(d)+(below?", "+fmtAge(ageAt(d)):""));
+  scene._ring.style.display=(!busy&&!dragging&&d<DMIN)?"":"none";
 }
 function drawDrill(){
   scene._drill.setAttribute("transform","translate(0 "+drillY+")");
@@ -352,6 +366,7 @@ function drawDrill(){
   scene._core.style.display=coreOn?"":"none"; scene._core.setAttribute("y",drillY+3);
   var deep=0; samples.forEach(function(p){deep=Math.max(deep,p.d);});
   scene._hole.setAttribute("height",Math.max(0,Math.max(yOf(deep),drillY)-SURF));
+  drawLive();
 }
 function drawMarks(){
   var m=scene._marks; while(m.firstChild) m.removeChild(m.firstChild);
@@ -367,20 +382,19 @@ function drawMarks(){
 function ease(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;}
 function animate(from,to,ms,cb,done){ if(reduce){cb(1);done();return;} var t0=null;
   function f(ts){ if(t0===null) t0=ts; var u=Math.min(1,(ts-t0)/ms); cb(ease(u)); if(u<1) requestAnimationFrame(f); else done(); } requestAnimationFrame(f); }
-function setBusy(b,msg){ busy=b; $("go").disabled=b; $("depth").disabled=b; $("stat").textContent=msg; }
-function drill(){
-  if(busy) return; var d=target, y=yOf(d), ms=700+d/3200*1500;
-  setBusy(true,"드릴 내려가는 중…");
-  animate(0,1,ms,function(u){ drillY=SURF-2+(y-SURF+2)*u; drawDrill(); },function(){
-    setBusy(true,"얼음 코어를 자르는 중…");
-    setTimeout(function(){ coreOn=true; drawDrill(); setBusy(true,"코어를 끌어올리는 중…");
-      animate(0,1,ms,function(u){ drillY=y-(y-SURF+2)*u; drawDrill(); },function(){
-        coreOn=false; drillY=SURF-2; var a=ageAt(d);
-        samples.push({d:d,a:a,c:co2At(a),t:tmpAt(a)}); drawDrill(); drawMarks(); setBusy(false,"공기 방울 분석 완료");
-        read(samples.length-1); drawCharts(true);
-      });
-    }, reduce?0:450);
-  });
+function setBusy(b,msg){ busy=b; $("stat").textContent=msg; }
+function release(){
+  var d=curDepth();
+  if(d<DMIN*2){ drillY=SURF; drawDrill(); setBusy(false,"대기 중"); return; }
+  var y=drillY, ms=600+d/3200*1200; pulling=d;
+  setBusy(true,"얼음 코어를 자르는 중…"); drawDrill();
+  setTimeout(function(){ coreOn=true; drawDrill(); setBusy(true,"코어를 끌어올리는 중…");
+    animate(0,1,ms,function(u){ drillY=y-(y-SURF+2)*u; drawDrill(); },function(){
+      coreOn=false; drillY=SURF; pulling=null; var a=ageAt(d);
+      samples.push({d:d,a:a,c:co2At(a),t:tmpAt(a)}); setBusy(false,"공기 방울 분석 완료"); drawDrill(); drawMarks();
+      read(samples.length-1); drawCharts(true);
+    });
+  }, reduce?0:450);
 }
 
 /* ---------- 결과 ---------- */
@@ -430,15 +444,29 @@ function drawCharts(fresh){
   $("full").setAttribute("aria-pressed",showFull); $("obs").setAttribute("aria-pressed",showObs);
 }
 
-/* ---------- 조작 ---------- */
-function pickFromEvent(e){ var r=scene.getBoundingClientRect(); var y=(e.clientY-r.top)/r.height*600; if(y<SURF-10) return; target=dOf(y); drawTarget(); }
-var dragging=false;
-scene.addEventListener("pointerdown",function(e){ if(busy) return; dragging=true; try{scene.setPointerCapture(e.pointerId);}catch(_){} pickFromEvent(e); });
-scene.addEventListener("pointermove",function(e){ if(dragging&&!busy) pickFromEvent(e); });
-scene.addEventListener("pointerup",function(){ dragging=false; });
-scene.addEventListener("pointercancel",function(){ dragging=false; });
-$("depth").addEventListener("input",function(e){ target=+e.target.value; drawTarget(); });
-$("go").addEventListener("click",drill);
+/* ---------- 조작: 드릴을 잡고 끌어내리기 ---------- */
+var dragging=false, grabOff=0;
+function svgY(e){ var r=scene.getBoundingClientRect(); return (e.clientY-r.top)/r.height*600; }
+function svgX(e){ var r=scene.getBoundingClientRect(); return (e.clientX-r.left)/r.width*360; }
+function nearDrill(e){ var x=svgX(e), y=svgY(e); return Math.abs(x-HX)<34 && y>10 && y<drillY+26; }
+function moveTo(y){ drillY=Math.max(SURF,Math.min(yOf(DMAX),y)); drawDrill(); }
+scene.addEventListener("pointerdown",function(e){
+  if(busy||!nearDrill(e)) return;
+  dragging=true; grabOff=svgY(e)-drillY; scene.classList.add("dragging"); setBusy(false,"드릴 내리는 중…");
+  try{scene.setPointerCapture(e.pointerId);}catch(_){} e.preventDefault(); drawLive();
+});
+scene.addEventListener("pointermove",function(e){
+  if(dragging){ moveTo(svgY(e)-grabOff); return; }
+  scene.classList.toggle("can",!busy&&nearDrill(e));
+});
+function endDrag(){ if(!dragging) return; dragging=false; scene.classList.remove("dragging"); release(); }
+scene.addEventListener("pointerup",endDrag); scene.addEventListener("pointercancel",endDrag);
+scene.addEventListener("keydown",function(e){
+  if(busy) return; var st=(e.shiftKey?10:50)/3200*(BOT-SURF);
+  if(e.key==="ArrowDown"){ e.preventDefault(); moveTo(drillY+st); setBusy(false,"드릴 내리는 중…"); }
+  else if(e.key==="ArrowUp"){ e.preventDefault(); moveTo(drillY-st); }
+  else if(e.key==="Enter"||e.key===" "){ e.preventDefault(); release(); }
+});
 $("full").addEventListener("click",function(){ showFull=!showFull; drawCharts(false); });
 $("obs").addEventListener("click",function(){ showObs=!showObs; drawCharts(false); });
 var rz=null; addEventListener("resize",function(){ clearTimeout(rz); rz=setTimeout(function(){drawCharts(false);},120); });
@@ -447,7 +475,7 @@ var rz=null; addEventListener("resize",function(){ clearTimeout(rz); rz=setTimeo
 var modal=$("modal");
 function show(n){ $("s1").hidden=n!==1; $("s2").hidden=n!==2; var b=n===1?$("toS2"):$("s2").querySelector("[data-close]"); if(b) b.focus(); }
 function openModal(){ modal.hidden=false; show(1); }
-function closeModal(){ modal.hidden=true; $("go").focus(); }
+function closeModal(){ modal.hidden=true; scene.focus({preventScroll:true}); }
 $("toS2").addEventListener("click",function(){show(2);}); $("toS1").addEventListener("click",function(){show(1);});
 [].forEach.call(document.querySelectorAll("[data-close]"),function(b){ b.addEventListener("click",closeModal); });
 $("help").addEventListener("click",openModal);
@@ -460,9 +488,9 @@ opener.addEventListener("click",openS); $("closeSheet").addEventListener("click"
 document.addEventListener("keydown",function(e){ if(e.key!=="Escape") return; if(!modal.hidden) closeModal(); else if(!sheet.hidden) closeS(); });
 $("optT").addEventListener("change",function(e){ showT=e.target.checked; drawCharts(false); });
 $("optDark").addEventListener("change",function(e){ document.documentElement.setAttribute("data-theme",e.target.checked?"dark":"light"); drawCharts(false); });
-$("reset").addEventListener("click",function(){ if(busy) return; samples=[]; showFull=false; showObs=false; target=1500; drawTarget(); drawDrill(); drawMarks(); read(-1); drawCharts(false); $("stat").textContent="대기 중"; closeS(); });
+$("reset").addEventListener("click",function(){ if(busy) return; pulling=null; samples=[]; showFull=false; showObs=false; drillY=SURF; drawDrill(); drawMarks(); read(-1); drawCharts(false); $("stat").textContent="대기 중"; closeS(); });
 
-drawTarget(); drawDrill(); drawMarks(); read(-1); drawCharts(false); openModal();
+drawDrill(); drawMarks(); read(-1); drawCharts(false); openModal();
 })();
 </script>
 </body>
