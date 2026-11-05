@@ -56,6 +56,8 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 .depthbar b{font-family:var(--f-mono);font-size:1.4rem;color:var(--accent);font-variant-numeric:tabular-nums}
 .depthbar #ageLab{font-size:.88rem;color:var(--muted)}
 .hint{margin:0;font-size:.85rem;font-weight:700;color:var(--accent)}
+.stage,.stage svg{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body.nosel{-webkit-user-select:none;user-select:none}
 .stage svg{cursor:default}
 .stage svg.can{cursor:grab} .stage svg.dragging{cursor:grabbing}
 .ring{transform-box:fill-box;transform-origin:center;animation:ring 1.6s infinite ease-out}
@@ -451,15 +453,18 @@ function svgX(e){ var r=scene.getBoundingClientRect(); return (e.clientX-r.left)
 function nearDrill(e){ var x=svgX(e), y=svgY(e); return Math.abs(x-HX)<34 && y>10 && y<drillY+26; }
 function moveTo(y){ drillY=Math.max(SURF,Math.min(yOf(DMAX),y)); drawDrill(); }
 scene.addEventListener("pointerdown",function(e){
+  e.preventDefault();
   if(busy||!nearDrill(e)) return;
-  dragging=true; grabOff=svgY(e)-drillY; scene.classList.add("dragging"); setBusy(false,"드릴 내리는 중…");
+  dragging=true; grabOff=svgY(e)-drillY; scene.classList.add("dragging"); document.body.classList.add("nosel"); setBusy(false,"드릴 내리는 중…");
   try{scene.setPointerCapture(e.pointerId);}catch(_){} e.preventDefault(); drawLive();
 });
 scene.addEventListener("pointermove",function(e){
   if(dragging){ moveTo(svgY(e)-grabOff); return; }
   scene.classList.toggle("can",!busy&&nearDrill(e));
 });
-function endDrag(){ if(!dragging) return; dragging=false; scene.classList.remove("dragging"); release(); }
+function endDrag(){ document.body.classList.remove("nosel"); if(!dragging) return; dragging=false; scene.classList.remove("dragging"); release(); }
+scene.addEventListener("selectstart",function(e){ e.preventDefault(); });
+scene.addEventListener("dragstart",function(e){ e.preventDefault(); });
 scene.addEventListener("pointerup",endDrag); scene.addEventListener("pointercancel",endDrag);
 scene.addEventListener("keydown",function(e){
   if(busy) return; var st=(e.shiftKey?10:50)/3200*(BOT-SURF);
