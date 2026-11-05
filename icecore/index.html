@@ -59,6 +59,9 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 .stage,.stage svg{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 body.nosel{-webkit-user-select:none;user-select:none}
 .stage svg{cursor:default}
+.stage .smp{cursor:pointer}
+.stage .smp:focus{outline:none}
+.stage .smp:focus-visible circle,.stage .smp:focus-visible rect+rect{stroke:var(--ink);stroke-width:3}
 .stage svg.can{cursor:grab} .stage svg.dragging{cursor:grabbing}
 .ring{transform-box:fill-box;transform-origin:center;animation:ring 1.6s infinite ease-out}
 @keyframes ring{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.5);opacity:0}}
@@ -129,6 +132,16 @@ body.nosel{-webkit-user-select:none;user-select:none}
 @keyframes mvCap{0%,31%{opacity:1}34%,100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.mv-drill,.mv-core,.mv-seg,.mv-zoom,.mv-cap,.sc,.mv-bub,.mv-hand,.mv-rel{animation:none}.mv-rel{opacity:0}.mv-seg,.mv-zoom{opacity:1}.mv-cap.c1{opacity:1}}
 
+/* 공기 방울 창 */
+.scard{width:min(640px,100%);max-height:100%;overflow:auto;border-radius:18px;background:var(--paper);color:var(--ink);padding:18px 20px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.scard header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.scard h2{font-family:var(--f-display);font-weight:400;font-size:1.5rem;margin:0}
+.lens{border-radius:14px;overflow:hidden;border:2px solid var(--accent-soft)}
+.lens svg{display:block;width:100%;height:auto}
+.scard .cap{font-size:.8rem;color:var(--muted);margin:10px 0 0}
+.bub{animation:fl 3.2s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.bub{animation:none}}
 /* 설정 패널 */
 .scrim{position:fixed;inset:0;background:var(--scrim);z-index:20}
 .sheet{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--paper);z-index:21;overflow-y:auto;border-left:1px solid var(--line);
@@ -170,13 +183,11 @@ body.nosel{-webkit-user-select:none;user-select:none}
           <div><small>깊이</small><b id="rDepth">−</b></div>
           <div><small>얼음의 나이</small><b id="rAge">−</b></div>
           <div class="co2"><small>CO₂ 농도</small><b id="rCo2">−</b></div>
-          <div class="tmp" id="rTmpBox" hidden><small>남극 기온 변화</small><b id="rTmp">−</b></div>
         </div>
       </div>
       <div class="box chartbox">
         <h2>누적 시추 그래프 <span id="count">0개 샘플</span></h2>
         <svg id="chart" viewBox="0 0 640 300" role="img" aria-label="시추한 시기의 CO₂ 농도 그래프"></svg>
-        <svg id="chartT" viewBox="0 0 640 240" role="img" aria-label="시추한 시기의 남극 기온 변화 그래프" hidden></svg>
       </div>
       <div class="acts">
         <button type="button" class="btn" id="full" aria-pressed="false">80만 년 전체 그래프 보기</button>
@@ -262,27 +273,39 @@ body.nosel{-webkit-user-select:none;user-select:none}
   </div>
 </div>
 
+<div class="modal" id="smodal" role="dialog" aria-modal="true" aria-labelledby="smTitle" hidden>
+  <div class="scard">
+    <header><h2 id="smTitle">코어 #1</h2><button type="button" class="btn" id="smClose">닫기</button></header>
+    <div class="lens"><svg id="smArt" viewBox="0 0 560 280" aria-hidden="true"></svg></div>
+    <div class="read" id="smRead"></div>
+    <p class="cap">얼음 속에 갇힌 공기 방울을 크게 그린 그림입니다. 파란 점(CO₂)의 수는 측정한 농도에 비례하게 그렸으며, 실제 공기 속 CO₂ 비율(약 0.02~0.03%)보다 훨씬 많이 나타냈습니다.</p>
+  </div>
+</div>
 <div class="scrim" id="scrim" hidden></div>
 <aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
   <header><h2 id="sheetTitle">설정 · 자료 출처</h2><button type="button" class="btn" id="closeSheet">닫기</button></header>
   <h3>설정</h3>
-  <label class="opt"><input type="checkbox" id="optT"> 남극 기온 그래프 함께 보기</label>
   <label class="opt"><input type="checkbox" id="optDark"> 어두운 화면</label>
   <button type="button" class="btn wide" id="reset">초기화 (시추 기록 지우기)</button>
 
   <h3>자료</h3>
   <ul>
     <li><b>CO₂:</b> Bereiter 외(2015), 남극 빙하 코어 CO₂ 종합 기록(약 80만 년). NOAA NCEI 고기후 자료실(study 17975). 여러 남극 코어의 측정값을 시기별로 이은 것이다.</li>
-    <li><b>깊이·나이·기온:</b> Jouzel 외(2007), EPICA Dome C 빙하 코어(남극, 깊이 약 3,190 m). 기온은 얼음의 수소 동위 원소(중수소) 비율로 추정한 값이다.</li>
+    <li><b>깊이·나이:</b> Jouzel 외(2007), EPICA Dome C 빙하 코어(남극, 깊이 약 3,190 m).</li>
     <li><b>2024년 대기:</b> 전 지구 평균 CO₂ 423.9 ppm(WMO 온실 기체 회보 21호). 빙하 코어가 아닌 대기 직접 관측값이다.</li>
   </ul>
   <h3>그래프 읽기</h3>
   <ul>
     <li>지난 80만 년(1,000년 전 이전) 빙하 코어의 CO₂는 <span id="sMin"></span>~<span id="sMax"></span> ppm 범위에 있다. 전체 그래프의 옅은 띠가 이 범위이다.</li>
     <li>시추한 점들은 나이 순서대로 선으로 이어진다. 점이 적으면 실제 변화가 생략되어 보일 수 있다.</li>
-    <li>남극 기온 변화는 최근 1,000년 평균과의 차이이며, 지구 평균 기온이 아니다. 남극은 지구 평균보다 변화 폭이 크다.</li>
     <li>나이는 1950년을 기준으로 몇 년 전인지를 나타낸다.</li>
   </ul>
+  <h3>참고: 남극 기온</h3>
+  <ul>
+    <li>같은 Jouzel 외(2007) 자료에는 얼음의 수소 동위 원소(중수소) 비율로 추정한 남극 기온도 들어 있다. 지난 80만 년 동안 CO₂가 높았던 시기에는 남극 기온도 높았고, 낮았던 시기에는 기온도 낮았다.</li>
+    <li>이 기온은 최근 1,000년 평균과의 차이로 나타낸 남극 현지 값이며, 지구 평균 기온이 아니다. 자료에서 가장 추웠던 시기는 약 −10.6℃, 가장 따뜻했던 시기는 약 +4.9℃였다.</li>
+  </ul>
+
   <h3>유의점</h3>
   <ul>
     <li>깊이와 나이의 관계는 EPICA Dome C 코어의 EDC3 연대이다. CO₂는 여러 코어를 다른 연대로 이은 기록이므로, 시추한 깊이의 CO₂는 그 나이와 같은 시기의 값을 보여 준 것이다.</li>
@@ -300,7 +323,7 @@ var DA=DATA.da, CO2=DATA.co2, TT=DATA.t, OBS=423.9, DMIN=10, DMAX=3180;
 function interp(arr,x){ var lo=0,hi=arr.length-1; if(x<=arr[0][0]) return arr[0][1]; if(x>=arr[hi][0]) return arr[hi][1];
   while(hi-lo>1){var m=(lo+hi)>>1; if(arr[m][0]<=x) lo=m; else hi=m;} var a=arr[lo],b=arr[hi]; return a[1]+(b[1]-a[1])*(x-a[0])/(b[0]-a[0]); }
 function ageAt(d){return interp(DA,d);} function co2At(a){return interp(CO2,a);} function tmpAt(a){return interp(TT,a);}
-function fmtAge(a){ if(a<10000) return "약 "+(Math.round(a/100)*100).toLocaleString("ko-KR")+"년 전"; var m=a/10000; return "약 "+(m<10?Math.round(m*10)/10:Math.round(m))+"만 년 전"; }
+function fmtAge(a){ if(a<1000) return "약 "+Math.max(10,Math.round(a/10)*10)+"년 전"; if(a<10000) return "약 "+(Math.round(a/100)*100).toLocaleString("ko-KR")+"년 전"; var m=a/10000; return "약 "+(m<10?Math.round(m*10)/10:Math.round(m))+"만 년 전"; }
 function fmtD(d){return Math.round(d).toLocaleString("ko-KR")+" m";}
 function sg(v){var s=v.toFixed(1); if(s==="-0.0") s="0.0"; return (v>0.05?"+":"")+s.replace("-","−");}
 var pre=CO2.filter(function(p){return p[0]>1000;}).map(function(p){return p[1];});
@@ -308,7 +331,7 @@ var PMIN=Math.min.apply(null,pre), PMAX=Math.max.apply(null,pre);
 $("sMin").textContent=Math.round(PMIN); $("sMax").textContent=Math.round(PMAX);
 var reduce=false; try{reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){}
 
-var samples=[], busy=false, showFull=false, showObs=false, showT=false;
+var samples=[], busy=false, showFull=false, showObs=false;
 
 /* ---------- 시추 기지 단면 (viewBox 360×600) ---------- */
 var SURF=120, BOT=540, HX=196;
@@ -373,13 +396,17 @@ function drawDrill(){
 function drawMarks(){
   var m=scene._marks; while(m.firstChild) m.removeChild(m.firstChild);
   samples.forEach(function(p,i){ var y=yOf(p.d);
-    el("line",{x1:HX+8,x2:HX+22,y1:y,y2:y,style:"stroke:var(--warm)","stroke-width":2},m);
-    var c=el("circle",{cx:HX+30,cy:y,r:8,style:"fill:var(--warm)"},m);
-    var t=el("text",{x:HX+30,y:y+3.5,"text-anchor":"middle",style:"fill:#fff;font-size:9.5px;font-weight:600"},m); t.textContent=i+1; });
+    var g=el("g",{class:"smp","data-s":i,tabindex:0,role:"button","aria-label":"시추 "+(i+1)+"번 코어 공기 방울 보기"},m);
+    el("line",{x1:HX+12,x2:HX+34,y1:y,y2:y,style:"stroke:var(--warm)","stroke-width":2},g);
+    el("circle",{cx:HX+44,cy:y,r:9,style:"fill:var(--warm)"},g);
+    var t=el("text",{x:HX+44,y:y+3.5,"text-anchor":"middle",style:"fill:#fff;font-size:10px;font-weight:600"},g); t.textContent=i+1; });
   var tr=scene._tray; while(tr.firstChild) tr.removeChild(tr.firstChild);
-  samples.slice(-3).forEach(function(p,k,arr){ var x=236+k*38, n=samples.length-arr.length+k+1;
-    el("rect",{x:x,y:SURF-14,width:32,height:10,rx:3,style:"fill:var(--ice1);stroke:var(--hole)"},tr);
-    var t=el("text",{x:x+16,y:SURF-18,"text-anchor":"middle",style:"font-size:9px"},tr); t.textContent="#"+n; });
+  samples.slice(-3).forEach(function(p,k,arr){ var x=244+k*36, n=samples.length-arr.length+k;
+    var g=el("g",{class:"smp","data-s":n,tabindex:0,role:"button","aria-label":"시추 "+(n+1)+"번 코어 공기 방울 보기"},tr);
+    el("rect",{x:x-2,y:SURF-34,width:34,height:30,fill:"transparent"},g);
+    el("rect",{x:x,y:SURF-14,width:30,height:10,rx:3,style:"fill:var(--ice1);stroke:var(--accent)","stroke-width":1.5},g);
+    el("circle",{cx:x+9,cy:SURF-9,r:1.6,style:"fill:var(--hole)"},g); el("circle",{cx:x+19,cy:SURF-10,r:1.2,style:"fill:var(--hole)"},g);
+    var t=el("text",{x:x+15,y:SURF-19,"text-anchor":"middle",style:"font-size:10px;font-weight:700;fill:var(--accent)"},g); t.textContent="#"+(n+1); });
 }
 function ease(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;}
 function animate(from,to,ms,cb,done){ if(reduce){cb(1);done();return;} var t0=null;
@@ -387,7 +414,9 @@ function animate(from,to,ms,cb,done){ if(reduce){cb(1);done();return;} var t0=nu
 function setBusy(b,msg){ busy=b; $("stat").textContent=msg; }
 function release(){
   var d=curDepth();
-  if(d<DMIN*2){ drillY=SURF; drawDrill(); setBusy(false,"대기 중"); return; }
+  var raw=(drillY-SURF)/(BOT-SURF)*3200;
+  if(raw<5){ drillY=SURF; drawDrill(); setBusy(false,"대기 중"); return; }
+  d=Math.max(DMIN,d);
   var y=drillY, ms=600+d/3200*1200; pulling=d;
   setBusy(true,"얼음 코어를 자르는 중…"); drawDrill();
   setTimeout(function(){ coreOn=true; drawDrill(); setBusy(true,"코어를 끌어올리는 중…");
@@ -406,7 +435,6 @@ function read(i){
   $("rDepth").innerHTML=p?Math.round(p.d).toLocaleString("ko-KR")+"<span>m</span>":"−";
   $("rAge").innerHTML=p?fmtAge(p.a).replace("약 ","").replace(" 전","")+"<span>전</span>":"−";
   $("rCo2").innerHTML=p?p.c.toFixed(0)+"<span>ppm</span>":"−";
-  $("rTmp").innerHTML=p?sg(p.t)+"<span>℃</span>":"−";
   $("count").textContent=samples.length+"개 샘플";
 }
 
@@ -441,8 +469,6 @@ function chart(svgId,P,key,color,full,unit,isT,fresh){
 function drawCharts(fresh){
   sizeX();
   chart("chart",{h:300,y0:34,y1:262,lo:160,hi:440,ticks:[200,250,300,350,400]},"c","var(--accent)",CO2,"CO₂ 농도 (ppm)",false,fresh);
-  $("chartT").hidden=!showT; $("rTmpBox").hidden=!showT; $("read").style.setProperty("--n",showT?4:3);
-  if(showT) chart("chartT",{h:240,y0:28,y1:202,lo:-11,hi:6,ticks:[-10,-5,0,5]},"t","var(--warm)",TT,"남극 기온 변화 (℃, 최근 1,000년 평균 대비)",true,fresh);
   $("full").setAttribute("aria-pressed",showFull); $("obs").setAttribute("aria-pressed",showObs);
 }
 
@@ -454,6 +480,7 @@ function nearDrill(e){ var x=svgX(e), y=svgY(e); return Math.abs(x-HX)<34 && y>1
 function moveTo(y){ drillY=Math.max(SURF,Math.min(yOf(DMAX),y)); drawDrill(); }
 scene.addEventListener("pointerdown",function(e){
   e.preventDefault();
+  if(e.target.closest&&e.target.closest(".smp")) return;
   if(busy||!nearDrill(e)) return;
   dragging=true; grabOff=svgY(e)-drillY; scene.classList.add("dragging"); document.body.classList.add("nosel"); setBusy(false,"드릴 내리는 중…");
   try{scene.setPointerCapture(e.pointerId);}catch(_){} e.preventDefault(); drawLive();
@@ -485,13 +512,48 @@ $("toS2").addEventListener("click",function(){show(2);}); $("toS1").addEventList
 [].forEach.call(document.querySelectorAll("[data-close]"),function(b){ b.addEventListener("click",closeModal); });
 $("help").addEventListener("click",openModal);
 
+/* 공기 방울 창 */
+var smodal=$("smodal"), lastFocus=null;
+function rnd(seed){ return function(){ seed=(seed*9301+49297)%233280; return seed/233280; }; }
+function openSample(i){
+  var p=samples[i]; if(!p) return; lastFocus=document.activeElement;
+  $("smTitle").textContent="코어 #"+(i+1)+" · "+fmtD(p.d);
+  var r=rnd(1000+i*37+Math.round(p.d)), s='<defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--ice1)"/><stop offset="1" style="stop-color:var(--ice2)"/></linearGradient></defs>';
+  s+='<rect width="560" height="280" fill="url(#lg)"/>';
+  for(var k=0;k<14;k++){ var y=20*k+r()*8; s+='<path d="M0 '+y.toFixed(1)+' Q140 '+(y+r()*10-5).toFixed(1)+' 280 '+y.toFixed(1)+' T560 '+y.toFixed(1)+'" stroke="#fff" stroke-opacity=".35" fill="none"/>'; }
+  var bubbles=[], tries=0;
+  while(bubbles.length<9&&tries<400){ tries++; var b={x:50+r()*460,y:40+r()*200,r:22+r()*20}, ok=true;
+    bubbles.forEach(function(q){ if(Math.hypot(q.x-b.x,q.y-b.y)<q.r+b.r+8) ok=false; }); if(ok) bubbles.push(b); }
+  var nCO2=Math.round(p.c/10), per=bubbles.map(function(){return 0;});
+  for(var c=0;c<nCO2;c++) per[c%bubbles.length]++;
+  bubbles.forEach(function(b,bi){
+    s+='<g class="bub" style="animation-delay:-'+(r()*3).toFixed(2)+'s"><circle cx="'+b.x.toFixed(1)+'" cy="'+b.y.toFixed(1)+'" r="'+b.r.toFixed(1)+'" fill="#ffffff" fill-opacity=".55" stroke="#ffffff" stroke-width="2"/>';
+    s+='<circle cx="'+(b.x-b.r*.35).toFixed(1)+'" cy="'+(b.y-b.r*.4).toFixed(1)+'" r="'+(b.r*.18).toFixed(1)+'" fill="#ffffff"/>';
+    for(var a=0;a<14;a++){ var t=r()*6.28, d=r()*(b.r-6); s+='<circle cx="'+(b.x+Math.cos(t)*d).toFixed(1)+'" cy="'+(b.y+Math.sin(t)*d).toFixed(1)+'" r="2.2" fill="#9aaab5"/>'; }
+    for(var q=0;q<per[bi];q++){ var t2=r()*6.28, d2=r()*(b.r-6); s+='<circle cx="'+(b.x+Math.cos(t2)*d2).toFixed(1)+'" cy="'+(b.y+Math.sin(t2)*d2).toFixed(1)+'" r="3.2" style="fill:var(--accent)"/>'; }
+    s+='</g>'; });
+  s+='<g font-family="sans-serif" font-size="13" font-weight="700"><rect x="10" y="246" width="250" height="24" rx="12" fill="#ffffff" fill-opacity=".85"/>'+
+     '<circle cx="26" cy="258" r="4" style="fill:var(--accent)"/><text x="36" y="262" fill="#14303a">CO₂</text><circle cx="86" cy="258" r="3" fill="#9aaab5"/><text x="96" y="262" fill="#14303a">다른 공기 (질소·산소 등)</text></g>';
+  $("smArt").innerHTML=s;
+  var rows='<div><small>깊이</small><b>'+Math.round(p.d).toLocaleString("ko-KR")+'<span>m</span></b></div>'+
+    '<div><small>얼음의 나이</small><b>'+fmtAge(p.a).replace("약 ","").replace(" 전","")+'<span>전</span></b></div>'+
+    '<div class="co2"><small>CO₂ 농도</small><b>'+p.c.toFixed(0)+'<span>ppm</span></b></div>'+
+    '';
+  $("smRead").innerHTML=rows; 
+  smodal.hidden=false; $("smClose").focus();
+}
+function closeSample(){ smodal.hidden=true; if(lastFocus&&lastFocus.focus) lastFocus.focus({preventScroll:true}); }
+$("smClose").addEventListener("click",closeSample);
+smodal.addEventListener("click",function(e){ if(e.target===smodal) closeSample(); });
+scene.addEventListener("click",function(e){ var g=e.target.closest&&e.target.closest(".smp"); if(g&&!busy&&!dragging) openSample(+g.getAttribute("data-s")); });
+scene.addEventListener("keydown",function(e){ var g=e.target.closest&&e.target.closest(".smp"); if(g&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); e.stopPropagation(); openSample(+g.getAttribute("data-s")); } },true);
+
 /* 설정 */
 var sheet=$("sheet"), scrim=$("scrim"), opener=$("openSheet");
 function openS(){ sheet.hidden=false; scrim.hidden=false; $("closeSheet").focus(); }
 function closeS(){ sheet.hidden=true; scrim.hidden=true; opener.focus(); }
 opener.addEventListener("click",openS); $("closeSheet").addEventListener("click",closeS); scrim.addEventListener("click",closeS);
-document.addEventListener("keydown",function(e){ if(e.key!=="Escape") return; if(!modal.hidden) closeModal(); else if(!sheet.hidden) closeS(); });
-$("optT").addEventListener("change",function(e){ showT=e.target.checked; drawCharts(false); });
+document.addEventListener("keydown",function(e){ if(e.key!=="Escape") return; if(!smodal.hidden) closeSample(); else if(!modal.hidden) closeModal(); else if(!sheet.hidden) closeS(); });
 $("optDark").addEventListener("change",function(e){ document.documentElement.setAttribute("data-theme",e.target.checked?"dark":"light"); drawCharts(false); });
 $("reset").addEventListener("click",function(){ if(busy) return; pulling=null; samples=[]; showFull=false; showObs=false; drillY=SURF; drawDrill(); drawMarks(); read(-1); drawCharts(false); $("stat").textContent="대기 중"; closeS(); });
 
