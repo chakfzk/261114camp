@@ -71,11 +71,11 @@ body.nosel{-webkit-user-select:none;user-select:none}
 @media (max-width:520px){.read{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .read div{background:var(--bg);border-radius:10px;padding:8px 10px;min-width:0}
 .read small{display:block;font-size:.74rem;color:var(--muted);font-weight:600}
-.read b{font-family:var(--f-mono);font-size:1.3rem;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.read b{font-family:var(--f-body);font-size:1.3rem;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .read b span{font-size:.8rem;margin-left:2px}
 .read .co2 b{color:var(--accent)} .read .tmp b{color:var(--warm)}
 .chartbox svg{display:block;width:100%;height:auto;margin-top:6px}
-.chartbox text{font-family:var(--f-mono);font-size:13px;fill:var(--muted)}
+.chartbox text{font-family:var(--f-body);font-size:13px;fill:var(--muted)}
 .chartbox .grid{stroke:var(--line)}
 .chartbox .empty{font-family:var(--f-body);font-size:14px}
 .acts{display:flex;flex-wrap:wrap;gap:8px}
@@ -135,7 +135,7 @@ body.nosel{-webkit-user-select:none;user-select:none}
 /* 공기 방울 창 */
 .scard{width:min(640px,100%);max-height:100%;overflow:auto;border-radius:18px;background:var(--paper);color:var(--ink);padding:18px 20px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .scard header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
-.scard h2{font-family:var(--f-display);font-weight:400;font-size:1.5rem;margin:0}
+.scard h2{font-family:var(--f-body);font-weight:700;font-size:1.25rem;margin:0}
 .view{position:relative}
 .photo{position:absolute;inset:0;margin:0;border-radius:14px;overflow:hidden;background:#000}
 .photo img{display:block;width:100%;height:100%;object-fit:cover}
@@ -156,6 +156,7 @@ body.nosel{-webkit-user-select:none;user-select:none}
 .sheet h3{font-size:.92rem;margin:18px 0 4px;color:var(--accent)}
 .sheet p,.sheet li{font-size:.86rem;margin:4px 0}
 .sheet ul{padding-left:18px;margin:4px 0}
+.sheet a{color:var(--accent)}
 .opt{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-top:6px;cursor:pointer;font-weight:600;font-size:.88rem}
 .opt input{width:18px;height:18px;accent-color:var(--accent)}
 .sheet .wide{width:100%;margin-top:6px;border-radius:10px;text-align:left}
@@ -284,11 +285,8 @@ body.nosel{-webkit-user-select:none;user-select:none}
       <div class="lens"><svg id="smArt" viewBox="0 0 560 280" aria-hidden="true"></svg></div>
       <figure class="photo" id="smPhoto" hidden>
         <img src="bubbles.jpg" width="960" height="410" alt="편광으로 비춘 남극 얼음 조각. 얼음 결정 사이에 작은 공기 방울 수백 개가 갇혀 있다.">
-        <figcaption>실제 남극 얼음 속 공기 방울 (편광으로 비춰 색이 보임, 이 깊이의 사진은 아님)<br>
-        사진: Atmospheric Research, CSIRO · <a href="https://commons.wikimedia.org/wiki/File:CSIRO_ScienceImage_518_Air_Bubbles_Trapped_in_Ice.jpg" target="_blank" rel="noopener">CC BY 3.0</a> · 일부를 잘라 사용</figcaption>
       </figure>
     </div>
-    <p class="cap" id="smCap">공기 방울 하나를 크게 그린 그림입니다. 파란 점(CO₂)의 수는 측정한 농도에 비례하게 그렸으며, 실제 공기 속 CO₂ 비율(약 0.02~0.03%)보다 훨씬 많이 나타냈습니다.</p>
     <div class="read" id="smRead"></div>
     <button type="button" class="btn" id="smPhotoBtn" aria-expanded="false" aria-controls="smPhoto" style="margin-top:12px">실제 사진 보기</button>
 
@@ -305,7 +303,7 @@ body.nosel{-webkit-user-select:none;user-select:none}
   <ul>
     <li><b>CO₂:</b> Bereiter 외(2015), 남극 빙하 코어 CO₂ 종합 기록(약 80만 년). NOAA NCEI 고기후 자료실(study 17975). 여러 남극 코어의 측정값을 시기별로 이은 것이다.</li>
     <li><b>깊이·나이:</b> Jouzel 외(2007), EPICA Dome C 빙하 코어(남극, 깊이 약 3,190 m).</li>
-    <li><b>공기 방울 사진:</b> Atmospheric Research, CSIRO, "Air Bubbles Trapped in Ice"(Wikimedia Commons, CC BY 3.0). 일부를 잘라 사용하였다.</li>
+    <li><b>공기 방울 사진:</b> Atmospheric Research, CSIRO, "Air Bubbles Trapped in Ice", <a href="https://commons.wikimedia.org/wiki/File:CSIRO_ScienceImage_518_Air_Bubbles_Trapped_in_Ice.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener">CC BY 3.0</a>. 일부를 잘라 사용하였다. 편광으로 비춰 색이 보이는 남극 얼음이며, 시추한 깊이의 사진은 아니다.</li>
     <li><b>2024년 대기:</b> 전 지구 평균 CO₂ 423.9 ppm(WMO 온실 기체 회보 21호). 빙하 코어가 아닌 대기 직접 관측값이다.</li>
   </ul>
   <h3>그래프 읽기</h3>
@@ -324,6 +322,7 @@ body.nosel{-webkit-user-select:none;user-select:none}
   <ul>
     <li>깊이와 나이의 관계는 EPICA Dome C 코어의 EDC3 연대이다. CO₂는 여러 코어를 다른 연대로 이은 기록이므로, 시추한 깊이의 CO₂는 그 나이와 같은 시기의 값을 보여 준 것이다.</li>
     <li>실제로 같은 깊이의 얼음 속 공기 방울은 얼음보다 젊다. 눈이 단단한 얼음으로 굳기 전까지 공기가 드나들기 때문이며, Dome C에서는 그 차이가 수천 년에 이른다.</li>
+    <li>표본 창의 공기 방울 그림은 파란 점(CO₂)의 수를 측정한 농도에 비례하게 그린 것으로, 실제 공기 속 CO₂ 비율(약 0.02~0.03%)보다 훨씬 많이 나타냈다.</li>
     <li>시추 그림의 깊이 비율은 실제와 같지만, 시추 장치와 코어의 크기는 보기 쉽게 키웠다.</li>
   </ul>
 </aside>
@@ -550,13 +549,13 @@ function openSample(i){
     '<div class="co2"><small>CO₂ 농도</small><b>'+p.c.toFixed(0)+'<span>ppm</span></b></div>'+
     '';
   $("smRead").innerHTML=rows; 
-  $("smPhoto").hidden=true; $("smCap").style.visibility=""; $("smPhotoBtn").setAttribute("aria-expanded","false"); $("smPhotoBtn").textContent="실제 사진 보기";
+  $("smPhoto").hidden=true; $("smPhotoBtn").setAttribute("aria-expanded","false"); $("smPhotoBtn").textContent="실제 사진 보기";
   smodal.hidden=false; $("smClose").focus();
 }
 function closeSample(){ smodal.hidden=true; if(lastFocus&&lastFocus.focus) lastFocus.focus({preventScroll:true}); }
 $("smClose").addEventListener("click",closeSample);
 $("smPhotoBtn").addEventListener("click",function(){ var f=$("smPhoto"), show=f.hidden; f.hidden=!show;
-  $("smCap").style.visibility=show?"hidden":""; this.setAttribute("aria-expanded",show?"true":"false"); this.textContent=show?"그림으로 돌아가기":"실제 사진 보기"; });
+   this.setAttribute("aria-expanded",show?"true":"false"); this.textContent=show?"그림으로 돌아가기":"실제 사진 보기"; });
 smodal.addEventListener("click",function(e){ if(e.target===smodal) closeSample(); });
 scene.addEventListener("click",function(e){ var g=e.target.closest&&e.target.closest(".smp"); if(g&&!busy&&!dragging) openSample(+g.getAttribute("data-s")); });
 scene.addEventListener("keydown",function(e){ var g=e.target.closest&&e.target.closest(".smp"); if(g&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); e.stopPropagation(); openSample(+g.getAttribute("data-s")); } },true);
