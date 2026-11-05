@@ -81,6 +81,12 @@ body.nosel{-webkit-user-select:none;user-select:none}
 .acts{display:flex;flex-wrap:wrap;gap:8px}
 .acts .btn{flex:1 1 200px;display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
 .acts .lk{width:15px;height:15px;fill:currentColor;flex:none}
+.acts .btn{position:relative}
+.acts .btn.flash{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.acts .btn.flash::before,.acts .btn.flash::after{content:"";position:absolute;inset:-3px;border:3px solid var(--accent);border-radius:999px;pointer-events:none;animation:ping 1.1s ease-out 3}
+.acts .btn.flash::after{animation-delay:.35s}
+@keyframes ping{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.35,1.9);opacity:0}}
+@media (prefers-reduced-motion:reduce){.acts .btn.flash::before,.acts .btn.flash::after{animation:none;opacity:0}}
 .acts .prog{font-size:.8rem;font-weight:600;color:var(--muted)}
 @keyframes pulse{0%{r:6}40%{r:13}100%{r:6}}
 .new{animation:pulse .9s ease-out}
@@ -513,7 +519,8 @@ scene.addEventListener("keydown",function(e){
   else if(e.key==="Enter"||e.key===" "){ e.preventDefault(); release(); }
 });
 /* 잠금: 10번 시추하면 전체 그래프, 전체 그래프를 본 뒤 2024년 비교 */
-var NEED=10, seenFull=false;
+var NEED=10, seenFull=false, wasF=false, wasO=false;
+function flash(b){ b.classList.remove("flash"); void b.offsetWidth; b.classList.add("flash"); clearTimeout(b._ft); b._ft=setTimeout(function(){ b.classList.remove("flash"); },3800); }
 var LOCK='<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>';
 function locks(){
   var f=$("full"), o=$("obs"), fOpen=samples.length>=NEED, oOpen=seenFull;
@@ -522,6 +529,9 @@ function locks(){
   o.innerHTML=oOpen?"2024년 대기와 비교":LOCK+"2024년 대기와 비교";
   f.title=fOpen?"":NEED+"번 시추하면 열립니다"; o.title=oOpen?"":"80만 년 전체 그래프를 본 뒤 열립니다";
   f.setAttribute("aria-pressed",showFull); o.setAttribute("aria-pressed",showObs);
+  if(fOpen&&!wasF) flash(f); if(oOpen&&!wasO) flash(o);
+  if(!fOpen) f.classList.remove("flash"); if(!oOpen) o.classList.remove("flash");
+  wasF=fOpen; wasO=oOpen;
 }
 $("full").addEventListener("click",function(){ if(samples.length<NEED) return; showFull=!showFull; if(showFull) seenFull=true; drawCharts(false); });
 $("obs").addEventListener("click",function(){ if(!seenFull) return; showObs=!showObs; drawCharts(false); });
