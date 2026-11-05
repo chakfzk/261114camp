@@ -312,7 +312,7 @@ body.nosel{-webkit-user-select:none;user-select:none}
     <li><b>CO₂:</b> Bereiter 외(2015), 남극 빙하 코어 CO₂ 종합 기록(약 80만 년). NOAA NCEI 고기후 자료실(study 17975). 여러 남극 코어의 측정값을 시기별로 이은 것이다.</li>
     <li><b>깊이·나이:</b> Jouzel 외(2007), EPICA Dome C 빙하 코어(남극, 깊이 약 3,190 m).</li>
     <li><b>공기 방울 사진:</b> Atmospheric Research, CSIRO, "Air Bubbles Trapped in Ice", <a href="https://commons.wikimedia.org/wiki/File:CSIRO_ScienceImage_518_Air_Bubbles_Trapped_in_Ice.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener">CC BY 3.0</a>. 일부를 잘라 사용하였다. 편광으로 비춰 색이 보이는 남극 얼음이며, 시추한 깊이의 사진은 아니다.</li>
-    <li><b>2024년 대기와 킬링 곡선:</b> 하와이 마우나로아 관측소의 CO₂ 연평균(1959~2024년, NOAA 지구 감시 연구소). 1958년 킬링(C. D. Keeling)이 측정을 시작해 '킬링 곡선'이라 부른다. 2024년 연평균은 424.61 ppm이다. 빙하 코어가 아닌 대기 직접 관측값이다.</li>
+    <li><b>2024년 대기 관측:</b> 하와이 마우나로아 관측소의 CO₂ 연평균(1959~2024년, NOAA 지구 감시 연구소). 2024년 연평균은 424.61 ppm이다. 빙하 코어가 아닌 대기 직접 관측값이다.</li>
     <li>참고: 같은 해 전 지구 평균은 423.9 ppm(WMO 온실 기체 회보 21호)으로, 6·7번 시뮬레이션은 이 값을 썼다.</li>
   </ul>
   <h3>그래프 읽기</h3>
@@ -482,7 +482,7 @@ function chart(svgId,P,key,color,full,unit,isT,fresh){
   var last=samples.length-1;
   pts.forEach(function(p){ s+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="6" fill="'+color+'" stroke="var(--paper)" stroke-width="2"'+(fresh&&p.i===last&&!reduce?' class="new"':'')+'/>'; });
   if(!isT&&showObs){
-    /* 산업화 이후: 빙하 코어(1750년~) → 킬링 곡선(마우나로아, 1959~2024년). 80만 년 축에서는 오른쪽 끝의 세로선이 된다 */
+    /* 산업화 이후: 빙하 코어(1750년~) → 대기 관측(마우나로아, 1959~2024년). 80만 년 축에서는 오른쪽 끝의 세로선이 된다 */
     var y0=yv(co2At(200)), yo=yv(OBS);
     s+='<line x1="'+X1+'" x2="'+X1+'" y1="'+y0.toFixed(1)+'" y2="'+yo.toFixed(1)+'" stroke="var(--obs)" stroke-width="3" stroke-linecap="round" pathLength="1" stroke-dasharray="1" style="'+(reduce?'':'animation:drawln .8s ease-out both')+'"/>';
     s+='<circle cx="'+X1+'" cy="'+yo+'" r="7" fill="var(--obs)" stroke="var(--paper)" stroke-width="2"/>'+
@@ -500,7 +500,7 @@ function chart(svgId,P,key,color,full,unit,isT,fresh){
     var dm=MLO.map(function(p,k){return (k?"L":"M")+ixo(p[0]).toFixed(1)+" "+iyo(p[1]).toFixed(1);}).join("");
     s+='<path d="'+dm+'" fill="none" stroke="var(--obs)" stroke-width="2.4" pathLength="1" stroke-dasharray="1" style="'+(reduce?'':'animation:drawln 1s ease-out .2s both')+'"/>';
     s+='<circle cx="'+ixo(2024)+'" cy="'+iyo(OBS)+'" r="4" fill="var(--obs)"/>';
-    if(W>=600) s+='<text x="'+ixo(1830)+'" y="'+(iyo(285)-6)+'" style="font-size:10px;fill:var(--accent)">빙하 코어</text><text x="'+(ixo(2024)-4)+'" y="'+(iyo(330)+6)+'" text-anchor="end" style="font-size:10px;fill:var(--obs);font-weight:700">킬링 곡선</text>';
+    if(W>=600) s+='<text x="'+ixo(1830)+'" y="'+(iyo(285)-6)+'" style="font-size:10px;fill:var(--accent)">빙하 코어</text><text x="'+(ixo(2024)-4)+'" y="'+(iyo(330)+6)+'" text-anchor="end" style="font-size:10px;fill:var(--obs);font-weight:700">대기 관측</text>';
   }
   if(!samples.length&&!showFull&&!isT) s+='<text class="empty" x="'+((X0+X1)/2)+'" y="'+((P.y0+P.y1)/2)+'" text-anchor="middle">깊이를 고르고 시추하면 이곳에 측정값이 쌓입니다</text>';
   svg.innerHTML=s;
