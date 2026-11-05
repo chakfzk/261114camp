@@ -521,17 +521,15 @@ function openSample(i){
   var r=rnd(1000+i*37+Math.round(p.d)), s='<defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--ice1)"/><stop offset="1" style="stop-color:var(--ice2)"/></linearGradient></defs>';
   s+='<rect width="560" height="280" fill="url(#lg)"/>';
   for(var k=0;k<14;k++){ var y=20*k+r()*8; s+='<path d="M0 '+y.toFixed(1)+' Q140 '+(y+r()*10-5).toFixed(1)+' 280 '+y.toFixed(1)+' T560 '+y.toFixed(1)+'" stroke="#fff" stroke-opacity=".35" fill="none"/>'; }
-  var bubbles=[], tries=0;
-  while(bubbles.length<9&&tries<400){ tries++; var b={x:50+r()*460,y:40+r()*200,r:22+r()*20}, ok=true;
-    bubbles.forEach(function(q){ if(Math.hypot(q.x-b.x,q.y-b.y)<q.r+b.r+8) ok=false; }); if(ok) bubbles.push(b); }
-  var nCO2=Math.round(p.c/10), per=bubbles.map(function(){return 0;});
-  for(var c=0;c<nCO2;c++) per[c%bubbles.length]++;
-  bubbles.forEach(function(b,bi){
-    s+='<g class="bub" style="animation-delay:-'+(r()*3).toFixed(2)+'s"><circle cx="'+b.x.toFixed(1)+'" cy="'+b.y.toFixed(1)+'" r="'+b.r.toFixed(1)+'" fill="#ffffff" fill-opacity=".55" stroke="#ffffff" stroke-width="2"/>';
-    s+='<circle cx="'+(b.x-b.r*.35).toFixed(1)+'" cy="'+(b.y-b.r*.4).toFixed(1)+'" r="'+(b.r*.18).toFixed(1)+'" fill="#ffffff"/>';
-    for(var a=0;a<14;a++){ var t=r()*6.28, d=r()*(b.r-6); s+='<circle cx="'+(b.x+Math.cos(t)*d).toFixed(1)+'" cy="'+(b.y+Math.sin(t)*d).toFixed(1)+'" r="2.2" fill="#9aaab5"/>'; }
-    for(var q=0;q<per[bi];q++){ var t2=r()*6.28, d2=r()*(b.r-6); s+='<circle cx="'+(b.x+Math.cos(t2)*d2).toFixed(1)+'" cy="'+(b.y+Math.sin(t2)*d2).toFixed(1)+'" r="3.2" style="fill:var(--accent)"/>'; }
-    s+='</g>'; });
+  /* 큰 공기 방울 하나: 회색 점(다른 공기) 사이에 파란 점(CO₂)을 농도에 비례한 수만큼 */
+  var cx=280, cy=128, R=112, nCO2=Math.round(p.c/10), pts=[];
+  function spot(){ for(var t=0;t<60;t++){ var a=r()*6.283, d=Math.sqrt(r())*(R-12), x=cx+Math.cos(a)*d, y=cy+Math.sin(a)*d, ok=true;
+    for(var k=0;k<pts.length;k++){ if(Math.hypot(pts[k][0]-x,pts[k][1]-y)<9){ok=false;break;} } if(ok){ pts.push([x,y]); return [x,y]; } } return null; }
+  s+='<g class="bub"><circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="#ffffff" fill-opacity=".6" stroke="#ffffff" stroke-width="3"/>';
+  s+='<ellipse cx="'+(cx-R*.42)+'" cy="'+(cy-R*.48)+'" rx="'+(R*.16)+'" ry="'+(R*.1)+'" transform="rotate(-35 '+(cx-R*.42)+' '+(cy-R*.48)+')" fill="#ffffff"/>';
+  for(var g=0;g<80;g++){ var q=spot(); if(q) s+='<circle cx="'+q[0].toFixed(1)+'" cy="'+q[1].toFixed(1)+'" r="2.6" fill="#9aaab5"/>'; }
+  for(var c=0;c<nCO2;c++){ var q2=spot(); if(q2) s+='<circle cx="'+q2[0].toFixed(1)+'" cy="'+q2[1].toFixed(1)+'" r="3.8" style="fill:var(--accent)"/>'; }
+  s+='</g>';
   s+='<g font-family="sans-serif" font-size="13" font-weight="700"><rect x="10" y="246" width="250" height="24" rx="12" fill="#ffffff" fill-opacity=".85"/>'+
      '<circle cx="26" cy="258" r="4" style="fill:var(--accent)"/><text x="36" y="262" fill="#14303a">CO₂</text><circle cx="86" cy="258" r="3" fill="#9aaab5"/><text x="96" y="262" fill="#14303a">다른 공기 (질소·산소 등)</text></g>';
   $("smArt").innerHTML=s;
