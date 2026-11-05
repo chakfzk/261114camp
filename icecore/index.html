@@ -136,7 +136,7 @@ body.nosel{-webkit-user-select:none;user-select:none}
 .scard{width:min(640px,100%);max-height:100%;overflow:auto;border-radius:18px;background:var(--paper);color:var(--ink);padding:18px 20px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .scard header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
 .scard h2{font-family:var(--f-display);font-weight:400;font-size:1.5rem;margin:0}
-.photo{margin:0 0 10px}
+.photo{margin:12px 0 0}
 .photo img{display:block;width:100%;height:auto;border-radius:14px}
 .photo figcaption{font-size:.78rem;color:var(--muted);margin-top:6px;line-height:1.45}
 .photo a{color:var(--accent)}
@@ -279,14 +279,16 @@ body.nosel{-webkit-user-select:none;user-select:none}
 <div class="modal" id="smodal" role="dialog" aria-modal="true" aria-labelledby="smTitle" hidden>
   <div class="scard">
     <header><h2 id="smTitle">코어 #1</h2><button type="button" class="btn" id="smClose">닫기</button></header>
-    <figure class="photo">
+    <div class="lens"><svg id="smArt" viewBox="0 0 560 280" aria-hidden="true"></svg></div>
+    <p class="cap">공기 방울 하나를 크게 그린 그림입니다. 파란 점(CO₂)의 수는 측정한 농도에 비례하게 그렸으며, 실제 공기 속 CO₂ 비율(약 0.02~0.03%)보다 훨씬 많이 나타냈습니다.</p>
+    <div class="read" id="smRead"></div>
+    <button type="button" class="btn" id="smPhotoBtn" aria-expanded="false" aria-controls="smPhoto" style="margin-top:12px">실제 사진 보기</button>
+    <figure class="photo" id="smPhoto" hidden>
       <img src="bubbles.jpg" width="960" height="410" alt="편광으로 비춘 남극 얼음 조각. 얼음 결정 사이에 작은 공기 방울 수백 개가 갇혀 있다.">
       <figcaption>실제 남극 얼음 속 공기 방울 (편광으로 비춰 색이 보임, 이 깊이의 사진은 아님)<br>
         사진: Atmospheric Research, CSIRO · <a href="https://commons.wikimedia.org/wiki/File:CSIRO_ScienceImage_518_Air_Bubbles_Trapped_in_Ice.jpg" target="_blank" rel="noopener">CC BY 3.0</a> · 일부를 잘라 사용</figcaption>
     </figure>
-    <div class="lens"><svg id="smArt" viewBox="0 0 560 280" aria-hidden="true"></svg></div>
-    <p class="cap">공기 방울 하나를 크게 그린 그림입니다. 파란 점(CO₂)의 수는 측정한 농도에 비례하게 그렸으며, 실제 공기 속 CO₂ 비율(약 0.02~0.03%)보다 훨씬 많이 나타냈습니다.</p>
-    <div class="read" id="smRead"></div>
+
   </div>
 </div>
 <div class="scrim" id="scrim" hidden></div>
@@ -545,10 +547,13 @@ function openSample(i){
     '<div class="co2"><small>CO₂ 농도</small><b>'+p.c.toFixed(0)+'<span>ppm</span></b></div>'+
     '';
   $("smRead").innerHTML=rows; 
+  $("smPhoto").hidden=true; $("smPhotoBtn").setAttribute("aria-expanded","false"); $("smPhotoBtn").textContent="실제 사진 보기";
   smodal.hidden=false; $("smClose").focus();
 }
 function closeSample(){ smodal.hidden=true; if(lastFocus&&lastFocus.focus) lastFocus.focus({preventScroll:true}); }
 $("smClose").addEventListener("click",closeSample);
+$("smPhotoBtn").addEventListener("click",function(){ var f=$("smPhoto"), show=f.hidden; f.hidden=!show;
+  this.setAttribute("aria-expanded",show?"true":"false"); this.textContent=show?"실제 사진 닫기":"실제 사진 보기"; if(show) f.scrollIntoView({block:"nearest",behavior:"smooth"}); });
 smodal.addEventListener("click",function(e){ if(e.target===smodal) closeSample(); });
 scene.addEventListener("click",function(e){ var g=e.target.closest&&e.target.closest(".smp"); if(g&&!busy&&!dragging) openSample(+g.getAttribute("data-s")); });
 scene.addEventListener("keydown",function(e){ var g=e.target.closest&&e.target.closest(".smp"); if(g&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); e.stopPropagation(); openSample(+g.getAttribute("data-s")); } },true);
