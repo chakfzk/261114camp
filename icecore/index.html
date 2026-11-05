@@ -79,7 +79,9 @@ body.nosel{-webkit-user-select:none;user-select:none}
 .chartbox .grid{stroke:var(--line)}
 .chartbox .empty{font-family:var(--f-body);font-size:14px}
 .acts{display:flex;flex-wrap:wrap;gap:8px}
-.acts .btn{flex:1 1 200px}
+.acts .btn{flex:1 1 200px;display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.acts .lk{width:15px;height:15px;fill:currentColor;flex:none}
+.acts .prog{font-size:.8rem;font-weight:600;color:var(--muted)}
 @keyframes pulse{0%{r:6}40%{r:13}100%{r:6}}
 .new{animation:pulse .9s ease-out}
 @keyframes drawln{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
@@ -480,7 +482,7 @@ function chart(svgId,P,key,color,full,unit,isT,fresh){
 function drawCharts(fresh){
   sizeX();
   chart("chart",{h:300,y0:34,y1:262,lo:160,hi:440,ticks:[200,250,300,350,400]},"c","var(--accent)",CO2,"CO₂ 농도 (ppm)",false,fresh);
-  $("full").setAttribute("aria-pressed",showFull); $("obs").setAttribute("aria-pressed",showObs);
+  locks();
 }
 
 /* ---------- 조작: 드릴을 잡고 끌어내리기 ---------- */
@@ -510,8 +512,19 @@ scene.addEventListener("keydown",function(e){
   else if(e.key==="ArrowUp"){ e.preventDefault(); moveTo(drillY-st); }
   else if(e.key==="Enter"||e.key===" "){ e.preventDefault(); release(); }
 });
-$("full").addEventListener("click",function(){ showFull=!showFull; drawCharts(false); });
-$("obs").addEventListener("click",function(){ showObs=!showObs; drawCharts(false); });
+/* 잠금: 10번 시추하면 전체 그래프, 전체 그래프를 본 뒤 2024년 비교 */
+var NEED=10, seenFull=false;
+var LOCK='<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>';
+function locks(){
+  var f=$("full"), o=$("obs"), fOpen=samples.length>=NEED, oOpen=seenFull;
+  f.disabled=!fOpen; o.disabled=!oOpen;
+  f.innerHTML=fOpen?"80만 년 전체 그래프 보기":LOCK+"80만 년 전체 그래프 보기 <span class=\"prog\">"+samples.length+"/"+NEED+"회 시추</span>";
+  o.innerHTML=oOpen?"2024년 대기와 비교":LOCK+"2024년 대기와 비교";
+  f.title=fOpen?"":NEED+"번 시추하면 열립니다"; o.title=oOpen?"":"80만 년 전체 그래프를 본 뒤 열립니다";
+  f.setAttribute("aria-pressed",showFull); o.setAttribute("aria-pressed",showObs);
+}
+$("full").addEventListener("click",function(){ if(samples.length<NEED) return; showFull=!showFull; if(showFull) seenFull=true; drawCharts(false); });
+$("obs").addEventListener("click",function(){ if(!seenFull) return; showObs=!showObs; drawCharts(false); });
 var rz=null; addEventListener("resize",function(){ clearTimeout(rz); rz=setTimeout(function(){drawCharts(false);},120); });
 
 /* 모달 */
@@ -567,7 +580,7 @@ function closeS(){ sheet.hidden=true; scrim.hidden=true; opener.focus(); }
 opener.addEventListener("click",openS); $("closeSheet").addEventListener("click",closeS); scrim.addEventListener("click",closeS);
 document.addEventListener("keydown",function(e){ if(e.key!=="Escape") return; if(!smodal.hidden) closeSample(); else if(!modal.hidden) closeModal(); else if(!sheet.hidden) closeS(); });
 $("optDark").addEventListener("change",function(e){ document.documentElement.setAttribute("data-theme",e.target.checked?"dark":"light"); drawCharts(false); });
-$("reset").addEventListener("click",function(){ if(busy) return; pulling=null; samples=[]; showFull=false; showObs=false; drillY=SURF; drawDrill(); drawMarks(); read(-1); drawCharts(false); $("stat").textContent="대기 중"; closeS(); });
+$("reset").addEventListener("click",function(){ if(busy) return; pulling=null; samples=[]; showFull=false; showObs=false; seenFull=false; drillY=SURF; drawDrill(); drawMarks(); read(-1); drawCharts(false); $("stat").textContent="대기 중"; closeS(); });
 
 drawDrill(); drawMarks(); read(-1); drawCharts(false); openModal();
 })();
