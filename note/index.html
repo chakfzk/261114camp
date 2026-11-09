@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- 아이폰 Safari에서 링크로 넘어가면 구글이 "파일을 열 수 없습니다"를 띄우는 경우가 있어, 앞 페이지 정보를 넘기지 않음(직접 입력과 같게) -->
+<meta name="referrer" content="no-referrer">
 <title>지구공학 생각 노트</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gothic+A1:wght@400;600;700&display=swap">
@@ -83,7 +85,7 @@ else {
     const url = target(n);
     const el = document.createElement(url ? "a" : "div");
     el.className = "cls" + (url ? "" : " off");
-    if (url) el.href = url; else el.setAttribute("aria-disabled", "true");
+    if (url) { el.href = url; el.rel = "noreferrer"; } else el.setAttribute("aria-disabled", "true");
     el.innerHTML = "<b>" + n + "반</b><small>" + (url ? "들어가기" : "준비 중") + "</small>";
     li.append(el); list.append(li);
   }
