@@ -16,9 +16,6 @@
     const nm=document.createElement('span'); nm.className='embed-name';
     const title=document.getElementById('title'), put=()=>{ nm.textContent=title?title.textContent:''; };
     if(sub&&bar){ sub.after(nm); put(); if(title) new MutationObserver(put).observe(title,{childList:true,characterData:true,subtree:true}); }
-    /* 실제 사진을 열면 생각 노트가 시뮬레이션 칸을 크게 보기로 키움 */
-    const ph=document.getElementById('photos');
-    if(ph&&parent!==window) ph.addEventListener('click',()=>{ try{ parent.postMessage({geolab:'photo'},'*'); }catch(e){} });
   }
   if(m&&typeof select==='function'){
     document.body.classList.remove('choosing');
