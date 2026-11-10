@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>/* 이 페이지는 '온실 효과와 지구 온난화'(greenhouse/)의 탭 안에서 열림. 주소로 바로 들어오면 그 페이지의 이 탭으로 넘어감 */
-if(window.self!==window.top) document.documentElement.className+=" embed"; else location.replace("../greenhouse/#radiation");</script>
+if(window.self!==window.top){ document.documentElement.className+=" embed"; if(/[?&]mini\b/.test(location.search)) document.documentElement.className+=" mini"; } else location.replace("../greenhouse/#radiation");
+/* ?embed&mini=1: 생각 노트의 원리 칸 옆 판. 그림(화살표)과 농도 슬라이더만 보임(6번 페이지 자체는 그대로) */</script>
 <title>지구 복사 평형 이해하기</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,6 +41,13 @@ button{font:inherit;color:inherit}
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .embed .top{display:none}
+/* 생각 노트용 작은 모드: 그림 + 농도 슬라이더 한 줄 */
+.mini body{background:var(--paper)}
+.mini .wrap{padding:8px!important;max-width:none}
+.mini .main{display:block}
+.mini .stagebar,.mini .tempbox,.mini .presets,.mini .panel>.box~*{display:none!important}
+.mini .panel{margin-top:8px}
+.mini .panel>.box{padding:8px 12px;border:0;background:var(--bg)}
 .embed .wrap{padding-top:16px}
 h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0;text-wrap:balance;min-width:0}
 .btn{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:600;font-size:.88rem}
