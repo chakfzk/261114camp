@@ -1,0 +1,23 @@
+/* 작은 화면 모드(생각 노트 안): embed.js가 body에 .focus .embed를 붙임. 기존 집중 모드(.focus)를 바탕으로 더 줄임 */
+body.embed{background:transparent;margin:0;overflow:hidden}
+body.embed header,body.embed footer,body.embed #start-screen,body.embed #reading-panel,
+body.embed .stage-heading,body.embed #ocean-modes,body.embed #fullscreen,body.embed #focus,
+body.embed .gesture,body.embed #photos,body.embed #menu-toggle{display:none!important}
+body.embed main{padding:0!important;margin:0!important;width:auto!important;max-width:none!important;display:block!important}
+body.embed .experiment{margin:0!important;padding:4px!important;width:auto!important;max-width:none!important;box-sizing:border-box}
+body.embed .experiment{height:100vh!important;max-height:none!important;min-height:0!important;display:flex;flex-direction:column;gap:6px}
+/* 하늘·지면 반사의 세부 방법 버튼은 남김 */
+body.embed #subtechniques:not([hidden]){display:flex!important;flex-wrap:wrap;gap:4px;padding:0;margin:0}
+body.embed #subtechniques button{min-height:30px;padding:4px 10px;font-size:12.5px}
+body.embed .scene-toolbar{display:flex!important;padding:0!important;margin:0;border:0!important;gap:6px;justify-content:flex-start;min-height:0}
+body.embed .scene-toolbar #names-toggle{display:none}
+body.embed .camera-presets button{min-height:28px;font-size:12px;padding:3px 10px}
+body.embed #stage{flex:1;min-height:120px;height:auto!important;border-radius:10px}
+body.embed .controls{padding:4px 2px!important;column-gap:12px}
+body.embed .controls .range-title{font-size:12px}
+body.embed .buttons button{min-height:32px;font-size:12.5px;padding:4px 10px}
+body.embed #pause{display:none}
+/* 확대·축소·시점 버튼을 작게, 장면 오른쪽 위로 */
+body.embed .stage-tools{top:6px!important;right:6px!important;bottom:auto!important;gap:4px}
+body.embed .stage-tools button{width:28px!important;height:28px!important;min-height:0!important;padding:0!important}
+body.embed .stage-tools svg{width:15px;height:15px}
