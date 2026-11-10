@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=1280">
+<!-- 휴대폰에서도 넓은 화면 배치를 그대로 축소해 보여 줌(사용자 결정). 가로로 들면 꽉 참 -->
 <title>온실 효과와 지구 온난화</title>
 <link rel="icon" type="image/svg+xml" href="../radiation/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,12 +32,22 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 .ibtn{display:inline-grid;place-items:center;width:40px;height:40px;padding:0;border-radius:50%;flex:none;border:1px solid var(--line);background:var(--paper);cursor:pointer}
 .ibtn:hover{border-color:var(--accent)}
 .ibtn svg{width:20px;height:20px;fill:currentColor}
-.tabs{display:flex;gap:6px;margin-top:14px;border-bottom:1px solid var(--line)}
-.tab{border:1px solid transparent;border-bottom:0;background:none;padding:8px 16px;border-radius:10px 10px 0 0;cursor:pointer;font-weight:700;font-size:.95rem;color:var(--muted);margin-bottom:-1px}
+.tabs{display:flex;gap:6px;margin-top:14px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;border:1px solid transparent;border-bottom:0;background:none;padding:8px 16px;border-radius:10px 10px 0 0;cursor:pointer;font-weight:700;font-size:.95rem;color:var(--muted);margin-bottom:-1px}
 .tab:hover{color:var(--ink)}
 .tab[aria-selected="true"]{background:var(--paper);border-color:var(--line);color:var(--accent)}
 .tab:focus-visible,.ibtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tab .n{display:inline-grid;place-items:center;width:1.45em;height:1.45em;border-radius:50%;background:var(--line);color:var(--paper);font-size:.8em}
+.tab[aria-selected="true"] .n{background:var(--accent)}
 .frames{flex:1;min-height:0;position:relative}
+/* ② 데스모스 안내: 이 페이지 안의 글 안내판(데스모스로 화면을 옮기지는 못함) */
+.guide{position:absolute;inset:0;display:grid;place-items:center;padding:16px;overflow:auto}
+.guide .card{max-width:560px;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:28px 30px;text-align:center}
+.guide .ic{width:56px;height:56px;margin:0 auto 12px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;color:var(--accent)}
+.guide .ic svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.guide p{margin:6px 0;font-size:1rem}
+.guide .q{display:inline-block;margin:6px 0 2px;padding:6px 16px;font-size:1.15rem;border-radius:99px;background:var(--accent-soft);color:var(--accent);font-weight:700}
 .frames iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg)}
 @media (max-width:420px){.tab{padding:8px 10px;font-size:.88rem}}
 </style>
@@ -50,31 +61,41 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
     </button>
   </div>
   <div class="tabs" role="tablist" aria-label="활동 고르기">
-    <button type="button" class="tab" role="tab" id="tab-radiation" data-k="radiation" aria-controls="f-radiation">복사 평형과 온실 효과</button>
-    <button type="button" class="tab" role="tab" id="tab-factors" data-k="factors" aria-controls="f-factors">지구 온난화의 요인</button>
+    <button type="button" class="tab" role="tab" id="tab-radiation" data-k="radiation" aria-controls="f-radiation"><span class="n">1</span>복사 평형과 온실 효과</button>
+    <button type="button" class="tab" role="tab" id="tab-desmos" data-k="desmos" aria-controls="f-desmos"><span class="n">2</span>온실 효과와 지구 온난화의 차이</button>
+    <button type="button" class="tab" role="tab" id="tab-factors" data-k="factors" aria-controls="f-factors"><span class="n">3</span>지구 온난화의 요인</button>
   </div>
 </div></div>
 <div class="frames">
   <iframe id="f-radiation" role="tabpanel" aria-labelledby="tab-radiation" title="복사 평형과 온실 효과" hidden></iframe>
+  <div class="guide" id="f-desmos" role="tabpanel" aria-labelledby="tab-desmos" hidden>
+    <div class="card">
+      <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></div>
+      <span class="q">온실 효과와 지구 온난화의 차이</span>
+      <p style="margin-top:12px">원래 페이지로 돌아가서 작성해 주세요.</p>
+    </div>
+  </div>
   <iframe id="f-factors" role="tabpanel" aria-labelledby="tab-factors" title="지구 온난화의 요인" hidden></iframe>
 </div>
 <script>
 (function(){
-  var SRC={radiation:"../radiation/?embed",factors:"../factors/?embed"}, cur=null;
+  var SRC={radiation:"../radiation/?embed",desmos:null,factors:"../factors/?embed"}, ORDER=["radiation","desmos","factors"], cur=null;
   var tabs=document.querySelectorAll(".tab");
   function frame(k){ return document.getElementById("f-"+k); }
   function show(k,focus){
-    if(!SRC[k]) k="radiation";
+    if(ORDER.indexOf(k)<0) k="radiation";
     cur=k;
     for(var i=0;i<tabs.length;i++){ var on=tabs[i].dataset.k===k; tabs[i].setAttribute("aria-selected",on); tabs[i].tabIndex=on?0:-1; }
-    for(var key in SRC){ var f=frame(key); if(key===k){ if(!f.getAttribute("src")) f.src=SRC[key]; f.hidden=false; } else f.hidden=true; }
+    for(var key in SRC){ var f=frame(key); if(key===k){ if(SRC[key]&&!f.getAttribute("src")) f.src=SRC[key]; f.hidden=false; } else f.hidden=true; }
+    document.getElementById("gear").style.visibility=SRC[k]?"":"hidden";
+    var t=document.getElementById("tab-"+k); if(t.scrollIntoView) try{ t.scrollIntoView({block:"nearest",inline:"nearest"}); }catch(e){}
     try{ history.replaceState(null,"","#"+k); }catch(e){ location.hash=k; }
     if(focus) document.getElementById("tab-"+k).focus();
   }
   for(var i=0;i<tabs.length;i++) tabs[i].addEventListener("click",function(){ show(this.dataset.k); });
   document.querySelector(".tabs").addEventListener("keydown",function(e){
     if(e.key!=="ArrowLeft"&&e.key!=="ArrowRight") return;
-    e.preventDefault(); show(cur==="radiation"?"factors":"radiation",true);
+    e.preventDefault(); var i=ORDER.indexOf(cur)+(e.key==="ArrowRight"?1:-1); show(ORDER[(i+ORDER.length)%ORDER.length],true);
   });
   // 톱니: 지금 탭 안의 '설정 · 수치 근거' 패널을 엶
   document.getElementById("gear").addEventListener("click",function(){
