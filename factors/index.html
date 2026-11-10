@@ -278,7 +278,7 @@ details.q li{margin:4px 0}
 
   <h3>줄이는 요인의 크기</h3>
   <ul>
-    <li>재생에너지는 화석 연료를 같은 비율만큼 대체한다고 가정하였다(100% = CO₂ −<span class="num" id="sRen"></span> ppm). 화석 연료가 없으면 효과가 없다.</li>
+    <li>신재생에너지는 그때 쓰는 화석 연료 중 그 비율만큼을 대체한다고 가정하였다(50% = 화석 연료 배출이 절반, 100% = 0). 화석 연료가 없으면 효과가 없다.</li>
     <li>나무 심기는 AR6 3실무그룹 제12장의 농림업·토지 부문 CO₂ 제거 2050년 중앙값 약 3 GtCO₂/년을 참고해, 연 3 GtCO₂를 30년 동안 흡수하는 규모(100% = 90 GtCO₂)로 놓았다.</li>
     <li>농도 환산은 1 ppm ≈ 7.8 GtCO₂, 대기 잔류 비율 약 45%를 써서 100%일 때 −<span class="num" id="sTree"></span> ppm이다. 이 가정은 교육용이며 원문 대조가 필요하다.</li>
     <li>제거량은 산업화 이전 농도 아래로 내려가지 않게 제한하였다. CO₂ 제거에 대한 반응은 배출과 정확히 대칭이 아니다(AR6 1실무그룹 제5장).</li>
@@ -293,6 +293,7 @@ details.q li{margin:4px 0}
   <ul>
     <li>파란 띠는 산업화 이전에도 있던 온실 기체 층(수증기, 이산화 탄소 등)이다. 이 층이 없으면 지구 평균 기온은 약 −18℃이다(교과서 비교값).</li>
     <li>주황 점선 띠는 사람 활동으로 강화된 부분이다. 두께 변화는 보기 쉽게 과장하였다.</li>
+    <li>적외선 화살표(지표 복사·통과·대기 복사)의 두께는 280 ppm보다 진할 때 그 농도와의 차이를 6배로 키워 그렸다. 실제 값은 몇 %만 변해 비례대로 그리면 차이가 보이지 않기 때문이다. 이름표의 숫자는 실제 값이다.</li>
     <li>이 요인들은 반사율을 바꾸지 않는다고 가정하였다.</li>
   </ul>
 </aside>
@@ -349,7 +350,11 @@ function svgHead(aria){
 }
 function ground(){ return '<rect x="0" y="'+SURF+'" width="'+VW+'" height="'+(VH-SURF)+'" fill="url(#gd)"/><rect x="0" y="'+SURF+'" width="'+VW+'" height="2.5" fill="#8FD6AE" opacity=".7"/>'; }
 /* 공통 화살표: 태양 복사, 반사, 지표 흡수, 지표 복사, 통과, 대기 복사(아래·위) */
+/* IR 화살표 두께: 280 ppm(대기 있음)보다 진하면 그때와의 차이를 EXG배로 키워 그림(값 자체는 몇 %만 변해 정비례로는 안 보임). 이름표 숫자는 실제 값 */
+var EXG=6;
+function xw(v,ref,on){ return wd(on?ref+EXG*(v-ref):v); }
 function flowArrows(f,bt,bb,eps){
+  var e0=epsOf(280), es0=ASR/(1-e0/2), on=eps>e0;
   var s=arrow(SX,SY,HX,SURF,wd(340),SUN,0)+badge(66,72,"태양 복사",100,SUN,"start",0,"sun");
   s+=arrow(HX,SURF,xRef(TOP),TOP,wd(100),SUN,1)+badge(xRef(72)-12,72,"반사",REF,SUN,"end",1,"ref");
   s+='<g class="bd" style="--i:2"'+keyAttr("abs")+'><ellipse cx="'+HX+'" cy="'+SURF+'" rx="70" ry="9" fill="'+SUN+'" opacity=".55" filter="url(#glow)"/>'+
@@ -359,10 +364,10 @@ function flowArrows(f,bt,bb,eps){
     s+=arrow(EM,SURF,EM,TOP,wd(f.Es),IR,3)+badge(EM-14,318,"지표 복사",f.em,IR,"end",3,"surf")+badge(EM+14,96,"모두 우주로",null,IR,"start",3,"pass");
     return s;
   }
-  s+=arrow(EM,SURF,EM,bb+4,wd(f.Es),IR,3)+badge(EM-14,318,"지표 복사",f.em,IR,"end",3,"surf");
-  if(f.pass>0) s+=arrow(EM,bt-4,EM,TOP,wd((1-eps)*f.Es),IR,4)+badge(EM-12,96,"통과",f.pass,IR,"end",4,"pass");
-  s+=arrow(BK,bb+4,BK,SURF,wd(eps*f.Es/2),IR,5)+badge((EM+BK)/2,306,"대기 복사",f.up,IR,"middle",5,"down","(지표로)");
-  s+=arrow(SP,bt-4,SP,TOP,wd(eps*f.Es/2),IR,5)+badge(SP+12,90,"대기 복사",f.up,IR,"start",5,"upa","(우주로)");
+  s+=arrow(EM,SURF,EM,bb+4,xw(f.Es,es0,on),IR,3)+badge(EM-14,318,"지표 복사",f.em,IR,"end",3,"surf");
+  if(f.pass>0) s+=arrow(EM,bt-4,EM,TOP,xw((1-eps)*f.Es,(1-e0)*es0,on),IR,4)+badge(EM-12,96,"통과",f.pass,IR,"end",4,"pass");
+  s+=arrow(BK,bb+4,BK,SURF,xw(eps*f.Es/2,e0*es0/2,on),IR,5)+badge((EM+BK)/2,306,"대기 복사",f.up,IR,"middle",5,"down","(지표로)");
+  s+=arrow(SP,bt-4,SP,TOP,xw(eps*f.Es/2,e0*es0/2,on),IR,5)+badge(SP+12,90,"대기 복사",f.up,IR,"start",5,"upa","(우주로)");
   return s;
 }
 
@@ -441,7 +446,7 @@ function epsOf(c){ if(c<=0) return 0; if(c>=M_CB) return epsLog(c); var u=c/M_CB
 function tempK(c){return TE*Math.pow(1-epsOf(c)/2,-0.25);}
 var TPRE=tempK(C0);
 var FACT=[
-  {id:"ren", nm:"재생에너지·에너지 효율", sh:"재생에너지", dir:"sol"},
+  {id:"ren", nm:"신재생에너지·에너지 효율", sh:"신재생에너지", dir:"sol"},
   {id:"fos", nm:"화석 연료 연소·시멘트 생산", sh:"화석 연료", dir:"warm"},
   {id:"luc", nm:"산림 벌채·토지 이용 변화", sh:"산림 벌채", dir:"warm"},
   {id:"tree", nm:"나무 심기(조림·재조림)", sh:"나무 심기", dir:"sol"}
@@ -450,7 +455,7 @@ var TLS={warm:"강화", sol:"줄이기"};
 var lv={ren:0,fos:0,luc:0,tree:0}; /* 0~4 (4 = 100%) */
 function calc(x){
   x=x||lv;
-  var eFos=Math.max(0,x.fos-x.ren), eLuc=x.luc;
+  var eFos=x.fos*(1-x.ren/4), eLuc=x.luc; /* 신재생에너지 %: 그때 쓰는 화석 연료 중 바꾼 비율 */
   var raw=C0+eFos*PER_FOS+eLuc*PER_LUC;
   var C=Math.max(C0,raw-x.tree*PER_TREE);
   var F=(M_F2X/Math.LN2)*Math.log(C/C0); /* 띠 두께 표시용 복사 강제력 */
@@ -555,7 +560,6 @@ knobs.addEventListener("keydown",function(e){
 /* ---------- 결과 ---------- */
 function effNote(){
   var m=calc(), out=[];
-  if(lv.ren>lv.fos+1e-9) out.push("재생에너지는 대체할 화석 연료만큼("+pct(lv.fos)+"%)만 적용됩니다.");
   if(lv.tree>0&&m.treeEff<lv.tree-1e-6) out.push("나무 심기는 줄일 CO₂가 모자라 "+pct(m.treeEff)+"%만 적용됩니다.");
   $("msg").textContent=out.join(" ");
 }
@@ -597,7 +601,7 @@ $("reset").addEventListener("click",function(){
 $("sT24").textContent=(T24*100).toFixed(0);
 $("sT1").textContent=calc({ren:0,fos:4*T24,luc:4*T24,tree:0}).Teq.toFixed(1);
 $("sT2").textContent=calc({ren:0,fos:4,luc:4,tree:0}).Teq.toFixed(1);
-$("sRen").textContent=(PER_FOS*4).toFixed(1); $("sTree").textContent=(PER_TREE*4).toFixed(1);
+$("sTree").textContent=(PER_TREE*4).toFixed(1);
 
 /* 처음 화면: 2024년 수준, 이미 새 평형에 도달한 상태. "평형 과정 다시 보기"는 산업화 이전부터 보여 줌 */
 set2024(); cur=tgt=calc().Teq; from=0;
