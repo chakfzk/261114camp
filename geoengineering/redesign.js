@@ -2,7 +2,7 @@
 (()=>{
 const groups=[
  {name:'우주 반사',icon:'orbit',note:'우주에서 빛의 방향 바꾸기',ids:[0]},
- {name:'하늘 반사',icon:'cloud-sun',note:'입자와 구름으로 햇빛 돌려보내기',ids:[1,3,4]},
+ {name:'하늘 반사',icon:'cloud-sun',note:'입자와 구름으로 햇빛 돌려보내기',ids:[3,1,4]},
  {name:'지면 반사',icon:'building-2',note:'사막과 지붕을 더 밝게',ids:[2,6]},
  {name:'인공 나무 ‘매머드’ 설치',icon:'fan',note:'공기에서 잡아 지하에 저장하기',ids:[8]},
  {name:'철분 살포하기',icon:'sprout',note:'철분으로 플랑크톤 성장 돕기',ids:[10],mode:'iron'},

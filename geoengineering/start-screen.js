@@ -2,7 +2,7 @@
 (()=>{
 const art=window.LAB_ILLUSTRATIONS;
 const choices=[
- ['우주 반사',0,'iron'],['하늘 반사',1,'iron'],['지면 반사',2,'iron'],
+ ['우주 반사',0,'iron'],['하늘 반사',3,'iron'],['지면 반사',2,'iron'],
  ['인공 나무 ‘매머드’ 설치',8,'iron'],['철분 살포하기',10,'iron'],['심층수 끌어올리기',10,'up']
 ];
 const container=document.getElementById('start-options');
