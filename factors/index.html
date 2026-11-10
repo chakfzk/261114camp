@@ -293,7 +293,7 @@ details.q li{margin:4px 0}
   <ul>
     <li>파란 띠는 산업화 이전에도 있던 온실 기체 층(수증기, 이산화 탄소 등)이다. 이 층이 없으면 지구 평균 기온은 약 −18℃이다(교과서 비교값).</li>
     <li>주황 점선 띠는 사람 활동으로 강화된 부분이다. 두께 변화는 보기 쉽게 과장하였다.</li>
-    <li>적외선 화살표(지표 복사·통과·대기 복사)의 두께는 280 ppm보다 진할 때 그 농도와의 차이를 6배로 키워 그렸다. 실제 값은 몇 %만 변해 비례대로 그리면 차이가 보이지 않기 때문이다. 이름표의 숫자는 실제 값이다.</li>
+    <li>적외선 화살표(지표 복사·통과·대기 복사)의 두께는 280 ppm보다 진할 때 그 농도와의 차이를 10배로 키워 그렸다. 실제 값은 몇 %만 변해 비례대로 그리면 차이가 보이지 않기 때문이다. 이름표의 숫자는 실제 값이다.</li>
     <li>이 요인들은 반사율을 바꾸지 않는다고 가정하였다.</li>
   </ul>
 </aside>
@@ -313,8 +313,8 @@ var VW=700, VH=440, SURF=372, TOP=22, SCX=44, SCY=42, HX=214;
 var K=(HX-SCX)/(SURF-SCY);
 function xRef(y){return HX+K*(SURF-y);}
 var UL=Math.hypot(HX-SCX,SURF-SCY), SX=SCX+34*(HX-SCX)/UL, SY=SCY+34*(SURF-SCY)/UL;
-var EM=470, SP=550, BK=630, SUN="#FFC247", IR="#FF7A9C";
-function wd(v){return Math.max(1.5,v/40);}
+var EM=470, SP=550, BK=645, SUN="#FFC247", IR="#FF7A9C";
+function wd(v){return Math.max(2,v/25);}
 function arrow(x1,y1,x2,y2,w,c,i){
   var dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy), ux=dx/L, uy=dy/L;
   var hl=Math.max(14,w*1.7), hw=Math.max(9,w*1.1), ex=x2-ux*hl*.85, ey=y2-uy*hl*.85;
@@ -351,7 +351,7 @@ function svgHead(aria){
 function ground(){ return '<rect x="0" y="'+SURF+'" width="'+VW+'" height="'+(VH-SURF)+'" fill="url(#gd)"/><rect x="0" y="'+SURF+'" width="'+VW+'" height="2.5" fill="#8FD6AE" opacity=".7"/>'; }
 /* 공통 화살표: 태양 복사, 반사, 지표 흡수, 지표 복사, 통과, 대기 복사(아래·위) */
 /* IR 화살표 두께: 280 ppm(대기 있음)보다 진하면 그때와의 차이를 EXG배로 키워 그림(값 자체는 몇 %만 변해 정비례로는 안 보임). 이름표 숫자는 실제 값 */
-var EXG=6;
+var EXG=10;
 function xw(v,ref,on){ return wd(on?ref+EXG*(v-ref):v); }
 function flowArrows(f,bt,bb,eps){
   var e0=epsOf(280), es0=ASR/(1-e0/2), on=eps>e0;
