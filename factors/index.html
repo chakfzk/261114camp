@@ -328,7 +328,7 @@ var EM=470, SP=550, BK=645, SUN="#FFC247", IR="#FF7A9C";
 function wd(v){return Math.max(2,v/25);}
 function arrow(x1,y1,x2,y2,w,c,i){
   var dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy), ux=dx/L, uy=dy/L;
-  var hl=Math.max(14,w*1.7), hw=Math.max(9,w*1.1), ex=x2-ux*hl*.85, ey=y2-uy*hl*.85;
+  var hl=Math.max(14,w*1.3), hw=Math.max(9,w*0.85), ex=x2-ux*hl*.85, ey=y2-uy*hl*.85;
   var bx=x2-ux*hl, by=y2-uy*hl, px=-uy, py=ux;
   return '<g class="ar" style="--i:'+i+'" filter="url(#glow)"><line pathLength="1" x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+ex.toFixed(1)+'" y2="'+ey.toFixed(1)+'" stroke="'+c+'" stroke-width="'+w.toFixed(1)+'"/>'+
     '<polygon points="'+(bx+px*hw).toFixed(1)+','+(by+py*hw).toFixed(1)+' '+(bx-px*hw).toFixed(1)+','+(by-py*hw).toFixed(1)+' '+x2.toFixed(1)+','+y2.toFixed(1)+'" fill="'+c+'"/></g>';
@@ -375,10 +375,14 @@ function flowArrows(f,bt,bb,eps){
     s+=arrow(EM,SURF,EM,TOP,wd(f.Es),IR,3)+badge(EM-14,318,"지표 복사",f.em,IR,"end",3,"surf")+badge(EM+14,96,"모두 우주로",null,IR,"start",3,"pass");
     return s;
   }
-  s+=arrow(EM,SURF,EM,bb+4,xw(f.Es,es0,on),IR,3)+badge(EM-14,318,"지표 복사",f.em,IR,"end",3,"surf");
-  if(f.pass>0) s+=arrow(EM,bt-4,EM,TOP,xw((1-eps)*f.Es,(1-e0)*es0,on),IR,4)+badge(EM-12,96,"통과",f.pass,IR,"end",4,"pass");
-  s+=arrow(BK,bb+4,BK,SURF,xw(eps*f.Es/2,e0*es0/2,on),IR,5)+badge((EM+BK)/2,306,"대기 복사",f.up,IR,"middle",5,"down","(지표로)");
-  s+=arrow(SP,bt-4,SP,TOP,xw(eps*f.Es/2,e0*es0/2,on),IR,5)+badge(SP+12,90,"대기 복사",f.up,IR,"start",5,"upa","(우주로)");
+  /* 화살표 끝점은 층 두께와 상관없이 '대기 있음(280 ppm)' 층의 위아래(174~214)에 고정. 층이 두꺼워지면 화살표가 층 안으로 들어가 보임 → 길이는 그대로, 굵기만 바뀜 */
+  bt=174; bb=214;
+  var wE=xw(f.Es,es0,on), wB=xw(eps*f.Es/2,e0*es0/2,on), hE=Math.max(9,wE*0.85), hB=Math.max(9,wB*0.85);
+  s+=arrow(EM,SURF,EM,bb+4,wE,IR,3)+badge(EM-Math.max(14,hE+6),318,"지표 복사",f.em,IR,"end",3,"surf");
+  var yp=Math.min(96,bt-24), yu=Math.min(90,bt-40); /* 층이 두꺼워지면 위쪽 이름표를 올림 */
+  if(f.pass>0) s+=arrow(EM,bt-4,EM,TOP,xw((1-eps)*f.Es,(1-e0)*es0,on),IR,4)+badge(EM-12,yp,"통과",f.pass,IR,"end",4,"pass");
+  s+=arrow(BK,bb+4,BK,SURF,xw(eps*f.Es/2,e0*es0/2,on),IR,5)+badge((EM+hE+BK-hB)/2,306,"대기 복사",f.up,IR,"middle",5,"down","(지표로)");
+  s+=arrow(SP,bt-4,SP,TOP,xw(eps*f.Es/2,e0*es0/2,on),IR,5)+badge(SP+12,yu,"대기 복사",f.up,IR,"start",5,"upa","(우주로)");
   return s;
 }
 
@@ -493,7 +497,8 @@ function scene(){
   if(band>1) s+='<rect x="12" y="'+bt.toFixed(1)+'" width="'+(VW-24)+'" height="'+h.toFixed(1)+'" rx="14" fill="#FFAA6E" fill-opacity="'+(0.10+0.14*Math.min(1,g)).toFixed(2)+'" stroke="#FFAA6E" stroke-width="1.6" stroke-dasharray="6 5"/>';
   s+='<rect x="12" y="'+(CY-h0/2)+'" width="'+(VW-24)+'" height="'+h0+'" rx="12" fill="#4CC3C9" fill-opacity=".34" stroke="#7AE3E8" stroke-width="1.5"/>';
   s+=label(SP,CY,"산업화 이전의 온실 기체 층",15,"#CFF7F9","pre");
-  if(band>=18) s+=label(SP,+(bt+band/2).toFixed(1),"강화된 부분 (사람 활동)",14,"#FFD9BC","enh");
+  /* 이름은 화살표가 지나가지 않는 오른쪽 위에 두 줄로 */
+  if(band>=34){ var ly=bt+band/2; s+=label(618,+(ly-8).toFixed(1),"강화된 부분",13,"#FFD9BC","enh")+label(618,+(ly+9).toFixed(1),"(사람 활동)",12,"#FFD9BC","enh"); }
   s+=ground()+flowArrows(f,bt,bb,f.eps);
   return s+'</svg>';
 }
