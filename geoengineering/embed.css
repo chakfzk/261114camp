@@ -11,8 +11,8 @@ body.embed #subtechniques:not([hidden]){display:flex!important;flex-wrap:wrap;ga
 body.embed #subtechniques button{min-height:30px;padding:4px 10px;font-size:12.5px}
 body.embed .scene-toolbar{display:flex!important;flex-wrap:wrap;align-items:center;padding:0!important;margin:0;border:0!important;gap:6px;justify-content:flex-end;min-height:0}
 body.embed .scene-toolbar #subtechniques:not([hidden]){margin-right:auto}
-body.embed .embed-name{display:none;margin-right:auto;font-weight:700;font-size:13.5px;color:#22313d;padding:4px 2px}
-body.embed #subtechniques[hidden]+.embed-name{display:inline-block}
+body.embed .embed-name{display:none;margin-right:auto;align-items:center;min-height:30px;padding:4px 10px;font-size:12.5px;border-radius:5px;background:#246b66;color:#fff;border:1px solid #246b66;box-sizing:border-box}
+body.embed #subtechniques[hidden]+.embed-name{display:inline-flex}
 /* 실제 사진이 있는 장면(에어로졸·기존 구름·매머드·철분·심층수)에만 버튼이 보임(features.js가 정함) */
 body.embed #photos:not([hidden]){min-height:28px;font-size:12px;padding:3px 10px}
 body.embed .scene-toolbar #names-toggle{display:none}
