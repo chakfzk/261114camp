@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>온실 효과와 지구 온난화</title>
+<link rel="icon" type="image/svg+xml" href="../radiation/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gothic+A1:wght@400;600;700&display=swap">
+<style>
+/* 6·7번을 한 브라우저 탭에서 보도록 묶은 페이지. 두 시뮬레이션은 원래 파일(radiation/, factors/)을 그대로 iframe으로 넣음.
+   원래 주소로 바로 들어오면 그 페이지가 이 페이지의 해당 탭(#radiation, #factors)으로 넘어옴 */
+html,body{margin:0;height:100%}
+[hidden]{display:none!important}
+:root{
+  --bg:#eef3f4; --paper:#ffffff; --ink:#15323a; --muted:#5b7279; --line:#cfdcdf; --accent:#0f7d8c; --accent-soft:#d8eef0;
+  --f-display:"Do Hyeon","Gothic A1",system-ui,sans-serif;
+  --f-body:"Gothic A1",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1b1e; --paper:#162a2f; --ink:#e3eef0; --muted:#93abb1; --line:#28434a; --accent:#5cc6d2; --accent-soft:#1d3d43; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1b1e; --paper:#162a2f; --ink:#e3eef0; --muted:#93abb1; --line:#28434a; --accent:#5cc6d2; --accent-soft:#1d3d43; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;display:flex;flex-direction:column;height:100vh;height:100dvh}
+button{font:inherit;color:inherit}
+.head{padding-top:20px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));flex:none}
+.head-in{max-width:1180px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0;text-wrap:balance;min-width:0}
+.ibtn{display:inline-grid;place-items:center;width:40px;height:40px;padding:0;border-radius:50%;flex:none;border:1px solid var(--line);background:var(--paper);cursor:pointer}
+.ibtn:hover{border-color:var(--accent)}
+.ibtn svg{width:20px;height:20px;fill:currentColor}
+.tabs{display:flex;gap:6px;margin-top:14px;border-bottom:1px solid var(--line)}
+.tab{border:1px solid transparent;border-bottom:0;background:none;padding:8px 16px;border-radius:10px 10px 0 0;cursor:pointer;font-weight:700;font-size:.95rem;color:var(--muted);margin-bottom:-1px}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--paper);border-color:var(--line);color:var(--accent)}
+.tab:focus-visible,.ibtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.frames{flex:1;min-height:0;position:relative}
+.frames iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg)}
+@media (max-width:420px){.tab{padding:8px 10px;font-size:.88rem}}
+</style>
+</head>
+<body>
+<div class="head"><div class="head-in">
+  <div class="top">
+    <h1>온실 효과와 지구 온난화</h1>
+    <button type="button" class="ibtn" id="gear" aria-haspopup="dialog" aria-label="설정 · 수치 근거" title="설정 · 수치 근거">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.5 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+    </button>
+  </div>
+  <div class="tabs" role="tablist" aria-label="활동 고르기">
+    <button type="button" class="tab" role="tab" id="tab-radiation" data-k="radiation" aria-controls="f-radiation">복사 평형과 온실 효과</button>
+    <button type="button" class="tab" role="tab" id="tab-factors" data-k="factors" aria-controls="f-factors">지구 온난화의 요인</button>
+  </div>
+</div></div>
+<div class="frames">
+  <iframe id="f-radiation" role="tabpanel" aria-labelledby="tab-radiation" title="복사 평형과 온실 효과" hidden></iframe>
+  <iframe id="f-factors" role="tabpanel" aria-labelledby="tab-factors" title="지구 온난화의 요인" hidden></iframe>
+</div>
+<script>
+(function(){
+  var SRC={radiation:"../radiation/?embed",factors:"../factors/?embed"}, cur=null;
+  var tabs=document.querySelectorAll(".tab");
+  function frame(k){ return document.getElementById("f-"+k); }
+  function show(k,focus){
+    if(!SRC[k]) k="radiation";
+    cur=k;
+    for(var i=0;i<tabs.length;i++){ var on=tabs[i].dataset.k===k; tabs[i].setAttribute("aria-selected",on); tabs[i].tabIndex=on?0:-1; }
+    for(var key in SRC){ var f=frame(key); if(key===k){ if(!f.getAttribute("src")) f.src=SRC[key]; f.hidden=false; } else f.hidden=true; }
+    try{ history.replaceState(null,"","#"+k); }catch(e){ location.hash=k; }
+    if(focus) document.getElementById("tab-"+k).focus();
+  }
+  for(var i=0;i<tabs.length;i++) tabs[i].addEventListener("click",function(){ show(this.dataset.k); });
+  document.querySelector(".tabs").addEventListener("keydown",function(e){
+    if(e.key!=="ArrowLeft"&&e.key!=="ArrowRight") return;
+    e.preventDefault(); show(cur==="radiation"?"factors":"radiation",true);
+  });
+  // 톱니: 지금 탭 안의 '설정 · 수치 근거' 패널을 엶
+  document.getElementById("gear").addEventListener("click",function(){
+    try{ frame(cur).contentWindow.document.getElementById("openSheet").click(); }catch(e){}
+  });
+  addEventListener("hashchange",function(){ var k=location.hash.slice(1); if(k!==cur) show(k); });
+  show(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>
