@@ -9,6 +9,12 @@
   if(q.get('embed')==='1'){
     document.documentElement.classList.add('embed');
     document.body.classList.add('focus','embed');
+    /* 세부 방법 버튼을 '입체로/원리 보기'와 같은 줄로(왼쪽에 세부 방법, 오른쪽에 실제 사진·보기 전환) */
+    const sub=document.getElementById('subtechniques'), bar=document.querySelector('.scene-toolbar');
+    if(sub&&bar) bar.prepend(sub);
+    /* 실제 사진을 열면 생각 노트가 시뮬레이션 칸을 크게 보기로 키움 */
+    const ph=document.getElementById('photos');
+    if(ph&&parent!==window) ph.addEventListener('click',()=>{ try{ parent.postMessage({geolab:'photo'},'*'); }catch(e){} });
   }
   if(m&&typeof select==='function'){
     document.body.classList.remove('choosing');
