@@ -12,6 +12,10 @@
     /* 세부 방법 버튼을 '입체로/원리 보기'와 같은 줄로(왼쪽에 세부 방법, 오른쪽에 실제 사진·보기 전환) */
     const sub=document.getElementById('subtechniques'), bar=document.querySelector('.scene-toolbar');
     if(sub&&bar) bar.prepend(sub);
+    /* 세부 방법이 하나뿐인 방법(우주 반사경·매머드·철분·심층수)은 그 자리에 장면 이름을 보여 줌 */
+    const nm=document.createElement('span'); nm.className='embed-name';
+    const title=document.getElementById('title'), put=()=>{ nm.textContent=title?title.textContent:''; };
+    if(sub&&bar){ sub.after(nm); put(); if(title) new MutationObserver(put).observe(title,{childList:true,characterData:true,subtree:true}); }
     /* 실제 사진을 열면 생각 노트가 시뮬레이션 칸을 크게 보기로 키움 */
     const ph=document.getElementById('photos');
     if(ph&&parent!==window) ph.addEventListener('click',()=>{ try{ parent.postMessage({geolab:'photo'},'*'); }catch(e){} });
