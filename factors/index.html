@@ -305,6 +305,7 @@ details.q li{margin:4px 0}
     <li>파란 띠는 산업화 이전에도 있던 온실 기체 층(수증기, 이산화 탄소 등)이다. 이 층이 없으면 지구 평균 기온은 약 −18℃이다(교과서 비교값).</li>
     <li>주황 점선 띠는 사람 활동으로 강화된 부분이다. 두께 변화는 보기 쉽게 과장하였다.</li>
     <li>적외선 화살표(지표 복사·통과·대기 복사)의 두께는 280 ppm보다 진할 때 그 농도와의 차이를 10배로 키워 그렸다. 실제 값은 몇 %만 변해 비례대로 그리면 차이가 보이지 않기 때문이다. 이름표의 숫자는 실제 값이다.</li>
+    <li>화살표 두께는 다이얼을 돌리는 즉시 그 농도의 새 평형 값으로 그렸다. 평형에 이르는 동안 기온과 이름표의 숫자는 천천히 바뀐다.</li>
     <li>이 요인들은 반사율을 바꾸지 않는다고 가정하였다.</li>
   </ul>
 </aside>
@@ -364,7 +365,9 @@ function ground(){ return '<rect x="0" y="'+SURF+'" width="'+VW+'" height="'+(VH
 /* IR 화살표 두께: 280 ppm(대기 있음)보다 진하면 그때와의 차이를 EXG배로 키워 그림(값 자체는 몇 %만 변해 정비례로는 안 보임). 이름표 숫자는 실제 값 */
 var EXG=10;
 function xw(v,ref,on){ return wd(on?ref+EXG*(v-ref):v); }
-function flowArrows(f,bt,bb,eps){
+/* fw: 굵기용 값(주지 않으면 f). 탭 ③은 그 농도의 평형 값을 넘겨, 기온을 기다리지 않고 다이얼을 돌리는 즉시 굵기가 바뀜. 이름표 숫자는 f */
+function flowArrows(f,bt,bb,eps,fw){
+  fw=fw||f;
   var e0=epsOf(280), es0=ASR/(1-e0/2), on=eps>e0;
   var s=arrow(SX,SY,HX,SURF,wd(340),SUN,0)+badge(66,72,"태양 복사",100,SUN,"start",0,"sun");
   s+=arrow(HX,SURF,xRef(TOP),TOP,wd(100),SUN,1)+badge(xRef(72)-12,72,"반사",REF,SUN,"end",1,"ref");
@@ -377,12 +380,12 @@ function flowArrows(f,bt,bb,eps){
   }
   /* 화살표 끝점은 층 두께와 상관없이 '대기 있음(280 ppm)' 층의 위아래(174~214)에 고정. 층이 두꺼워지면 화살표가 층 안으로 들어가 보임 → 길이는 그대로, 굵기만 바뀜 */
   bt=174; bb=214;
-  var wE=xw(f.Es,es0,on), wB=xw(eps*f.Es/2,e0*es0/2,on), hE=Math.max(9,wE*0.85), hB=Math.max(9,wB*0.85);
+  var wE=xw(fw.Es,es0,on), wB=xw(eps*fw.Es/2,e0*es0/2,on), hE=Math.max(9,wE*0.85), hB=Math.max(9,wB*0.85);
   s+=arrow(EM,SURF,EM,bb+4,wE,IR,3)+badge(EM-Math.max(14,hE+6),318,"지표 복사",f.em,IR,"end",3,"surf");
   var yp=Math.min(96,bt-24), yu=Math.min(90,bt-40); /* 층이 두꺼워지면 위쪽 이름표를 올림 */
-  if(f.pass>0) s+=arrow(EM,bt-4,EM,TOP,xw((1-eps)*f.Es,(1-e0)*es0,on),IR,4)+badge(EM-12,yp,"통과",f.pass,IR,"end",4,"pass");
-  s+=arrow(BK,bb+4,BK,SURF,xw(eps*f.Es/2,e0*es0/2,on),IR,5)+badge((EM+hE+BK-hB)/2,306,"대기 복사",f.up,IR,"middle",5,"down","(지표로)");
-  s+=arrow(SP,bt-4,SP,TOP,xw(eps*f.Es/2,e0*es0/2,on),IR,5)+badge(SP+12,yu,"대기 복사",f.up,IR,"start",5,"upa","(우주로)");
+  if(f.pass>0) s+=arrow(EM,bt-4,EM,TOP,xw((1-eps)*fw.Es,(1-e0)*es0,on),IR,4)+badge(EM-12,yp,"통과",f.pass,IR,"end",4,"pass");
+  s+=arrow(BK,bb+4,BK,SURF,xw(eps*fw.Es/2,e0*es0/2,on),IR,5)+badge((EM+hE+BK-hB)/2,306,"대기 복사",f.up,IR,"middle",5,"down","(지표로)");
+  s+=arrow(SP,bt-4,SP,TOP,xw(eps*fw.Es/2,e0*es0/2,on),IR,5)+badge(SP+12,yu,"대기 복사",f.up,IR,"start",5,"upa","(우주로)");
   return s;
 }
 
@@ -497,9 +500,9 @@ function scene(){
   if(band>1) s+='<rect x="12" y="'+bt.toFixed(1)+'" width="'+(VW-24)+'" height="'+h.toFixed(1)+'" rx="14" fill="#FFAA6E" fill-opacity="'+(0.10+0.14*Math.min(1,g)).toFixed(2)+'" stroke="#FFAA6E" stroke-width="1.6" stroke-dasharray="6 5"/>';
   s+='<rect x="12" y="'+(CY-h0/2)+'" width="'+(VW-24)+'" height="'+h0+'" rx="12" fill="#4CC3C9" fill-opacity=".34" stroke="#7AE3E8" stroke-width="1.5"/>';
   s+=label(SP,CY,"산업화 이전의 온실 기체 층",15,"#CFF7F9","pre");
-  /* 이름은 화살표가 지나가지 않는 오른쪽 위에 두 줄로 */
-  if(band>=34){ var ly=bt+band/2; s+=label(618,+(ly-8).toFixed(1),"강화된 부분",13,"#FFD9BC","enh")+label(618,+(ly+9).toFixed(1),"(사람 활동)",12,"#FFD9BC","enh"); }
-  s+=ground()+flowArrows(f,bt,bb,f.eps);
+  /* 이름은 화살표가 지나가지 않는 오른쪽 위에 */
+  if(band>=20) s+=label(618,+(bt+band/2).toFixed(1),"강화된 부분",13,"#FFD9BC","enh");
+  s+=ground()+flowArrows(f,bt,bb,f.eps,flows(m,m.Teq));
   return s+'</svg>';
 }
 
