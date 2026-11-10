@@ -295,7 +295,7 @@ var VW=700, VH=440, SURF=372, TOP=22, SCX=44, SCY=42, HX=214;
 var K=(HX-SCX)/(SURF-SCY);
 function xRef(y){return HX+K*(SURF-y);}
 var UL=Math.hypot(HX-SCX,SURF-SCY), SX=SCX+34*(HX-SCX)/UL, SY=SCY+34*(SURF-SCY)/UL;
-var EM=480, SP=550, BK=620, SUN="#FFC247", IR="#FF7A9C";
+var EM=470, SP=550, BK=630, SUN="#FFC247", IR="#FF7A9C";
 function wd(v){return Math.max(1.5,v/40);}
 function arrow(x1,y1,x2,y2,w,c,i){
   var dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy), ux=dx/L, uy=dy/L;
@@ -306,10 +306,12 @@ function arrow(x1,y1,x2,y2,w,c,i){
 }
 function tw(t){var w=22; for(var i=0;i<t.length;i++) w+=t.charCodeAt(i)>=0xAC00?17:10.2; return w;}
 function keyAttr(k){ return k?' data-key="'+k+'" tabindex="0" aria-label="'+TIPS[k][0]+': '+TIPS[k][1]+'"':''; }
-function badge(x,y,lab,val,c,anchor,i,k){
-  var t=(hide||val===null)?lab:lab+" "+val, w=tw(t), x0=anchor==="end"?x-w:anchor==="middle"?x-w/2:x;
-  return '<g class="bd" style="--i:'+i+'"'+keyAttr(k)+'><rect x="'+x0.toFixed(1)+'" y="'+(y-15)+'" width="'+w.toFixed(1)+'" height="30" rx="15" fill="rgba(7,12,31,.86)" stroke="'+c+'" stroke-width="1.5"/>'+
-    '<text x="'+(x0+w/2).toFixed(1)+'" y="'+y+'" fill="#fff" font-size="17" font-weight="700" text-anchor="middle" dominant-baseline="central">'+t+'</text></g>';
+/* sub: 둘째 줄(작은 글씨). 대기 방출의 방향 '(지표로)'·'(우주로)'에 씀 */
+function badge(x,y,lab,val,c,anchor,i,k,sub){
+  var t=(hide||val===null)?lab:lab+" "+val, w=Math.max(tw(t),sub?tw(sub)*.8:0), x0=anchor==="end"?x-w:anchor==="middle"?x-w/2:x, h=sub?48:30;
+  return '<g class="bd" style="--i:'+i+'"'+keyAttr(k)+'><rect x="'+x0.toFixed(1)+'" y="'+(y-15)+'" width="'+w.toFixed(1)+'" height="'+h+'" rx="15" fill="rgba(7,12,31,.86)" stroke="'+c+'" stroke-width="1.5"/>'+
+    '<text x="'+(x0+w/2).toFixed(1)+'" y="'+y+'" fill="#fff" font-size="17" font-weight="700" text-anchor="middle" dominant-baseline="central">'+t+'</text>'+
+    (sub?'<text x="'+(x0+w/2).toFixed(1)+'" y="'+(y+19)+'" fill="#fff" fill-opacity=".85" font-size="13.5" font-weight="700" text-anchor="middle" dominant-baseline="central">'+sub+'</text>':'')+'</g>';
 }
 function label(x,y,t,size,fill,k){
   var w=t.length*size*0.95+16;
@@ -342,8 +344,8 @@ function flowArrows(f,bt,bb,eps){
   }
   s+=arrow(EM,SURF,EM,bb+4,wd(f.Es),IR,3)+badge(EM-14,318,"지표 복사",f.em,IR,"end",3,"surf");
   if(f.pass>0) s+=arrow(EM,bt-4,EM,TOP,wd((1-eps)*f.Es),IR,4)+badge(EM-12,96,"통과",f.pass,IR,"end",4,"pass");
-  s+=arrow(BK,bb+4,BK,SURF,wd(eps*f.Es/2),IR,5)+badge((EM+BK)/2,318,"대기 방출",f.up,IR,"middle",5,"down");
-  s+=arrow(SP,bt-4,SP,TOP,wd(eps*f.Es/2),IR,6)+badge(SP+12,96,"대기 방출",f.up,IR,"start",6,"upa");
+  s+=arrow(BK,bb+4,BK,SURF,wd(eps*f.Es/2),IR,5)+badge((EM+BK)/2,306,"대기 방출",f.up,IR,"middle",5,"down","(지표로)");
+  s+=arrow(SP,bt-4,SP,TOP,wd(eps*f.Es/2),IR,5)+badge(SP+12,90,"대기 방출",f.up,IR,"start",5,"upa","(우주로)");
   return s;
 }
 
@@ -403,8 +405,8 @@ TIPS={
   abs:["지구가 흡수","반사되지 않은 태양 복사를 지구가 흡수한 양입니다. 실제로는 대기와 지표가 나누어 흡수하지만, 이 그림에서는 합쳐서 나타냈습니다."],
   surf:["지표 복사","데워진 지표가 내보내는 적외선 에너지입니다. 지표가 따뜻할수록 커집니다."],
   pass:["통과","지표 복사 중 대기에 흡수되지 않고 곧바로 우주로 나가는 몫입니다."],
-  down:["대기 방출 (지표 쪽)","온실 기체가 흡수한 에너지를 다시 내보낸 것 중 지표로 향하는 몫입니다. 지표를 더 데웁니다."],
-  upa:["대기 방출 (우주 쪽)","온실 기체가 흡수한 에너지를 다시 내보낸 것 중 우주로 향하는 몫입니다. 통과한 몫과 합한 것이 지구 복사입니다."],
+  down:["대기 방출 (지표로)","온실 기체가 흡수한 에너지를 다시 내보낸 것 중 지표로 향하는 몫입니다. 지표를 더 데웁니다."],
+  upa:["대기 방출 (우주로)","온실 기체가 흡수한 에너지를 다시 내보낸 것 중 우주로 향하는 몫입니다. 통과한 몫과 합한 것이 지구 복사입니다."],
   air:["대기","온실 기체가 많을수록 지표 복사를 더 많이 흡수합니다."]
 };
 
