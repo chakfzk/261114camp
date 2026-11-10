@@ -83,7 +83,17 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 @media (min-width:420px){.presets{grid-template-columns:repeat(6,minmax(0,1fr))}.presets .pb{grid-column:span 2}.presets .w{grid-column:span 3}}
 
 .temp{display:grid;grid-template-columns:8rem minmax(0,1fr);gap:4px 16px;align-items:center}
-.temp .k{grid-column:1/-1;font-size:.82rem;color:var(--muted);font-weight:600}
+.temp .k{grid-column:1/-1;font-size:.82rem;color:var(--muted);font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.deltas.co2row{grid-template-columns:minmax(0,1fr) auto;align-items:stretch}
+.co2row .btn{padding:0 18px}
+.notes{display:flex;flex-direction:column;gap:0;padding-top:6px;padding-bottom:6px}
+.nrow{padding:8px 0;border-top:1px solid var(--line);min-height:3.2em;font-size:.86rem;line-height:1.5}
+.nrow:first-child{border-top:0}
+.nrow b{display:flex;justify-content:space-between;font-size:.92rem}
+.nrow b span{font-family:var(--f-mono);color:var(--accent)}
+.nrow p{margin:2px 0 0;color:var(--muted)}
+.nrow.on p{color:var(--ink)}
+.nrow.now{background:linear-gradient(90deg,var(--accent-soft),transparent 70%);margin:0 -16px;padding-left:16px;padding-right:16px}
 .temp .v{font-family:var(--f-mono);font-size:2.1rem;font-weight:600;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
 .temp .v small{font-size:1rem;margin-left:2px}
 .gauge{min-width:0}
@@ -157,11 +167,6 @@ details.q li{margin:4px 0}
 .typed .kn.warm .kf{stroke:var(--warm)} .typed .kn.warm .kth{stroke:var(--warm)} .typed .kn.warm .kv{color:var(--warm)}
 .typed .kn.sol .kf{stroke:var(--ok)} .typed .kn.sol .kth{stroke:var(--ok)} .typed .kn.sol .kv{color:var(--ok)}
 /* 다이얼 설명: 마지막으로 돌린 다이얼 하나. 높이를 잡아 두어 아래 칸이 들썩이지 않게 함 */
-.note{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);min-height:6.4em;font-size:.86rem;line-height:1.5}
-@media (max-width:600px){.note{min-height:8em}}
-.note b{display:block;font-size:.92rem}
-.note p{margin:2px 0 0}
-.note.empty p{color:var(--muted)}
 .acts{display:flex;flex-wrap:wrap;gap:6px}
 .acts .btn{flex:1 1 auto}
 .gauge.w .bar{background:linear-gradient(90deg,#9cc9e8,#f3d08b 40%,#f3b26b 60%,#e0573a)}
@@ -185,9 +190,19 @@ details.q li{margin:4px 0}
           <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
         </button>
         <span>이름에 마우스를 올리거나 누르면 설명이 나옵니다.</span>
-        <button type="button" class="btn primary" id="again">평형 과정 다시 보기</button>
       </div>
       <div class="tip" id="tip" role="tooltip" hidden></div>
+      <div class="box tempbox">
+        <div class="temp">
+          <div class="k">기온 변화 (산업화 이전 대비)</div>
+          <div class="v" id="tVal"></div>
+          <div class="gauge w" aria-hidden="true"><div class="bar"><span class="mk" id="tMk"></span></div><div class="lb"><span>0</span><span>+2</span><span>+4℃</span></div></div>
+        </div>
+        <div class="deltas co2row">
+          <div><small>대기 중 CO₂ 농도</small><b id="cVal"></b></div>
+          <button type="button" class="btn primary" id="again">평형 과정 다시 보기</button>
+        </div>
+      </div>
     </div>
 
     <div class="panel">
@@ -195,20 +210,9 @@ details.q li{margin:4px 0}
         <button type="button" class="btn" id="p0">산업화 이전으로</button>
         <button type="button" class="btn" id="p1">2024년 수준으로</button>
       </div>
-      <div class="box"><div class="knobs" id="knobs"></div>
-        <div class="note" id="note" aria-live="polite"><b id="noteT"></b><p id="noteP"></p></div>
-      </div>
+      <div class="box"><div class="knobs" id="knobs"></div></div>
+      <div class="box notes" id="notes" aria-live="polite"></div>
 
-      <div class="box">
-        <div class="temp">
-          <div class="k">기온 변화 (산업화 이전 대비)</div>
-          <div class="v" id="tVal"></div>
-          <div class="gauge w" aria-hidden="true"><div class="bar"><span class="mk" id="tMk"></span></div><div class="lb"><span>0</span><span>+2</span><span>+4℃</span></div></div>
-        </div>
-        <div class="deltas" style="--n:1">
-          <div><small>대기 중 CO₂ 농도</small><b id="cVal"></b></div>
-        </div>
-      </div>
 
     </div>
   </div>
@@ -285,6 +289,7 @@ details.q li{margin:4px 0}
   <ul>
     <li>신재생에너지는 그때 쓰는 화석 연료 중 그 비율만큼을 대체한다고 가정하였다(50% = 화석 연료 배출이 절반, 100% = 0). 화석 연료가 없으면 효과가 없다.</li>
     <li>나무 심기는 AR6 3실무그룹 제12장의 농림업·토지 부문 CO₂ 제거 2050년 중앙값 약 3 GtCO₂/년을 참고해, 연 3 GtCO₂를 30년 동안 흡수하는 규모(100% = 90 GtCO₂)로 놓았다.</li>
+    <li>설명의 넓이는 우리나라 숲(30년생) 1 ha가 1년에 CO₂ 약 10.4톤을 흡수한다는 값(국립산림과학원 주요 산림수종의 표준 탄소흡수량)으로 환산하였다. 연 3 GtCO₂ ÷ 10.4 t/ha ≈ 2.9억 ha로 남한 면적(약 10만 km²)의 약 29배이며, 어린나무는 덜 흡수하므로 약 30배로 나타냈다.</li>
     <li>농도 환산은 1 ppm ≈ 7.8 GtCO₂, 대기 잔류 비율 약 45%를 써서 100%일 때 −<span class="num" id="sTree"></span> ppm이다. 이 가정은 교육용이며 원문 대조가 필요하다.</li>
     <li>제거량은 산업화 이전 농도 아래로 내려가지 않게 제한하였다. CO₂ 제거에 대한 반응은 배출과 정확히 대칭이 아니다(AR6 1실무그룹 제5장).</li>
   </ul>
@@ -563,38 +568,36 @@ knobs.addEventListener("keydown",function(e){
 });
 
 /* ---------- 결과 ---------- */
-/* 다이얼 설명(noteId: 마지막으로 돌린 다이얼, 없으면 안내 한 줄) */
-var noteId=null;
-var FULL="100%는 2100년까지(중간 배출 시나리오) 늘어날 양입니다.";
+/* 다이얼 설명: 네 다이얼 제목은 늘 보이고, 한 번이라도 돌린 다이얼은 지금 값의 뜻으로 바뀜(touched). 마지막으로 돌린 줄은 강조(noteId) */
+var noteId=null, touched={fos:1,luc:1};
 function noteText(id){
+  /* 데스모스에서 학생이 '늘리는 요인·줄이는 요인'을 직접 쓰므로, CO₂가 늘거나 준다는 방향은 말하지 않음 */
   var m=calc(), v=lv[id], P=pct(v), at24=Math.abs(v-4*T24)<0.02?" 지금은 2024년 수준입니다.":"";
   if(id==="fos"){
-    if(!v) return "화석 연료를 쓰지 않은 상태(산업화 이전)입니다. "+FULL;
-    var t="화석 연료 연소와 시멘트 생산으로 CO₂ 농도가 약 "+Math.round(v*PER_FOS)+" ppm 늘어나는 수준입니다. "+FULL+at24;
-    if(lv.ren>0) t+=" 신재생에너지로 바꾼 만큼 빠져 실제로는 약 "+Math.round(v*(1-lv.ren/4)*PER_FOS)+" ppm 늘어납니다.";
-    return t;
+    if(!v) return "화석 연료를 쓰지 않은 상태(산업화 이전)입니다.";
+    return "화석 연료를 태우고 시멘트를 만든 양입니다."+at24+(lv.ren>0?" 이 중 "+pct(lv.ren)+"%는 신재생에너지로 바꾸었습니다.":"");
   }
   if(id==="luc"){
-    if(!v) return "숲을 없애거나 땅의 쓰임을 바꾸지 않은 상태(산업화 이전)입니다. "+FULL;
-    return "숲을 없애고 땅의 쓰임을 바꾸어 CO₂ 농도가 약 "+Math.round(v*PER_LUC)+" ppm 늘어난 상태입니다. "+FULL+at24;
+    if(!v) return "숲을 없애거나 땅의 쓰임을 바꾸지 않은 상태(산업화 이전)입니다.";
+    return "숲을 없애고 땅의 쓰임을 바꾼 양입니다."+at24;
   }
   if(id==="ren"){
     if(!lv.fos) return "화석 연료를 쓰지 않는 상태라 신재생에너지로 바꿀 것이 없습니다.";
     if(!v) return "화석 연료를 신재생에너지로 바꾸지 않은 상태입니다.";
-    return "지금 쓰는 화석 연료의 "+P+"%를 신재생에너지로 바꾼 상태입니다. 그만큼 화석 연료로 늘어나는 CO₂가 줄어듭니다.";
+    return "지금 쓰는 화석 연료("+pct(lv.fos)+"%)의 "+P+"%를 신재생에너지로 바꾼 상태입니다.";
   }
-  var TREE="100%는 30년 동안 해마다 CO₂ 30억 톤을 흡수하는 규모입니다.";
-  if(!v) return "나무를 심지 않은 상태입니다. "+TREE;
-  if(m.treeEff<v-1e-6) return "더 줄일 CO₂가 없어서 나무 심기는 "+(pct(m.treeEff)?pct(m.treeEff)+"%까지만 효과가 있습니다":"효과가 없습니다")+". 산업화 이전 농도(280 ppm)보다 낮아지지는 않습니다.";
-  return "나무를 심어 공기 중 CO₂를 줄인 상태입니다. "+TREE;
+  if(!v) return "나무를 심지 않은 상태입니다.";
+  var TS="100%는 남한 면적의 약 30배 넓이에 나무를 심고 30년 동안 가꾸는 양입니다.";
+  var LIM=" CO₂ 농도가 이미 산업화 이전(280 ppm)이기 때문입니다.";
+  if(m.treeEff<v-1e-6) return pct(m.treeEff)?"나무 심기 다이얼을 "+pct(m.treeEff)+"%보다 더 돌려도 결과가 바뀌지 않습니다."+LIM:"지금은 나무 심기 다이얼을 돌려도 결과가 바뀌지 않습니다."+LIM;
+  return "나무를 심은 양입니다. "+TS;
 }
 function effNote(){
-  var n=$("note"), f=null;
-  FACT.forEach(function(x){ if(x.id===noteId) f=x; });
-  n.classList.toggle("empty",!f);
-  $("noteT").textContent=f?f.sh+" "+pct(lv[f.id])+"%":"";
-  $("noteT").hidden=!f;
-  $("noteP").textContent=f?noteText(f.id):"다이얼을 돌리면 설명이 나옵니다.";
+  if(noteId) touched[noteId]=1;
+  $("notes").innerHTML=FACT.map(function(f){
+    var on=!!touched[f.id];
+    return '<div class="nrow'+(on?' on':'')+(f.id===noteId?' now':'')+'"><b>'+f.sh+'</b><p>'+(on?noteText(f.id):'')+'</p></div>';
+  }).join("");
 }
 function readouts(){
   var m=calc();
@@ -619,13 +622,13 @@ function changed(){ stopPlay(); effNote(); readouts(); settle(); frame(); }
 function beforePlay(){ if(raf){ cancelAnimationFrame(raf); raf=null; last=0; } cur=tgt=calc().Teq; readouts(); paint(scene()); }
 
 function set2024(){ FACT.forEach(function(f){ lv[f.id]=f.dir==="sol"?0:4*T24; }); }
-$("p1").addEventListener("click",function(){ from=cur; noteId=null; set2024(); syncAll(); changed(); });
-$("p0").addEventListener("click",function(){ from=cur; noteId=null; FACT.forEach(function(f){ lv[f.id]=0; }); syncAll(); changed(); });
+$("p1").addEventListener("click",function(){ from=cur; noteId=null; touched={fos:1,luc:1}; set2024(); syncAll(); changed(); });
+$("p0").addEventListener("click",function(){ from=cur; noteId=null; touched={}; FACT.forEach(function(f){ lv[f.id]=0; }); syncAll(); changed(); });
 $("again").addEventListener("click",function(){ stopPlay(); cur=from; readouts(); settle(); });
 $("showType").addEventListener("change",function(e){ $("root").classList.toggle("typed",e.target.checked); });
 $("hideNum").addEventListener("change",function(e){ hide=e.target.checked; readouts(); paint(scene()); });
 $("reset").addEventListener("click",function(){
-  noteId=null; set2024(); syncAll();
+  noteId=null; touched={fos:1,luc:1}; set2024(); syncAll();
   if(raf){ cancelAnimationFrame(raf); raf=null; last=0; } cur=tgt=calc().Teq; from=0;
   hide=false; $("hideNum").checked=false; $("showType").checked=false; $("root").classList.remove("typed");
   stopPlay(); effNote(); readouts(); paint(scene()); closeS();

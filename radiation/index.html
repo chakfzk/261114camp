@@ -81,7 +81,11 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 @media (max-width:599px){.pb .era{display:block}.pb .era i{display:none}}
 .pb[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
 .pb[aria-pressed="true"] small{color:var(--accent)}
-@media (min-width:420px){.presets{grid-template-columns:repeat(6,minmax(0,1fr))}.presets .pb{grid-column:span 2}.presets .w{grid-column:span 3}}
+/* 세로 목록: 이름 왼쪽, 농도 오른쪽 */
+.presets{grid-template-columns:1fr;gap:8px;margin-top:16px}
+.presets .pb{flex-direction:row;justify-content:space-between;align-items:baseline;padding:12px 14px}
+.presets .pb b{font-size:.95rem}.presets .pb small{font-size:.8rem}
+.pb .era{display:inline!important}.pb .era i{display:inline!important}
 
 .temp{display:grid;grid-template-columns:8rem minmax(0,1fr);gap:4px 16px;align-items:center}
 .temp .k{grid-column:1/-1;font-size:.82rem;color:var(--muted);font-weight:600}
@@ -154,6 +158,18 @@ details.q li{margin:4px 0}
         <span>이름에 마우스를 올리거나 누르면 설명이 나옵니다.</span>
       </div>
       <div class="tip" id="tip" role="tooltip" hidden></div>
+      <div class="box tempbox">
+        <div class="temp">
+          <div class="k">평균 기온</div>
+          <div class="v" id="tVal">14.9<small>℃</small></div>
+          <div class="gauge" aria-hidden="true"><div class="bar"><span class="mk" id="tMk"></span></div><div class="lb"><span>−20</span><span>0</span><span>20℃</span></div></div>
+        </div>
+        <div class="deltas">
+          <div><small>대기가 없을 때보다</small><b id="d0"></b></div>
+          <div><small>산업화 이전보다</small><b id="d1"></b></div>
+          <div><small>2024년보다</small><b id="d2"></b></div>
+        </div>
+      </div>
     </div>
 
     <div class="panel">
@@ -167,25 +183,13 @@ details.q li{margin:4px 0}
         <div class="scale" aria-hidden="true"><span style="left:0%">0</span><span style="left:25%">280</span><span style="left:50%">560</span><span style="left:75%">840</span><span style="left:100%">1120</span></div>
         <div class="presets" role="group" aria-label="기준 농도">
           <button type="button" class="pb" data-p="0"><b>대기 없음</b><small>0 ppm</small></button>
-          <button type="button" class="pb" data-p="280"><b>대기 있음</b><small>280 ppm<span class="era"><i> · </i>산업화 이전</span></small></button>
+          <button type="button" class="pb" data-p="280"><b>대기 있음</b><small><span class="era">산업화 이전<i> · </i></span>280 ppm</small></button>
           <button type="button" class="pb" data-p="424"><b>2024년</b><small>424 ppm</small></button>
           <button type="button" class="pb w" id="pb15"><b>파리협정 1.5℃</b><small></small></button>
           <button type="button" class="pb w" id="pb20"><b>파리협정 2℃</b><small></small></button>
         </div>
       </div>
 
-      <div class="box">
-        <div class="temp">
-          <div class="k">평균 기온</div>
-          <div class="v" id="tVal">14.9<small>℃</small></div>
-          <div class="gauge" aria-hidden="true"><div class="bar"><span class="mk" id="tMk"></span></div><div class="lb"><span>−20</span><span>0</span><span>20℃</span></div></div>
-        </div>
-        <div class="deltas">
-          <div><small>대기가 없을 때보다</small><b id="d0"></b></div>
-          <div><small>산업화 이전보다</small><b id="d1"></b></div>
-          <div><small>2024년보다</small><b id="d2"></b></div>
-        </div>
-      </div>
 
     </div>
   </div>
