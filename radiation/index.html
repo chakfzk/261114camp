@@ -90,15 +90,6 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 .deltas small{display:block;font-size:.72rem;color:var(--muted);line-height:1.3}
 .deltas b{font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
 
-.bal{display:flex;flex-direction:column;gap:8px}
-.bal .row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;text-align:center}
-.bal .side small{display:block;font-size:.74rem;color:var(--muted);line-height:1.3}
-.bal .side b{font-family:var(--f-mono);font-size:1.1rem;font-variant-numeric:tabular-nums}
-.bal .sg{font-family:var(--f-mono);font-size:1.4rem;font-weight:600;color:var(--accent)}
-.tag{align-self:center;font-size:.76rem;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
-.tag.ok{background:var(--ok-soft);color:var(--ok)}
-.tag.warm{background:var(--warm-soft);color:var(--warm)}
-.bal hr{border:0;border-top:1px dashed var(--line);margin:2px 0;width:100%}
 
 details.q{background:var(--q-soft);border-color:var(--q-line)}
 details.q summary{cursor:pointer;font-weight:700;color:var(--q)}
@@ -189,8 +180,6 @@ details.q li{margin:4px 0}
           <div><small>2024년보다</small><b id="d2"></b></div>
         </div>
       </div>
-
-      <div class="box bal" id="bal"></div>
 
     </div>
   </div>
@@ -351,14 +340,6 @@ function flowArrows(f,bt,bb,eps){
   s+=arrow(SP,bt-4,SP,TOP,wd(eps*f.Es/2),IR,6)+badge(SP+12,96,"대기 방출",f.up,IR,"start",6,"upa");
   return s;
 }
-function balHtml(absV,outV,emV,ghTag,ghCls,absTag,absCls){
-  function side(lab,v){return '<div class="side"><small>'+lab+'</small>'+(hide?'':'<b>'+v+'</b>')+'</div>';}
-  function sign(a,b){return a>b?"&gt;":a<b?"&lt;":"=";}
-  return '<div class="row">'+side("지구가 흡수한<br>태양 에너지",absV)+'<div class="sg">'+sign(absV,outV)+'</div>'+side("우주로 나가는<br>지구 복사",outV)+'</div>'+
-    '<span class="tag '+absCls+'">'+absTag+'</span><hr>'+
-    '<div class="row">'+side("지표 복사",emV)+'<div class="sg">'+sign(emV,outV)+'</div>'+side("우주로 나가는<br>지구 복사",outV)+'</div>'+
-    '<span class="tag '+ghCls+'">'+ghTag+'</span>';
-}
 
 /* 그림 그리기와 툴팁 */
 var stage=$("stage"), col=$("stagecol"), tip=$("tip"), tipKey=null;
@@ -446,13 +427,10 @@ function scene(){
 
 function render(){
   paint(scene());
-  var eps=epsOf(ppm), f=flows(eps), Ts=tempK(ppm), tC=Ts-273.15;
+  var eps=epsOf(ppm), Ts=tempK(ppm), tC=Ts-273.15;
   $("tVal").innerHTML=f1(tC)+"<small>℃</small>";
   $("tMk").style.left=Math.max(0,Math.min(100,(tC+20)/40*100)).toFixed(1)+"%";
   $("d0").textContent=sd(Ts-TE)+"℃"; $("d1").textContent=sd(Ts-tempK(PRE))+"℃"; $("d2").textContent=sd(Ts-tempK(NOW))+"℃";
-  var g, gc="";
-  if(ppm===0) g="온실효과 없음"; else if(ppm<PRE) g="온실효과 약함"; else if(ppm===PRE) g="일반적 온실효과"; else {g="온실효과 가속화"; gc="warm";}
-  $("bal").innerHTML=balHtml(ABS,ABS,f.none?ABS:f.em,g,gc,"복사 평형 (이 농도가 유지될 때)","ok");
   var pbs=document.querySelectorAll(".pb");
   for(var i=0;i<pbs.length;i++) pbs[i].setAttribute("aria-pressed", +pbs[i].dataset.p===ppm?"true":"false");
 }

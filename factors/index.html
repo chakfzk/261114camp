@@ -90,15 +90,6 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 .deltas small{display:block;font-size:.72rem;color:var(--muted);line-height:1.3}
 .deltas b{font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
 
-.bal{display:flex;flex-direction:column;gap:8px}
-.bal .row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;text-align:center}
-.bal .side small{display:block;font-size:.74rem;color:var(--muted);line-height:1.3}
-.bal .side b{font-family:var(--f-mono);font-size:1.1rem;font-variant-numeric:tabular-nums}
-.bal .sg{font-family:var(--f-mono);font-size:1.4rem;font-weight:600;color:var(--accent)}
-.tag{align-self:center;font-size:.76rem;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
-.tag.ok{background:var(--ok-soft);color:var(--ok)}
-.tag.warm{background:var(--warm-soft);color:var(--warm)}
-.bal hr{border:0;border-top:1px dashed var(--line);margin:2px 0;width:100%}
 
 details.q{background:var(--q-soft);border-color:var(--q-line)}
 details.q summary{cursor:pointer;font-weight:700;color:var(--q)}
@@ -204,13 +195,10 @@ details.q li{margin:4px 0}
           <div class="v" id="tVal"></div>
           <div class="gauge w" aria-hidden="true"><div class="bar"><span class="mk" id="tMk"></span></div><div class="lb"><span>0</span><span>+2</span><span>+4℃</span></div></div>
         </div>
-        <div class="deltas" style="--n:2">
+        <div class="deltas" style="--n:1">
           <div><small>대기 중 CO₂ 농도</small><b id="cVal"></b></div>
-          <div><small>상태</small><b id="sVal" style="font-family:var(--f-body);font-size:.92rem"></b></div>
         </div>
       </div>
-
-      <div class="box bal" id="bal"></div>
 
     </div>
   </div>
@@ -369,14 +357,6 @@ function flowArrows(f,bt,bb,eps){
   s+=arrow(BK,bb+4,BK,SURF,wd(eps*f.Es/2),IR,5)+badge((EM+BK)/2,318,"대기 방출",f.up,IR,"middle",5,"down");
   s+=arrow(SP,bt-4,SP,TOP,wd(eps*f.Es/2),IR,6)+badge(SP+12,96,"대기 방출",f.up,IR,"start",6,"upa");
   return s;
-}
-function balHtml(absV,outV,emV,ghTag,ghCls,absTag,absCls){
-  function side(lab,v){return '<div class="side"><small>'+lab+'</small>'+(hide?'':'<b>'+v+'</b>')+'</div>';}
-  function sign(a,b){return a>b?"&gt;":a<b?"&lt;":"=";}
-  return '<div class="row">'+side("지구가 흡수한<br>태양 에너지",absV)+'<div class="sg">'+sign(absV,outV)+'</div>'+side("우주로 나가는<br>지구 복사",outV)+'</div>'+
-    '<span class="tag '+absCls+'">'+absTag+'</span><hr>'+
-    '<div class="row">'+side("지표 복사",emV)+'<div class="sg">'+sign(emV,outV)+'</div>'+side("우주로 나가는<br>지구 복사",outV)+'</div>'+
-    '<span class="tag '+ghCls+'">'+ghTag+'</span>';
 }
 
 /* 그림 그리기와 툴팁 */
@@ -573,15 +553,10 @@ function effNote(){
   $("msg").textContent=out.join(" ");
 }
 function readouts(){
-  var m=calc(), f=flows(m,cur), done=Math.abs(m.Teq-cur)<0.005;
+  var m=calc();
   $("tVal").innerHTML=fmt(cur,2,true)+"<small>℃</small>";
   $("tMk").style.left=Math.max(0,Math.min(100,cur/4*100)).toFixed(1)+"%";
   $("cVal").textContent=m.C.toFixed(1)+" ppm";
-  $("sVal").textContent=done?"이 농도가 유지될 때의 평형":"새 평형 "+fmt(m.Teq,2,true)+"℃로 가는 중";
-  var at, ac;
-  if(f.out===ABS){at="복사 평형 (이 농도가 유지될 때)"; ac="ok";} else if(f.out<ABS){at="흡수 > 방출 · 기온이 오르는 중"; ac="warm";} else {at="흡수 < 방출 · 기온이 내려가는 중"; ac="";}
-  var gt=m.C<=C0+0.05?"일반적 온실효과":"온실효과 가속화", gc=m.C<=C0+0.05?"":"warm";
-  $("bal").innerHTML=balHtml(ABS,f.out,f.em,gt,gc,at,ac);
 }
 var q=false;
 function frame(){ if(q) return; q=true; requestAnimationFrame(function(){ q=false; paint(scene()); }); }

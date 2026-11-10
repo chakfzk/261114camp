@@ -538,8 +538,8 @@ scene.addEventListener("keydown",function(e){
   else if(e.key==="ArrowUp"){ e.preventDefault(); moveTo(drillY-st); }
   else if(e.key==="Enter"||e.key===" "){ e.preventDefault(); release(); }
 });
-/* 잠금: 10번 시추하면 전체 그래프, 전체 그래프를 본 뒤 2024년 비교 */
-var NEED=10, seenFull=false, wasF=false, wasO=false;
+/* 잠금: 7번 시추하면 전체 그래프, 전체 그래프를 본 뒤 2024년 비교 */
+var NEED=7, seenFull=false, wasF=false, wasO=false;
 function flash(b){ b.classList.remove("flash"); void b.offsetWidth; b.classList.add("flash"); clearTimeout(b._ft); b._ft=setTimeout(function(){ b.classList.remove("flash"); },3800); }
 var LOCK='<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>';
 function locks(){
