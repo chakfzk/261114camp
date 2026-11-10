@@ -57,6 +57,7 @@ h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,4vw,2.2re
 .stage [data-key]:focus{outline:none}
 .stage [data-key]:focus-visible rect{stroke:#fff;stroke-width:3}
 .stagebar{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.8rem}
+.stagebar #again{margin-left:auto;flex:none}
 .tip{position:absolute;z-index:5;max-width:min(260px,90%);background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:8px;
   padding:8px 11px;font-size:.84rem;line-height:1.45;box-shadow:0 6px 18px rgba(0,0,0,.18);pointer-events:none}
 .tip b{display:block;font-size:.8rem;color:var(--accent);margin-bottom:2px}
@@ -176,6 +177,7 @@ details.q li{margin:4px 0}
           <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
         </button>
         <span>이름에 마우스를 올리거나 누르면 설명이 나옵니다.</span>
+        <button type="button" class="btn primary" id="again">평형 과정 다시 보기</button>
       </div>
       <div class="tip" id="tip" role="tooltip" hidden></div>
     </div>
@@ -186,7 +188,6 @@ details.q li{margin:4px 0}
       <div class="acts">
         <button type="button" class="btn" id="p0">산업화 이전으로</button>
         <button type="button" class="btn" id="p1">2024년 수준으로</button>
-        <button type="button" class="btn primary" id="again">평형 과정 다시 보기</button>
       </div>
 
       <div class="box">
