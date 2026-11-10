@@ -4,7 +4,7 @@
                                               다른 방법으로 가는 메뉴와 설명 패널은 숨김(설명은 생각 노트에 있음) */
 (()=>{
   const q=new URLSearchParams(location.search);
-  const MAP={space:[0,'iron'],sky:[1,'iron'],ground:[2,'iron'],mammoth:[8,'iron'],iron:[10,'iron'],deep:[10,'up']};
+  const MAP={space:[0,'iron'],sky:[3,'iron'],ground:[2,'iron'],mammoth:[8,'iron'],iron:[10,'iron'],deep:[10,'up']};
   const m=MAP[q.get('m')];
   if(q.get('embed')==='1'){
     document.documentElement.classList.add('embed');
