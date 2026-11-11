@@ -761,7 +761,7 @@ let workTick = null;
 function renderWork(mid){
   const m = M[mid]; const id = answerId(mid); const isGroup = m.kind==="co2";
   const wCls = isTeacher && isGroup? tCls : myCls(), wGrp = isGroup? workGroup(mid) : myGroup();
-  const cur = ()=> S.answers.get(id) || {};
+  const cur = ()=> (isTeacher && isGroup)? {} : (S.answers.get(id) || {});   /* 강사 모드의 모둠 활동은 여러 모둠이 맡으므로 한 모둠 답을 보여 주지 않음(답 보기는 강사 화면) */
   const pending = {}; let timer=null, saving=false, lastSaved=cur().updatedAt||0;
   const saveEls = [];
   async function flush(){
@@ -842,7 +842,7 @@ function renderWork(mid){
   const q1 = h("section",{class:"q sim"},
     h("div",{class:"q-h"},
       h("div",{style:"display:flex;gap:10px;align-items:center;min-width:0"}, ...titleWithCarousel(),
-        h("span",{class:"chip",style:isGroup?"background:var(--violet-soft);color:var(--violet)":""}, isGroup? wGrp+"모둠" : "선생님과 함께")),
+        h("span",{class:"chip",style:isGroup?"background:var(--violet-soft);color:var(--violet)":""}, isGroup? (isTeacher? groupsOf(mid,tCls).map(g=>g+"모둠").join(" · ") : wGrp+"모둠") : "선생님과 함께")),   /* 강사 모드: 이 방법을 맡은 모둠 모두 */
       bigBtn),
     labBox);
   const q2 = h("section",{class:"q principle"},
