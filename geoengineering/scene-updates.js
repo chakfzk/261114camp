@@ -68,7 +68,7 @@ Features.diagram=function(){
  const w=narrow?440:800,h=520;
  const r=(x,y,ww,hh,fill)=>'<rect x="'+x+'" y="'+y+'" width="'+ww+'" height="'+hh+'" rx="5" fill="'+fill+'" stroke="#4a6a70" stroke-width="2"/>';
  const text=(x,y,t,ax=x,ay=y)=>'<text data-anchor-x="'+ax+'" data-anchor-y="'+ay+'" x="'+x+'" y="'+y+'" text-anchor="middle" fill="#2a4d44" font-size="17">'+t+'</text>';
- const flow=(d,c='#9363b7')=>'<path class="diagram-flow" d="'+d+'" fill="none" stroke="'+c+'" stroke-width="4" marker-end="url(#scene-tip)"/>';
+ const flow=(d,c='#9363b7',sw=4)=>'<path class="diagram-flow" d="'+d+'" fill="none" stroke="'+c+'" stroke-width="'+sw.toFixed(1)+'" marker-end="url(#scene-tip)"/>';   /* sw: 화살표 굵기(양) */
  let content='';
  if(state.id===1){
   content+=r(0,305,w,180,'#cadfeb')+r(0,60,w,245,'#e4edf5')+r(0,485,w,35,'#a1b893');
@@ -87,9 +87,10 @@ Features.diagram=function(){
   content+=r(collect-22,205,44,95,'#c9dfd9');content+=r(collect-17,255,34,39,'#8bcbdc');
   const pipe='M'+(x0+unit*.4)+' 305 V338 H'+collect+' V260 H'+well+' V475 H'+storage;
   content+='<path d="'+pipe+'" stroke="#648c9b" stroke-width="13" fill="none" stroke-linejoin="round"/>';
-  content+=flow('M'+(w*.05)+' 235 H'+x0)+flow('M'+x0+' 235 H'+(x0+unit*.4)+' V305');
-  if(a)content+=flow(pipe);
-  content+=flow('M'+(x0+unit*.4)+' 235 V115 H'+(w*.93));content+=text(w*.75,92,'포집되지 않은 CO₂',w*.90,115);
+  content+=flow('M'+(w*.05)+' 235 H'+x0,'#9363b7',8);
+  /* 굵기: 들어오는 공기 속 CO₂ 8 = 포집 8×0.75a + 포집 안 됨 8×(1−0.75a). 0이면 장치로 내려가는 화살표 없음 */
+  if(a){content+=flow('M'+x0+' 235 H'+(x0+unit*.4)+' V305','#9363b7',8*.75*a);content+=flow(pipe,'#9363b7',Math.min(8,1.5+8*.75*a));}
+  content+=flow('M'+(x0+unit*.4)+' 235 V115 H'+(w*.93),'#9363b7',8*(1-.75*a));content+=text(w*.75,92,'포집되지 않은 CO₂',w*.90,115);
   content+='<g data-storage-rock="true">';for(let i=0;i<5;i++){const rx=storage-20+i*10,ry=474+Math.sin(i)*4;content+='<path d="M'+rx+' '+(ry-8)+' l8-3 5 10 -6 8 -10-4Z" fill="'+(i<Math.round(a*5)?'#e2d7c7':'#827c77')+'" stroke="#575b58" stroke-width="1.5"/>';}content+='</g>';
   content+=text(w*.12,277,'공기 속 CO₂')+text(w*.41,163,'포집 장치')+text(collect,185,'CO₂를 물에 녹이기')+text(storage,435,'암석 속 광물로 고정');
  }else{
@@ -106,10 +107,11 @@ Features.diagram=function(){
    if(a)content+=flow('M'+(w*.17+7)+' 447 V285 H'+(w*.35),'#b8984a');
    content+=text(w*.17,255,'심층수 펌프')+text(w*.16,496,'심층수의 영양분(질소와 인)');
   }
-  content+=flow('M'+(w*.62)+' 100 V258 L'+(w*.56)+' 300')+text(w*.62,84,'CO₂');
-  content+=flow('M'+(w*.53)+' 325 L'+(w*.56)+' 370','#ab8c65');for(let i=0;i<7;i++)content+='<circle cx="'+(w*.56+Math.sin(i*2.4)*7)+'" cy="'+(376+Math.cos(i*1.7)*5)+'" r="2.5" fill="#a78b68"/>';content+=flow('M'+(w*.56)+' 386 L'+(w*.61)+' 450','#ab8c65');
+  /* 굵기 = 플랑크톤 양(0이어도 자연 상태의 흡수는 있음). 침강은 늘 흡수보다 가늘게 */
+  content+=flow('M'+(w*.62)+' 100 V258 L'+(w*.56)+' 300','#9363b7',3+7*a)+text(w*.62,84,'CO₂');
+  content+=flow('M'+(w*.53)+' 325 L'+(w*.56)+' 370','#ab8c65',2.5+4.5*a);for(let i=0;i<7;i++)content+='<circle cx="'+(w*.56+Math.sin(i*2.4)*7)+'" cy="'+(376+Math.cos(i*1.7)*5)+'" r="2.5" fill="#a78b68"/>';content+=flow('M'+(w*.56)+' 386 L'+(w*.61)+' 450','#ab8c65',2+3*a);
   content+=text(w*.43,344,'식물 플랑크톤',w*.45,307)+text(w*.36,408,'유기물(탄소 포함)',w*.56,376)+text(w*.55,463,'일부 유기물의 침강',w*.61,450);
  }
- $('diagram').innerHTML='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+Features.data()[0]+' 원리"><defs><marker id="scene-tip" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" fill="none" stroke="context-stroke" stroke-width="1.3"/></marker></defs><rect width="'+w+'" height="'+h+'" fill="#e8f0f3"/>'+content+'</svg>';
+ $('diagram').innerHTML='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+Features.data()[0]+' 원리"><defs><marker id="scene-tip" markerUnits="userSpaceOnUse" markerWidth="30" markerHeight="30" refX="24" refY="12" orient="auto"><path d="M2 2 L24 12 L2 22" fill="none" stroke="context-stroke" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs><rect width="'+w+'" height="'+h+'" fill="#e8f0f3"/>'+content+'</svg>';
 };
 })();
