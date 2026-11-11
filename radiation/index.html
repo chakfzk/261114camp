@@ -42,7 +42,7 @@ button{font:inherit;color:inherit}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .embed .top{display:none}
 /* 생각 노트용 작은 모드: 그림 + 농도 슬라이더 한 줄 */
-.mini body{background:var(--paper)}
+.mini body{background:var(--paper);touch-action:manipulation}   /* 생각 노트 안: 두 번 탭해 확대 끔 */
 .mini .wrap{padding:8px!important;max-width:none}
 .mini .main{display:block}
 .mini .stagebar,.mini .tempbox,.mini .presets,.mini .panel>.box~*{display:none!important}

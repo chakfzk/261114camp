@@ -1,5 +1,5 @@
 /* 작은 화면 모드(생각 노트 안): embed.js가 body에 .focus .embed를 붙임. 기존 집중 모드(.focus)를 바탕으로 더 줄임 */
-body.embed{background:transparent;margin:0;overflow:hidden}
+body.embed{background:transparent;margin:0;overflow:hidden;touch-action:manipulation}   /* 생각 노트 안: 두 번 탭해 확대 끔 */
 body.embed header,body.embed footer,body.embed #start-screen,body.embed #reading-panel,
 body.embed .stage-heading,body.embed #ocean-modes,body.embed #fullscreen,body.embed #focus,
 body.embed .gesture,body.embed #menu-toggle{display:none!important}
