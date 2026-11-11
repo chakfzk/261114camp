@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>지구공학 생각 노트</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Nanum+Pen+Script&display=swap">
+<style>
+[hidden]{display:none!important}
+body{margin:0}
+/* Layout: 홈은 방법 카드 두 줄(태양빛 반사·이산화탄소 잡기), 활동은 화면을 꽉 채우는 2×2 사분면, 교사 화면은 방법 탭 + 4칸 답안 모음 */
+:root{
+  --paper:#f3f4f0; --card:#fbfbf8; --ink:#22303a; --muted:#5d6b66; --line:#d9ddd4;
+  --sage:#4f7d62; --sage-soft:#e3ece4; --sun:#c8963a; --sun-soft:#f5ead2;
+  --sea:#6f95a6; --sea-soft:#dde9ee; --violet:#7d5fa0; --violet-soft:#ece5f3;
+  --rust:#b0583f; --rust-soft:#f4e3dc; --sand:#cdbf9f;
+  --note1:#f6e58f; --note2:#cfe8c9; --note3:#f8d3c6; --note4:#d4e3f2; --note5:#ecd9f2; --note-ink:#2b2a22;
+  --g1:#2f6f9f; --g1-soft:#e1ecf5; --g2:#8a4f9e; --g2-soft:#f0e5f4; --g3:#2b8273; --g3-soft:#dcefea; --g4:#a0662a; --g4-soft:#f5e8d8; --g5:#b04a6a; --g5-soft:#f5e1e8; --g0:#7a847f; --g0-soft:#ecefec;
+  --teacher-bg:#e4ebf2;
+  --pt1:#d6e1f0; --pt2:#d6e7cf; --pt3:#e4daf0; --pt4:#f3e49c; --pt5:#f2d4cb; --wall:#fbfaf6;
+  --f-display:"Do Hyeon","IBM Plex Sans KR",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-hand:"Nanum Pen Script","IBM Plex Sans KR",cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#161c1f; --card:#1e2629; --ink:#e7ece8; --muted:#9daaa4; --line:#33403f;
+  --sage:#86b896; --sage-soft:#22332a; --sun:#e0b462; --sun-soft:#3a3122;
+  --sea:#8fb6c6; --sea-soft:#1f3038; --violet:#b39ad3; --violet-soft:#2e2639;
+  --rust:#e08f75; --rust-soft:#3a2722; --sand:#7d7259;
+  --g1:#86b8e0; --g1-soft:#1d2d3a; --g2:#cc9fdc; --g2-soft:#302438; --g3:#74c7b6; --g3-soft:#1b322d; --g4:#e0a96a; --g4-soft:#3a2b1c; --g5:#e48fa8; --g5-soft:#3a2129; --g0:#a3aca7; --g0-soft:#262d2b;
+  --note1:#e9d778; --note2:#b9d9b2; --note3:#eabfb0; --note4:#bed2e6; --note5:#d9c2e3; --note-ink:#24231c; --wall:#1a2023; --teacher-bg:#111a24; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#161c1f; --card:#1e2629; --ink:#e7ece8; --muted:#9daaa4; --line:#33403f;
+  --sage:#86b896; --sage-soft:#22332a; --sun:#e0b462; --sun-soft:#3a3122;
+  --sea:#8fb6c6; --sea-soft:#1f3038; --violet:#b39ad3; --violet-soft:#2e2639;
+  --rust:#e08f75; --rust-soft:#3a2722; --sand:#7d7259;
+  --g1:#86b8e0; --g1-soft:#1d2d3a; --g2:#cc9fdc; --g2-soft:#302438; --g3:#74c7b6; --g3-soft:#1b322d; --g4:#e0a96a; --g4-soft:#3a2b1c; --g5:#e48fa8; --g5-soft:#3a2129; --g0:#a3aca7; --g0-soft:#262d2b;
+  --note1:#e9d778; --note2:#b9d9b2; --note3:#eabfb0; --note4:#bed2e6; --note5:#d9c2e3; --note-ink:#24231c; --wall:#1a2023; --teacher-bg:#111a24; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%;touch-action:manipulation}   /* 두 번 탭해 확대하는 기능 끔(손가락으로 벌려 확대는 됨) */
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+/* 강사로 로그인한 동안은 바탕을 푸른 회색으로 바꿔 학생 화면과 구별 */
+body.is-teacher{background:var(--teacher-bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--sage);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 30px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;text-wrap:balance;letter-spacing:.01em}
+.eyebrow{font-size:13px;font-weight:600;color:var(--sage);letter-spacing:.06em}
+.muted{color:var(--muted)}
+.banner{border:1px solid var(--line);background:var(--sun-soft);border-radius:10px;padding:10px 14px;font-size:14px;margin-bottom:14px}
+.banner[hidden]{display:none}
+
+/* top bar */
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.bar .grow{flex:1;min-width:0}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--ink)}
+.btn:hover{border-color:var(--sage)}
+.btn.primary{background:var(--sage);border-color:var(--sage);color:var(--card)}
+.btn.small{padding:4px 10px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--sage-soft);color:var(--sage);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600}
+
+/* home */
+.hero{display:grid;grid-template-columns:1fr minmax(0,360px);gap:24px;align-items:end;margin-bottom:28px}
+.hero h1{font-size:clamp(34px,5vw,52px);line-height:1.08;margin-top:6px}
+.hero p{margin:10px 0 0;max-width:34em}
+.who{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:10px}
+.who label{font-size:13px;font-weight:600;color:var(--muted)}
+.who.teacher-mode{border-color:var(--sage);background:var(--sage-soft)}
+.tm-h{display:flex;align-items:baseline;gap:10px}
+.tm-h strong{font-family:var(--f-display);font-weight:400;font-size:24px;color:var(--sage)}
+.tm-acts{display:flex;gap:8px;flex-wrap:wrap}
+.pwrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.who .row{display:grid;grid-template-columns:84px 96px minmax(0,1fr);gap:8px}
+.field{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:9px 11px}
+.section-h{display:flex;align-items:baseline;gap:10px;margin:26px 0 12px;flex-wrap:wrap}
+.section-h h2{font-size:24px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px 16px;text-align:left;display:grid;gap:8px;position:relative;transition:border-color .15s, transform .15s}
+.mcard:hover:not(:disabled){border-color:var(--sage);transform:translateY(-2px)}
+.mcard:disabled{cursor:not-allowed;opacity:.55}
+.mcard .art{background:var(--paper);border-radius:10px;aspect-ratio:16/9;display:grid;place-items:center;max-width:100%}
+.mcard .art svg{width:78%;height:auto}
+.grp{font-family:var(--f-body);font-size:.72em;font-weight:600;color:var(--muted);white-space:nowrap}
+.tab[aria-selected="true"] .grp{color:var(--paper);opacity:.75}
+.mcard .t{font-family:var(--f-display);font-size:21px}
+.mcard .s{font-size:13px;color:var(--muted)}
+.mcard .tag{position:absolute;top:22px;left:22px;font-size:12px;font-weight:700;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.mcard.mine{border-color:var(--violet);box-shadow:inset 0 0 0 1px var(--violet)}
+.mcard .tag.mine{background:var(--violet);color:var(--card);border-color:var(--violet)}
+.gal-card{margin-top:22px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:16px 18px}
+.gal-card h3{font-size:21px}
+.who-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+/* 제목 옆 작은 체험실 버튼 */
+.title-row{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+/* 넓은 화면: 모둠·이름 블록의 윗줄을 '생쓰 캠프 · 3·4교시' 윗줄에 맞추고, 블록이 아래 '태양빛 반사' 줄 오른쪽 빈자리로 내려오게(카드를 밀지 않음) */
+@media (min-width:861px){
+  .hero{position:relative;grid-template-columns:1fr;align-items:start}
+  .hero > .who{position:absolute;top:0;right:0;width:360px;z-index:1}
+  .hero > div:first-child{padding-right:380px}
+}
+
+/* 개인정보 안내·동의 모달 (학생 첫 화면) */
+.consent{position:fixed;inset:0;z-index:70;background:rgba(22,28,31,.55);display:grid;place-items:center;overflow:auto;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.consent .box{background:var(--card);color:var(--ink);border-radius:16px;max-width:560px;width:100%;padding:22px 22px 18px;box-shadow:0 24px 48px -20px rgba(0,0,0,.45);display:grid;gap:12px}
+.consent h2{font-size:26px}
+.consent ul{margin:0;padding-left:20px;display:grid;gap:6px;font-size:15px}
+.consent .more{font-size:14px;color:var(--sea);font-weight:600}
+.consent .agree{display:flex;gap:10px;align-items:center;background:var(--sage-soft);border-radius:10px;padding:10px 12px;font-weight:600;cursor:pointer}
+.consent .agree input{width:20px;height:20px;accent-color:var(--sage);margin:0}
+.consent .acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center}
+.consent .acts .grow{flex:1}
+.icon-btn{padding:6px 9px;color:var(--rust)}
+.icon-btn svg{display:block}
+.consent .rbody .tcol, .consent .rbody{background:transparent;border:0;padding:0}
+.consent .rcards{display:grid;gap:10px}
+.consent .rcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px;background:var(--card)}
+.consent .rcard h3{font-size:17px;margin:0}
+.consent .rcard p{margin:0;font-size:14px}
+.consent .rnote{margin:0 2px;font-size:13px}
+.consent .rnote ul{margin:4px 0 0;padding-left:18px;gap:2px;font-size:13px}
+.consent .rdev{margin-top:8px;border-style:dashed}
+.consent.confirm{z-index:80}
+.btn.danger-solid{background:var(--rust);border-color:var(--rust);color:var(--card)}
+.consent .no-msg{font-size:14px;color:var(--rust);margin:0}
+.consent .crow{display:grid;grid-template-columns:auto 110px minmax(0,1fr);gap:8px;align-items:center}
+.consent .ccls{font-weight:700;padding:0 4px}
+
+/* work: 2x2 quadrants */
+.quad{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(300px,auto);gap:14px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.q-h{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.q-h h3{font-size:22px;display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.q.principle .dot{background:var(--sea)} .q.pc .dot{background:var(--sage)} .q.value .dot{background:var(--sun)}
+.q textarea{flex:1;width:100%;min-height:120px;resize:vertical;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:12px;line-height:1.6}
+.q textarea:focus{border-color:var(--sage);outline:none}
+.save{font-size:12px;color:var(--muted);white-space:nowrap}
+.pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1}
+.pc-col{display:flex;flex-direction:column;gap:6px;min-width:0}
+.pc-col .lab{font-size:13px;font-weight:700}
+.pc-col.pro .lab{color:var(--sage)} .pc-col.con .lab{color:var(--rust)}
+.illus{flex:1;background:var(--paper);border-radius:12px;display:grid;place-items:center;padding:10px;min-height:180px}
+.illus svg{width:min(100%,420px);height:auto}
+.hint{border-radius:12px;padding:12px 14px;font-size:14px}
+.hint.locked{background:var(--paper);color:var(--muted);border:1px dashed var(--line)}
+.hint.open{background:var(--sun-soft);border:1px solid var(--sun)}
+.hint.open b{display:block;font-size:12px;color:var(--sun);letter-spacing:.04em;margin-bottom:2px}
+.hint.open.cons{background:var(--rust-soft);border-color:var(--rust)}
+.hint.open.cons b{color:var(--rust)}
+.hint ul{margin:4px 0 0;padding-left:18px}
+.pop{animation:pop .45s ease-out}
+@keyframes pop{0%{transform:scale(.96);opacity:.3}100%{transform:none;opacity:1}}
+
+/* teacher */
+.tabs{display:grid;gap:8px;margin-bottom:14px}
+.gcbox{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
+.gcbox .gcsel{width:auto;padding:6px 10px;border-radius:999px;background:var(--card);color:var(--ink);font-weight:600}
+/* 방법 탭: 태양빛 반사 한 줄, 이산화탄소 잡기 한 줄, 줄마다 같은 폭 3칸 */
+.tabrow{display:grid;grid-template-columns:110px minmax(0,1fr) 132px;gap:8px;align-items:center}
+.tabside{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.tabside .toggle{padding:4px 10px 4px 4px;font-size:13px}
+.tabside .btn{justify-content:center}
+.tablab{font-family:var(--f-display);font-size:17px;color:var(--muted)}
+.tabgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.tabgrid .tab{min-width:0;width:100%;height:100%}
+.tabwrap{position:relative;min-width:0}
+.tab-x{position:absolute;top:6px;right:6px;border:1px solid var(--line);background:var(--card);color:var(--rust);border-radius:999px;min-width:30px;height:30px;padding:0 8px;display:grid;place-items:center;font-size:13px;font-weight:700;opacity:0;transition:opacity .15s}
+.tab-x svg{display:block}
+.tabwrap:hover .tab-x,.tab-x:focus-visible{opacity:1}
+@media (hover:none){ .tab-x{opacity:.6} }
+@media (max-width:700px){ .tabrow{grid-template-columns:1fr} .tabgrid{grid-template-columns:1fr} .tabside{flex-direction:row} .tabside:empty{display:none} }
+.tab{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 12px;font-size:14px;text-align:left}
+.tab small{display:block;font-size:11px;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tab[aria-selected="true"] small{color:var(--paper);opacity:.75}
+.ctrl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px}
+.toggle{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:6px 12px 6px 6px;background:var(--paper);font-size:14px;font-weight:500}
+.toggle .sw{width:34px;height:20px;border-radius:999px;background:var(--line);position:relative;transition:background .15s}
+.toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--card);transition:left .15s}
+.toggle[aria-pressed="true"] .sw{background:var(--sage)}
+.toggle[aria-pressed="true"] .sw::after{left:16px}
+.tgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.tcol{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:8px}
+.tcol h3{font-size:20px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.tcol h3 .n{font-family:var(--f-body);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.alist{display:grid;gap:8px;max-height:420px;overflow:auto;padding-right:2px}
+.ans{position:relative;background:var(--paper);border-radius:10px;padding:9px 11px;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.ans-x{position:absolute;top:6px;right:6px;border:1px solid var(--line);background:var(--card);color:var(--rust);border-radius:999px;min-width:28px;height:28px;padding:0 7px;display:grid;place-items:center;font-size:12px;font-weight:700;opacity:0;transition:opacity .15s;white-space:nowrap}
+.ans-x svg{display:block;width:14px;height:14px}
+.ans:hover .ans-x,.ans-x:focus-visible{opacity:1}
+.ans-confirm{position:absolute;top:5px;right:5px;display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--rust);border-radius:999px;padding:3px 4px 3px 12px;font-size:13px;font-weight:700;color:var(--rust);white-space:nowrap}
+.ans-confirm .btn{padding:3px 10px;font-size:12px}
+@media (hover:none){ .ans-x{opacity:.6} }
+.ans .who{all:unset;display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px}
+.ans.pro{border-left:3px solid var(--sage)} .ans.con{border-left:3px solid var(--rust)}
+.empty{font-size:14px;color:var(--muted);padding:10px 0}
+.danger{color:var(--rust);border-color:var(--rust-soft)}
+
+/* gallery */
+.gal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+/* 모둠 수만큼 한 줄: 4·5모둠이면 카드가 좁아지므로 화면 폭을 넓히고 그림을 위로 올림 */
+.gal.n4{grid-template-columns:repeat(4,minmax(0,1fr))} .gal.n5{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.wrap.wide{max-width:1500px}
+/* 활동 화면: 왼쪽 열 시뮬레이션 2 : 원리 1, 오른쪽 열 장점 : 단점 : 부가적 가치 = 1 : 1 : 1 */
+.quad.work{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-rows:unset;
+  grid-template-areas:"sim pro" "sim con" "pri val";height:max(600px,calc(100vh - 130px))}
+.quad.work .q.sim{grid-area:sim} .quad.work .q.principle{grid-area:pri} .quad.work .pro-c{grid-area:pro} .quad.work .con-c{grid-area:con} .quad.work .q.value{grid-area:val}
+.quad.work .q{padding:12px 14px;gap:8px;min-height:0}
+.quad.work .q-h h3{font-size:19px}
+.quad.work .q textarea{min-height:0;resize:none}
+.quad.work .labbox{min-height:0}
+.q.con-c .dot{background:var(--rust)}
+/* 답 칸과 생각의 실마리를 옆으로(열). 실마리가 닫혀 있으면 제목 옆 작은 글씨만 */
+.qbody{flex:1;display:flex;gap:10px;min-height:0}
+.qbody textarea{flex:3;min-width:0}
+.qbody .hint.locked{display:none}
+.qbody .hint.open{flex:2;min-width:0;overflow:auto;margin:0;font-size:13px;padding:10px 12px}
+.lk{font-size:12px;font-weight:400;color:var(--muted);margin-left:4px;font-family:var(--f-body);letter-spacing:0}
+.q:has(.hint.open) .lk{display:none}
+@media (max-width:900px){.quad.work{grid-template-columns:1fr;grid-template-rows:none;grid-template-areas:none;height:auto}.quad.work .q{grid-area:auto!important;min-height:220px}.quad.work .q.sim{min-height:380px}}
+/* 체험실(작은 화면 모드)을 끼워 넣는 칸. 크게 보기를 누르면 화면을 덮음 */
+.labbox{position:relative;flex:1;min-height:330px;border-radius:12px;overflow:hidden;background:var(--paper)}
+.labbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.labbox .labwait{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:14px}
+.q.sim.big{position:fixed;inset:14px;z-index:60;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.q.sim.big .labbox{min-height:0}
+.simscrim{position:fixed;inset:0;background:rgba(20,30,28,.45);z-index:59}
+.ghside{position:fixed;z-index:30;display:flex;flex-direction:column;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 12px 40px rgba(0,0,0,.22);border:2px solid var(--sea)}
+.ghside .gh-h{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 16px;background:var(--sea);color:#fff}
+.ghside .gh-h strong{font-family:var(--f-display);font-weight:400;font-size:17px;margin-right:auto}
+.ghside .gh-x{border:0;background:#fff;color:var(--ink);font:inherit;font-weight:700;font-size:13px;padding:6px 12px;border-radius:8px;cursor:pointer}
+.ghside .gh-b{flex:1;min-height:0}.ghside iframe{width:100%;height:100%;border:0;display:block}
+.ghwrap{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(1360px,calc(100vw - 72px));height:calc(100vh - 72px);z-index:61;display:flex;flex-direction:column;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.45);border:3px solid var(--sea)}
+.ghwrap .gh-h{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 20px;background:var(--sea);color:#fff}
+.ghwrap .gh-h strong{font-family:var(--f-display);font-weight:400;font-size:20px}
+.ghwrap .gh-sub{font-size:13px;opacity:.85;margin-right:auto}
+.ghwrap .gh-x{border:0;background:#fff;color:var(--ink);font:inherit;font-weight:700;padding:8px 16px;border-radius:10px;cursor:pointer}
+.ghwrap .gh-x:hover{background:var(--paper)}
+.ghwrap .gh-b{flex:1;min-height:0}.ghwrap iframe{width:100%;height:100%;border:0;display:block}
+.simscrim.dark{background:rgba(10,18,20,.72)}
+.carnav{position:fixed;top:50%;transform:translateY(-50%);z-index:40;width:44px;height:88px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:22px;font-size:30px;line-height:1;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.carnav:hover{border-color:var(--sage);color:var(--sage)}
+.carnav.prev{left:max(8px,calc((100vw - 1500px)/2 - 60px))}.carnav.next{right:max(8px,calc((100vw - 1500px)/2 - 60px))}
+/* 넘기기 버튼 자리를 위해 넓은 화면이 아니면 양옆 여백을 조금 넓힘 */
+.wrap.wide.hascar{padding-left:max(64px,env(safe-area-inset-left,0px));padding-right:max(64px,env(safe-area-inset-right,0px))}
+/* 슬라이드: 화면 전체가 옆으로 밀림(흐려지지 않음) */
+body.carmove{overflow-x:hidden}
+.quad.work.carold{z-index:5;pointer-events:none}
+body.carmove .quad.work{will-change:transform}
+/* 휴대폰·태블릿 세로: 화면 폭 1280으로 축소해 보이므로 높이를 화면에 맞추면 칸이 세로로 길게 늘어남 → 가로 화면 비율의 높이로 고정 */
+@media (orientation:portrait){.quad.work{height:820px}.carnav{top:540px}}   /* 넘기기 버튼도 칸 높이의 가운데로 */
+/* 터치 기기: 글자가 16px보다 작은 입력 칸을 누르면 아이폰이 자동으로 확대함 → 입력 칸만 16px */
+@media (hover:none) and (pointer:coarse){textarea,input,select{font-size:16px}}
+.cardots{display:inline-flex;gap:4px}.cardots i{width:6px;height:6px;border-radius:50%;background:var(--line)}.cardots i.on{background:var(--sage)}
+.gal.n4 .gcol .head,.gal.n5 .gcol .head{grid-template-columns:1fr}
+.gal.n4 .gcol .head .mini,.gal.n5 .gcol .head .mini{aspect-ratio:16/7}
+.gal.n4 .gcol .head .mini svg,.gal.n5 .gcol .head .mini svg{width:60%}
+.gal.n4 .note,.gal.n5 .note{width:100%}
+.gal.n5 .gcol{padding:12px}
+.gal .gcol{border-top:4px solid var(--gc,var(--line))}
+/* 모둠 수만큼 한 줄로: 4·5모둠이면 카드가 좁아지므로 화면 폭을 넓히고 그림을 위로 올림 */
+.gcol{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:10px;min-width:0}
+.gcol.mine{border-color:var(--violet)}
+
+.gcol .head{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:center}
+.gcol .head .mini{background:var(--paper);border-radius:8px;aspect-ratio:4/3;display:grid;place-items:center}
+.gcol .head .mini svg{width:90%;height:auto}
+.gcol .head h3{font-size:19px;line-height:1.2}
+.gblock{border-top:1px solid var(--line);padding-top:8px}
+.gblock .lab{font-size:12px;font-weight:700;letter-spacing:.04em}
+.gblock p{margin:2px 0 0;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.lab.principle{color:var(--sea)} .lab.pro{color:var(--sage)} .lab.con{color:var(--rust)} .lab.value{color:var(--sun)}
+.board{background:var(--sun-soft);border-radius:12px;padding:10px;display:grid;gap:8px}
+.notes{display:flex;flex-wrap:wrap;gap:8px}
+.note{background:var(--note1);color:var(--note-ink);padding:9px 10px 7px;width:calc(50% - 4px);min-height:74px;font-family:var(--f-hand);font-size:21px;line-height:1.1;box-shadow:0 2px 4px rgba(0,0,0,.12);position:relative;word-break:break-word;transform:rotate(var(--r,0deg))}
+.note small{display:block;font-family:var(--f-body);font-size:11px;opacity:.7;margin-top:4px}
+.note .x{position:absolute;top:2px;right:4px;border:0;background:transparent;color:var(--note-ink);opacity:.55;font-size:14px;line-height:1;padding:2px}
+.note.c2{background:var(--note2)} .note.c3{background:var(--note3)} .note.c4{background:var(--note4)}
+.nform{display:flex;gap:6px}
+.nform input{flex:1;min-width:0}
+.colors{display:flex;gap:5px;align-items:center}
+.colors button{width:20px;height:20px;border-radius:4px;border:2px solid transparent;padding:0}
+.colors button[aria-pressed="true"]{border-color:var(--ink)}
+
+/* svg palette */
+.i-sun{fill:var(--sun)} .i-ray{stroke:var(--sun);fill:none;stroke-width:3;stroke-linecap:round}
+.i-sea{fill:var(--sea-soft);stroke:var(--sea);stroke-width:2.5}
+.i-earth{fill:var(--sea);} .i-land{fill:var(--sage)}
+.i-line{stroke:var(--muted);fill:none;stroke-width:2.5;stroke-linecap:round}
+.i-ground{stroke:var(--sage);stroke-width:3;stroke-linecap:round}
+.i-cloud{fill:var(--card);stroke:var(--sea);stroke-width:2.5}
+.i-mirror{stroke:var(--sea);stroke-width:7;stroke-linecap:round}
+.i-co2{fill:var(--violet)} .i-arrow{stroke:var(--violet);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.i-box{fill:var(--sage);} .i-box-l{stroke:var(--card);stroke-width:2.5;stroke-linecap:round}
+.i-sand{fill:var(--sand)} .i-panel{fill:var(--card);stroke:var(--sea);stroke-width:2.5}
+.i-boat{fill:var(--muted)} .i-cabin{fill:var(--card);stroke:var(--muted);stroke-width:2.5}
+.i-plk{fill:var(--sage)} .i-iron{stroke:var(--sun);stroke-width:3;stroke-dasharray:2 6;stroke-linecap:round;fill:none}
+.i-pipe{stroke:var(--muted);stroke-width:9;stroke-linecap:round;fill:none}
+.i-dash{stroke:var(--sea);stroke-width:2;stroke-dasharray:6 5}
+.i-nut{fill:var(--sun)}
+
+
+/* 모둠 구분 */
+.g1{--gc:var(--g1);--gs:var(--g1-soft)} .g2{--gc:var(--g2);--gs:var(--g2-soft)} .g3{--gc:var(--g3);--gs:var(--g3-soft)} .g4{--gc:var(--g4);--gs:var(--g4-soft)} .g5{--gc:var(--g5);--gs:var(--g5-soft)} .g0{--gc:var(--g0);--gs:var(--g0-soft)}
+.gchip{display:inline-block;background:var(--gc);color:var(--card);border-radius:999px;padding:1px 9px;font-size:12px;font-weight:700;line-height:1.6}
+.ans.g1,.ans.g2,.ans.g3,.ans.g4,.ans.g5,.ans.g0{border-left:4px solid var(--gc);background:var(--gs)}
+.ans .who{display:flex!important;align-items:center;gap:6px;flex-wrap:wrap}
+.pclab{font-weight:700} .pclab.pro{color:var(--sage)} .pclab.con{color:var(--rust)}
+.gsec{display:grid;gap:6px}
+.gsec + .gsec{margin-top:6px;padding-top:8px;border-top:1px dashed var(--line)}
+.ghead{display:flex;align-items:center;gap:8px}
+.ghead .n{font-size:12px;color:var(--muted)}
+.gbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.gbtn{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:5px 14px;font-size:14px;font-weight:600;color:var(--ink)}
+.gbtn.g1,.gbtn.g2,.gbtn.g3,.gbtn.g4,.gbtn.g5{border-color:var(--gc);color:var(--gc)}
+.gbtn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.gbtn.g1[aria-pressed="true"],.gbtn.g2[aria-pressed="true"],.gbtn.g3[aria-pressed="true"],.gbtn.g4[aria-pressed="true"],.gbtn.g5[aria-pressed="true"]{background:var(--gc);border-color:var(--gc);color:var(--card)}
+.clsbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.cbtn{border:2px solid var(--line);background:var(--card);border-radius:12px;padding:8px 10px;font-family:var(--f-display);font-size:22px;line-height:1.1;text-align:left;color:var(--ink)}
+.cbtn small{display:block;font-family:var(--f-body);font-size:12px;color:var(--muted);margin-top:2px}
+.cbtn[aria-pressed="true"]{background:var(--sage);border-color:var(--sage);color:var(--card)}
+.cbtn[aria-pressed="true"] small{color:var(--card);opacity:.85}
+
+/* 발표 화면 — 밝은 벽에 붙인 파스텔 포스트잇 */
+.present{position:fixed;inset:0;z-index:50;background:var(--wall);display:flex;flex-direction:column;gap:12px;overflow:auto;
+  padding-top:max(20px,env(safe-area-inset-top,0px));padding-bottom:max(24px,env(safe-area-inset-bottom,0px));
+  padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+.p-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.p-title{flex:1 0 auto;min-width:0;flex-wrap:nowrap !important;font-family:var(--f-body);font-weight:700;font-size:30px;letter-spacing:-.01em;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.p-method{font:inherit;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);padding:2px 10px;cursor:pointer;max-width:100%;field-sizing:content}
+.p-method:hover{border-color:var(--sage)}
+.p-title .sep{color:var(--muted);font-weight:500}
+.p-fields{display:flex;gap:6px;flex-wrap:wrap}
+.p-ftab{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font-size:15px;font-weight:600;color:var(--ink);display:inline-flex;gap:6px;align-items:center}
+.p-ftab span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.p-ftab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.p-ftab[aria-selected="true"] span{color:var(--paper);opacity:.7}
+.p-tools{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.p-q{font-size:30px;font-weight:700;line-height:1.35;margin:6px 0 10px;text-wrap:balance}
+.p-qlab{font-size:15px;font-weight:700;letter-spacing:.04em;margin-right:12px;vertical-align:middle;padding:3px 10px;border-radius:6px;background:var(--card)}
+.p-qlab.principle{color:var(--sea)} .p-qlab.pros{color:var(--sage)} .p-qlab.cons{color:var(--rust)} .p-qlab.value{color:var(--sun)}
+.p-board{flex:1;display:grid;gap:28px;align-items:start;--fs:22px}
+.p-board.cols2{grid-template-columns:repeat(2,minmax(0,1fr))} .p-board.cols3{grid-template-columns:repeat(3,minmax(0,1fr))} .p-board.cols4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.p-board.cols5{grid-template-columns:repeat(5,minmax(0,1fr))} .p-board.cols6{grid-template-columns:repeat(6,minmax(0,1fr))}
+.p-board.group{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}
+.p-col{display:grid;gap:14px;align-content:start;min-width:0}
+.p-colhead{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:3px solid var(--gc,var(--line))}
+.p-colhead .gchip{font-size:17px;padding:3px 14px}
+.p-n{font-size:15px;color:var(--muted);font-weight:600}
+.p-notes{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--nw,180px),1fr));gap:16px 14px;align-items:stretch}
+.p-note{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:10px;
+  min-height:calc(var(--fs) * 6);padding:16px 22px 12px 16px;background:var(--pi,var(--pt1));color:var(--note-ink);
+  transform:rotate(var(--r,0deg));transition:transform .15s,box-shadow .15s;box-shadow:0 1px 1px rgba(40,40,30,.06),0 8px 14px -10px rgba(40,40,30,.35)}
+.p-note:hover{transform:rotate(0deg) translateY(-2px);box-shadow:0 1px 1px rgba(40,40,30,.06),0 14px 22px -12px rgba(40,40,30,.4)}
+.p-note:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.p-note.c1{--pi:var(--pt1)} .p-note.c2{--pi:var(--pt2)} .p-note.c3{--pi:var(--pt3)} .p-note.c4{--pi:var(--pt4)} .p-note.c5{--pi:var(--pt5)}
+.p-note.big{grid-column:1/-1;min-height:calc(var(--fs) * 9)}
+.p-txt{font-size:var(--fs);line-height:1.55;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;font-weight:400}
+.p-note.big .p-txt{font-size:calc(var(--fs) * 1.25)}
+.p-who{font-size:13px;font-weight:600;opacity:.5}
+.p-x{position:absolute;top:4px;right:4px;width:24px;height:24px;border:0;background:transparent;color:var(--note-ink);opacity:.35;font-size:18px;line-height:1;border-radius:50%;cursor:pointer}
+.p-x:hover{opacity:.8;background:rgba(0,0,0,.06)}
+.p-hidden{font-size:14px;color:var(--muted)}
+.p-hidden button{border:0;background:transparent;color:var(--sea);font-weight:600;cursor:pointer;padding:0 0 0 6px;text-decoration:underline}
+.p-empty{color:var(--muted);font-size:18px;padding:8px 2px}
+.p-spot{position:fixed;inset:0;z-index:60;background:rgba(22,26,28,.78);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:4vh 3vw;cursor:zoom-out}
+.p-spot-top{display:flex;align-items:center;gap:12px;width:min(1100px,92vw);cursor:default}
+.p-count{font-size:20px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;background:rgba(0,0,0,.35);border-radius:999px;padding:4px 14px}
+.p-spot-top .gchip{font-size:16px;padding:3px 12px}
+.p-spot-help{flex:1;color:#fff;opacity:.75;font-size:14px;text-align:right}
+.p-close{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:#22303a;font-size:20px;cursor:pointer}
+.p-spot-row{display:flex;align-items:center;gap:18px;width:min(1240px,96vw);justify-content:center}
+.p-nav{flex:none;width:64px;height:64px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#22303a;font-size:44px;line-height:1;padding-bottom:6px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+.p-nav:disabled{opacity:.25;cursor:default}
+.p-nav.jump:not(:disabled){background:var(--sun);color:#fff}
+.p-qtag{font-size:15px;font-weight:700;background:#fff;border-radius:6px;padding:3px 10px}
+.p-qtag.principle{color:var(--sea)} .p-qtag.pros{color:var(--sage)} .p-qtag.cons{color:var(--rust)} .p-qtag.value{color:var(--sun)}
+.p-nav:not(:disabled):hover{transform:scale(1.06)}
+.p-spot-note{position:relative;flex:1;min-width:0;color:var(--note-ink);background:var(--pi,var(--pt1));min-height:min(52vh,520px);max-height:76vh;overflow:auto;padding:52px 60px 32px;display:flex;flex-direction:column;justify-content:space-between;transform:rotate(-.5deg);box-shadow:0 30px 60px -24px rgba(0,0,0,.55);cursor:pointer;user-select:none}
+.p-spot-note.c1{--pi:var(--pt1)} .p-spot-note.c2{--pi:var(--pt2)} .p-spot-note.c3{--pi:var(--pt3)} .p-spot-note.c4{--pi:var(--pt4)} .p-spot-note.c5{--pi:var(--pt5)}
+.p-spot-note .p-txt{font-size:clamp(30px,4.2vw,56px);line-height:1.5}
+.p-spot-note .p-who{font-size:20px;margin-top:20px}
+@media (max-width:700px){ .p-nav{width:44px;height:44px;font-size:30px} .p-spot-note{padding:28px 24px} .p-spot-help{display:none} }
+@media (max-width:860px){ .p-board.cols2,.p-board.cols3,.p-board.cols4,.p-board.cols5,.p-board.cols6,.p-board.group{grid-template-columns:1fr} }
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr}
+  .cards,.gal,.gal.n4,.gal.n5{grid-template-columns:1fr}
+  .quad,.tgrid{grid-template-columns:1fr}
+}
+@media (max-width:480px){ .clsbar{grid-template-columns:repeat(3,minmax(0,1fr))} .pc-grid{grid-template-columns:1fr} .note{width:100%} }
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="banner" id="banner" hidden></div>
+  <main id="app"></main>
+</div>
+<script>
+(function(){
+/* GitHub 판(note/app/?c=N): 화면은 여기 한 곳, 답은 반마다 따로 있는 구글 시트(Apps Script)에 저장.
+   서버에 보낼 때 구글 로그인 정보를 보내지 않으므로, 브라우저의 구글 로그인 상태와 관계없이 열림 */
+// 반별 Apps Script 주소(…/exec). 주소를 받으면 여기에만 적음. 비어 있는 반은 미리보기(MOCK)로 동작
+const API_URLS = {
+  1: "",   // 1반 ~~~~~~~
+  2: "",   // 2반 ~~~~~~~
+  3: "",   // 3반 ~~~~~~~
+  4: "",   // 4반 ~~~~~~~
+  5: ""    // 5반 ~~~~~~~
+};
+const LAB_URL = "https://chakfzk.github.io/261114camp/geoengineering/";
+// 반 드롭다운에서 다른 반을 고르면 이 페이지를 그 반으로 새 탭에 엶
+const CLASS_HUB = "./?c=";
+/* 이 화면의 반: 주소의 ?c=N. 미리보기에서는 #class1 도 됨. 반이 없으면 반 선택 페이지로 */
+const FIXED_CLS = (function(){ const q=Number(new URLSearchParams(location.search).get("c")); if(q>=1&&q<=5) return q;
+  const m=String(location.hash).match(/class([1-5])/); return m? Number(m[1]) : 0; })();
+if(!FIXED_CLS){ location.replace("../"); return; }
+if(FIXED_CLS) document.title = "["+FIXED_CLS+"반] 지구공학 생각 노트";
+const API_URL = /[?&]mock\b/.test(location.search) ? "" : (API_URLS[FIXED_CLS] || "");
+
+const ART = {
+ space:`<svg viewBox="0 0 240 140" aria-hidden="true"><circle class="i-sun" cx="42" cy="70" r="26"/><path class="i-ray" d="M74 58h60M74 82h96"/><path class="i-ray" d="M134 58l-22-26m0 0l-1 9m1-9l8 4"/><line class="i-mirror" x1="146" y1="40" x2="134" y2="100"/><circle class="i-earth" cx="200" cy="72" r="28"/><path class="i-land" d="M188 52c8 2 10 8 6 14s4 10 12 8 6 10 2 18c-4 2-8 0-9-6s-9-6-12-12 0-14 1-22z"/></svg>`,
+ sky:`<svg viewBox="0 0 240 140" aria-hidden="true"><circle class="i-sun" cx="40" cy="30" r="16"/><path class="i-ray" d="M56 40l26 52M82 92l-16-6"/><path class="i-ray" d="M150 88l28-42m0 0l-2 10m2-10l-9 4"/><path class="i-cloud" d="M92 98c-14 0-16-20-2-22 0-16 22-22 32-10 10-10 30-6 30 10 14 0 18 22 0 22z"/><circle cx="112" cy="84" r="3" style="fill:var(--sea)"/><circle cx="126" cy="80" r="3" style="fill:var(--sea)"/><circle cx="140" cy="86" r="3" style="fill:var(--sea)"/><line class="i-ground" x1="20" y1="122" x2="220" y2="122"/></svg>`,
+ ground:`<svg viewBox="0 0 240 140" aria-hidden="true"><path class="i-sand" d="M10 112q60-14 120-2t100-6v26H10z"/><path class="i-ray" d="M30 18l50 34M96 54l26-38m0 0l-1 9m1-9l-8 4"/><path class="i-ray" d="M150 22l40 30M190 52l22-30"/><g transform="rotate(-12 80 80)"><rect class="i-panel" x="50" y="76" width="50" height="14" rx="2"/></g><g transform="rotate(-12 190 80)"><rect class="i-panel" x="160" y="76" width="50" height="14" rx="2"/></g><path class="i-line" d="M70 92v18M92 88v18M180 92v16M202 88v16"/></svg>`,
+ mammoth:`<svg viewBox="0 0 240 140" aria-hidden="true"><rect class="i-sand" x="20" y="104" width="200" height="26"/><rect class="i-box" x="92" y="22" width="56" height="82" rx="6"/><path class="i-box-l" d="M104 40h32M104 52h32M104 64h32M104 76h32"/><circle class="i-co2" cx="34" cy="38" r="5"/><path class="i-arrow" d="M28 56h52m-8-7l8 7-8 7"/><path class="i-arrow" d="M148 80h30v40h18m-7-7l7 7-7 7"/><circle class="i-co2" cx="204" cy="120" r="7"/></svg>`,
+ iron:`<svg viewBox="0 0 240 140" aria-hidden="true"><path class="i-sea" d="M14 56q24-10 48 0t48 0 48 0 48-4l20-2v76H14z"/><rect class="i-cabin" x="54" y="22" width="24" height="18"/><path class="i-boat" d="M36 40h62l-12 16H48z"/><path class="i-iron" d="M108 26l26 44"/><path class="i-arrow" d="M150 18v44m-7-7l7 7 7-7"/><circle class="i-plk" cx="132" cy="88" r="6"/><circle class="i-plk" cx="154" cy="98" r="6"/><circle class="i-plk" cx="176" cy="84" r="6"/><circle class="i-plk" cx="196" cy="100" r="5"/></svg>`,
+ deep:`<svg viewBox="0 0 240 140" aria-hidden="true"><path class="i-sea" d="M14 34q24-10 48 0t48 0 48 0 48-4l20-2v100H14z"/><line class="i-dash" x1="20" y1="84" x2="220" y2="84"/><path class="i-pipe" d="M96 116V30h60"/><path class="i-ray" d="M104 112V38h52m-8-6l8 6-8 6"/><circle class="i-nut" cx="60" cy="112" r="5"/><circle class="i-nut" cx="76" cy="100" r="5"/><circle class="i-plk" cx="176" cy="48" r="7"/><circle class="i-plk" cx="198" cy="40" r="7"/></svg>`
+};
+
+const METHODS = [
+ {id:"space", kind:"solar", title:"우주 반사", sub:"우주 반사경(대형 거울) 설치",
+  cons:["대형 거울 하나가 운석에 부딪혀 깨지면 어떻게 될까?","거울을 여러 개로 쪼개서 만들거나, 햇빛 방향에 따라 각도를 조절할 수 있게 만들면 어떨까?"],
+  value:"우주 통신 산업과는 어떤 연관이 있을까?"},
+ {id:"sky", kind:"solar", title:"하늘 반사", sub:"인공구름 만들기",
+  cons:["구름을 아무 데나 만들면 다른 지역에 가뭄이나 폭우가 오지 않을까?","구름을 피해서 만들어야 할 안전한 장소와 시기를 어떻게 알 수 있을까?"],
+  value:"여름철 태풍과는 어떤 관련이 있을까?"},
+ {id:"ground", kind:"solar", title:"지면 반사", sub:"사막에 반사판 설치",
+  cons:["사막은 모래바람이 많이 부는데, 반사판에 먼지가 쌓이면 어떻게 될까?","우리가 쓰는 스마트폰이나 유리창에 먼지가 안 붙게 하거나 스스로 씻어내는 기술이 있다면?"],
+  value:"반사판 그늘 아래서 농사를 짓거나 태양광 발전을 할 수 있을까?"},
+ {id:"mammoth", kind:"co2", group:1, title:"인공 나무 ‘매머드’ 설치", sub:"이산화 탄소 포집·저장",
+  cons:["가스를 땅속에 묻었다가 지진이 나면 가스가 다 새어 나오지 않을까?","가스 상태가 아니라 흔들려도 안 새어 나오는 형태로 바꿀 순 없을까?"],
+  value:"고체 형태로 만든 것을 다른 용도로 쓸 수 있을까?"},
+ {id:"iron", kind:"co2", group:2, title:"철분 살포하기", sub:"바다에 철분 뿌리기",
+  cons:["철분을 너무 많이 뿌려 적조 현상이 생길 가능성은?","생태계를 분석해 적정량만 뿌릴 수 있을까?"],
+  value:"플랑크톤이 늘면 어장에는 어떤 영향을 줄까?"},
+ {id:"deep", kind:"co2", group:3, title:"심층수 끌어올리기", sub:"차가운 바닷물 순환",
+  cons:["대형 펌프를 돌릴 전기는 어떻게 얻을 수 있을까?","바다의 파력이나 신재생에너지를 쓰면?"],
+  value:"차가운 심층수로 연안 냉방이나 어장을 만들 순 없을까?"}
+];
+const M = Object.fromEntries(METHODS.map(m=>[m.id,m]));
+const FIELDS = [["principle","원리"],["pros","장점"],["cons","단점"],["value","부가적 가치"]];
+
+/* ---------- helpers ---------- */
+function h(tag, attrs, ...kids){
+  const el = document.createElement(tag);
+  if(attrs) for(const [k,v] of Object.entries(attrs)){
+    if(v==null||v===false) continue;
+    if(k==="class") el.className=v;
+    else if(k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if(k==="html") el.innerHTML=v;
+    else el.setAttribute(k, v===true?"":v);
+  }
+  for(const k of kids.flat()){ if(k==null||k===false) continue; el.append(k.nodeType?k:document.createTextNode(String(k))); }
+  return el;
+}
+const mem = {};
+// 기기 기록: 다섯 반이 같은 사이트(github.io)라서 반마다 이름을 나눠 저장(c1:geo-me 등)
+const NS = "c"+FIXED_CLS+":";
+const ls = {
+  get(k){ try{ const v=localStorage.getItem(NS+k); return v==null? (mem[k]??null) : JSON.parse(v); }catch(e){ return mem[k]??null; } },
+  set(k,v){ mem[k]=v; try{ localStorage.setItem(NS+k, JSON.stringify(v)); }catch(e){} },
+  del(k){ delete mem[k]; try{ localStorage.removeItem(NS+k); }catch(e){} }
+};
+function rid(){ return Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); }
+function ago(t){ if(!t) return ""; const s=Math.round((Date.now()-t)/1000); if(s<10) return "방금 저장"; if(s<60) return s+"초 전 저장"; return Math.round(s/60)+"분 전 저장"; }
+function showBanner(t){ const b=document.getElementById("banner"); b.textContent=t||""; b.hidden=!t; }
+
+/* ---------- identity ---------- */
+let me = ls.get("geo-me") || {};
+if(!me.key){ me.key = rid(); ls.set("geo-me", me); }
+if(me.cls!==FIXED_CLS){ me.cls=FIXED_CLS; me.group=""; ls.set("geo-me", me); }   // 다른 반 주소로 들어오면 모둠은 다시 고름
+function saveMe(){ ls.set("geo-me", me); }
+let pw = ls.get("geo-pw") || "";
+// 강사 로그인은 그날만 기억: 날짜가 바뀌면 학생 기기에 비밀번호가 남지 않게 지움
+const today_ = ()=>{ const d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); };
+if(pw && ls.get("geo-pw-day")!==today_()){ pw=""; ls.set("geo-pw",""); }
+const PRIVACY_URL = "https://chakfzk.github.io/261114camp/privacy/";
+const CONSENT_VER = "2026-11-09";   // 안내 내용을 바꾸면 날짜를 바꿔 다시 동의를 받음
+const consented = ()=> ls.get("geo-consent")===CONSENT_VER;
+// 동의 기록: 반·모둠·이름이 정해진 뒤 처음 저장할 때 서버의 '동의기록' 시트에 한 번 보냄
+function consentMeta(){
+  if(isTeacher || !consented()) return null;
+  const sig=[me.key,me.cls,me.group,me.name,CONSENT_VER].join("|");
+  if(ls.get("geo-consent-logged")===sig) return null;
+  return {ver:CONSENT_VER, agreedAt:ls.get("geo-consent-at")||0, key:me.key, sig};
+}
+const consentLogged = c=>{ if(c) ls.set("geo-consent-logged", c.sig); };
+let isTeacher = false;
+
+/* ---------- server (Google Apps Script) ---------- */
+const hasGAS = !!API_URL;   // 서버 주소가 있으면 실제 저장, 없으면 미리보기
+const MOCK = (function(){ // 미리보기용: 구글 시트 없이 열었을 때 이 기기 안에서만 동작
+  const st={v:0,answers:{},notes:{},control:{},epoch:""}; const T="preview"; window.__consentLog=[];
+  const dflt=()=>{ const k=FIXED_CLS||1; if(st.control[k]&&st.control[k].groups) return; const c=st.control[k]=st.control[k]||{}; const pool=["mammoth","iron","deep"].sort(()=>Math.random()-.5); c.groups=5; c.assign={4:pool[0],5:pool[1]}; };
+  dflt();
+  st.roster=[]; const roster=(c,g,n)=>st.roster.push({cls:Number(c)||0,group:Number(g)||0,name:n||"",at:new Date().toISOString()});
+  const out=()=>JSON.stringify({v:st.v,answers:Object.values(st.answers),notes:Object.values(st.notes),roster:st.roster,control:st.control,epoch:st.epoch});
+  const done=()=>{ st.v++; return out(); };
+  return {
+    getState(v){ return String(v)===String(st.v)? '{"same":true}' : out(); },
+    saveAnswer(id,patch,meta){ if(meta.consent){ window.__consentLog.push([meta.consent.key,meta.cls,meta.group,meta.name,meta.consent.ver]); roster(meta.cls,meta.group,meta.name); } const a=st.answers[id]||{id}; Object.assign(a,{method:meta.method,kind:meta.kind,cls:Number(meta.cls)||0,group:Number(meta.group)||0,lastBy:meta.name||"",updatedAt:Date.now()}); a.name=meta.name||""; for(const [f] of FIELDS) if(patch[f]!==undefined) a[f]=patch[f]; st.answers[id]=a; return done(); },
+    addNote(n){ if(n.consent) window.__consentLog.push([n.key,n.cls,n.group,n.name,n.consent.ver]); const id="n"+rid(); st.notes[id]={...n,id,at:Date.now()}; return done(); },
+    clearAnswerField(p,id,f){ if(p!==T) throw new Error("강사 비밀번호가 맞지 않아요"); const a=st.answers[id]; if(a){ a[f]=""; if(FIELDS.every(([k])=>!(a[k]||"").trim())) delete st.answers[id]; } return done(); },
+    deleteNote(id,key,p){ const n=st.notes[id]; if(n&&(p===T||n.key===key)) delete st.notes[id]; return done(); },
+    checkTeacher(p){ return p===T; },
+    setControl(p,cls,patch){ if(p!==T) throw new Error("강사 비밀번호가 맞지 않아요"); const c=st.control[cls]=st.control[cls]||{}; if(patch.gallery!==undefined) c.gallery=!!patch.gallery; for(const k of ["reveal","hint"]) if(patch[k]) c[k]={...(c[k]||{}),...patch[k]};
+      if(patch.groups!==undefined){ const n=Math.min(5,Math.max(3,Number(patch.groups)||3)), as=c.assign||{}; for(const g of Object.keys(as)) if(Number(g)>n) delete as[g];
+        for(let g=4; g<=n; g++) if(!as[g]){ const pool=["mammoth","iron","deep"].filter(x=>!Object.values(as).includes(x)); as[g]=pool[Math.floor(Math.random()*pool.length)]; }
+        c.groups=n; c.assign=as; }
+      return done(); },
+    recordConsent(c){ window.__consentLog.push([c.key,c.cls,c.group,c.name,c.ver,"즉시"]); roster(c.cls,c.group,c.name); st.v++; return true; },
+    resetAll(p,withConsent){ if(p!==T) throw new Error("강사 비밀번호가 맞지 않아요"); st.answers={}; st.notes={}; st.control={}; dflt(); if(withConsent){ st.roster=[]; window.__consentLog=[]; } st.epoch=String(Date.now()); return done(); },
+    wipeMethod(p,m,cls){ if(p!==T) throw new Error("강사 비밀번호가 맞지 않아요"); for(const c of ["answers","notes"]) for(const [k,v] of Object.entries(st[c])) if(v.method===m && Number(v.cls)===Number(cls)) delete st[c][k]; return done(); }
+  };
+})();
+/* 서버 부르기: Content-Type을 따로 정하지 않은 POST(text/plain)라 사전 확인 요청 없이 바로 감.
+   credentials:"omit" = 구글 로그인 정보(쿠키)를 보내지 않음 → 로그인하지 않은 기기와 똑같이 처리됨 */
+function call(fn, ...args){
+  if(!hasGAS) return new Promise((res,rej)=>setTimeout(()=>{ try{ res(MOCK[fn](...args)); }catch(e){ rej(e); } }, 60));
+  const ctl = new AbortController(), t = setTimeout(()=>ctl.abort(), 45000);
+  return fetch(API_URL, {method:"POST", body:JSON.stringify({fn, args}), credentials:"omit", redirect:"follow", cache:"no-store", signal:ctl.signal})
+    .then(r=>{ if(!r.ok) throw new Error("서버 응답 "+r.status); return r.json(); })
+    .then(o=>{ if(!o || !o.ok) throw new Error((o&&o.error) || "서버 오류"); return o.r; })
+    .finally(()=>clearTimeout(t));
+}
+
+const S = { v:null, answers:new Map(), notes:new Map(), control:{}, roster:[], epoch:"" };
+// 동의 명단에서 이름마다 가장 최근 항목(모둠을 바꾼 학생은 마지막 모둠)
+function rosterOf(cls){ const m=new Map(); for(const r of S.roster) if(Number(r.cls)===cls){ const o=m.get(r.name); if(!o || String(r.at)>=String(o.at)) m.set(r.name,r); } return [...m.values()]; }
+function apply(json){
+  const o = typeof json==="string"? JSON.parse(json) : json;
+  if(!o || o.same) return;
+  S.v=o.v; S.answers=new Map((o.answers||[]).map(a=>[a.id,a])); S.notes=new Map((o.notes||[]).map(n=>[n.id,n])); S.control=o.control||{}; S.roster=o.roster||[]; S.epoch=String(o.epoch||"");
+  checkEpoch();
+  onData();
+}
+let polling=false, failCount=0;
+async function poll(){
+  if(polling || document.hidden) return; polling=true;
+  try{ const r=await call("getState", S.v, isTeacher?0:myCls()); if(!ctlPending) apply(r); /* 설정 저장 중에는 예전 상태로 덮지 않음 */ if(failCount){ failCount=0; showBanner(hasGAS?"":previewMsg); } }
+  catch(e){ failCount++; if(failCount>=2) showBanner("연결이 잠시 끊겼어요. 적은 내용은 화면에 남아 있고, 다시 연결되면 저장돼요."); }
+  finally{ polling=false; }
+}
+const previewMsg = "미리보기 모드예요. 구글 시트 웹앱으로 배포하면 모든 학생의 답이 선생님 화면에 모여요. (미리보기 강사 비밀번호: preview)";
+async function write(fn, ...args){
+  try{ const r = await call(fn, ...args); apply(r); return true; }
+  catch(e){ showBanner((e && e.message) ? "저장하지 못했어요: "+e.message : "저장하지 못했어요. 잠시 뒤 다시 시도해 주세요."); return false; }
+}
+function askLogout(){
+  confirmModal("강사 로그아웃할까요?", "학생 화면으로 돌아가요. 다시 들어오려면 비밀번호가 필요해요.", "로그아웃",
+    ()=>{ isTeacher=false; pw=""; ls.set("geo-pw",""); go({name:"home"}); }, "primary");
+}
+// 강사 설정: 화면을 먼저 바꾸고(즉시 반응) 서버에 저장. 실패하면 되돌림
+let ctlPending = 0, ctlSeq = 0;
+async function setControl(patch){
+  const before = JSON.stringify(S.control);
+  const c = S.control[tCls] = {...(S.control[tCls]||{})};
+  if(patch.gallery!==undefined) c.gallery=!!patch.gallery;
+  for(const k of ["reveal","hint"]) if(patch[k]) c[k]={...(c[k]||{}),...patch[k]};
+  if(patch.groups!==undefined){ c.groups=Number(patch.groups);   // 4·5모둠 배정은 서버가 정해 돌려줌
+    const as={...(c.assign||{})}; for(const g of Object.keys(as)) if(Number(g)>c.groups) delete as[g]; c.assign=as; }
+  onData();
+  const my = ++ctlSeq; ctlPending++;
+  let r = null, ok = true;
+  try{ r = await call("setControl", pw, tCls, patch); }
+  catch(e){ ok = false; showBanner((e && e.message) ? "저장하지 못했어요: "+e.message : "저장하지 못했어요. 잠시 뒤 다시 시도해 주세요."); }
+  ctlPending--;
+  if(my===ctlSeq){ if(ok) apply(r); else { S.control=JSON.parse(before); onData(); } }   // 더 뒤에 누른 것이 있으면 이 응답은 버림
+  return ok;
+}
+
+/* ---------- routing ---------- */
+let view = {name:"home"};
+const app = document.getElementById("app");
+let refreshers = [];
+function go(v){ view=v; window.scrollTo(0,0); render(); }
+const wrapEl = document.querySelector(".wrap");
+function render(){
+  refreshers=[]; document.querySelectorAll(".ghside").forEach(x=>x.__close?x.__close():x.remove()); if(window.__carKeep&&window.__carKeep.parentNode===app){ [...app.children].forEach(c=>{ if(c!==window.__carKeep) c.remove(); }); } else app.replaceChildren(); document.body.classList.toggle("is-teacher", isTeacher); wrapEl.classList.toggle("wide", view.name==="gallery"||view.name==="work"); wrapEl.classList.remove("hascar"); document.querySelectorAll(".consent").forEach(x=>x.remove());
+  if(view.name==="home") renderHome();
+  else if(view.name==="work") renderWork(view.method);
+  else if(view.name==="teacher") renderTeacher();
+  else if(view.name==="gallery") renderGallery();
+  else if(view.name==="present") renderPresent();
+}
+let gSig = "";
+const groupSig = ()=> JSON.stringify(CLASSES.map(c=>[groupCount(c), (S.control[c]||{}).assign||{}]));
+function onData(){
+  // 모둠 수나 배정이 바뀌면 처음 화면·둘러보기 화면을 다시 그림 (글을 쓰는 중이면 미룸)
+  const sg = groupSig();
+  if(sg!==gSig && (view.name==="home"||view.name==="gallery") && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement&&document.activeElement.tagName||"")){ gSig=sg; render(); return; }
+  if(view.name!=="home" && view.name!=="gallery") gSig=sg;
+  refreshers.forEach(f=>{ try{ f(); }catch(e){ console.error(e); } });
+  if(view.name==="home" && whoPending && !pwMode) askWho();
+}
+/* 초기화 회차: 강사가 초기화할 때마다 서버의 epoch가 바뀜. 이 기기가 기억한 회차와 다르면
+   지난 회차의 모둠·이름·동의를 지우고 동의 창부터 다시(시험 기기를 하나씩 정리하지 않아도 되게). 화면에는 보이지 않음
+   geo-epoch "?": 첫 자료를 받기 전에 동의한 기기(지우지 않고 지금 회차로 맞춤) */
+function checkEpoch(){
+  if(!S.epoch) return;
+  const e = ls.get("geo-epoch");
+  if(e===S.epoch) return;
+  ls.set("geo-epoch", S.epoch);
+  if(e==="?" || !(me.group || me.name || consented())) return;
+  ["geo-consent","geo-consent-at","geo-consent-logged"].forEach(k=>ls.del(k));
+  me = {key:rid(), cls:FIXED_CLS}; saveMe(); whoPending=false;
+  if(!isTeacher) go({name:"home"});
+}
+const CLASSES = FIXED_CLS? [FIXED_CLS] : [1,2,3,4,5];
+let tCls = FIXED_CLS || 1;   // 강사가 보고 있는 반
+const CO2 = METHODS.filter(m=>m.kind==="co2");
+const gOf = d=> Number(d.group)||0;
+// 반마다 모둠 수(3~5)와 4·5모둠의 방법은 강사 화면에서 정해 control에 저장됨
+// 기본 5모둠(서버가 처음 열릴 때 정함)
+function groupCount(cls){ const n=Number((S.control[cls]||{}).groups)||5; return Math.min(5,Math.max(3,n)); }
+function groupList(cls){ return Array.from({length:groupCount(cls)},(_,i)=>i+1); }
+function methodOfGroup(g, cls){ g=Number(g)||0; const base=CO2.find(m=>m.group===g); if(base) return base.id;
+  if(!g || g>groupCount(cls)) return null; return ((S.control[cls]||{}).assign||{})[g] || null; }
+function groupsOf(mid, cls){ return groupList(cls).filter(g=>methodOfGroup(g,cls)===mid); }   // 그 방법을 맡은 모둠들
+// 맡은 모둠 표시: 방법 이름 뒤에 괄호로 "(1모둠, 5모둠)"
+const gNames = (mid, cls)=> "("+groupsOf(mid,cls).map(g=>g+"모둠").join(", ")+")";
+function answerId(m){ return M[m].kind==="solar" ? `s|${m}|${me.cls}|${me.group}|${me.name}`   // 선생님과 함께: 학생마다 따로
+                                     : groupId(m, isTeacher? tCls : me.cls, workGroup(m)); }   // 모둠 활동: 모둠이 함께 쓰는 한 칸
+// 이산화 탄소 방법을 쓸 모둠: 고른 모둠이 그 방법을 맡았으면 그 모둠, 아니면(강사가 다른 방법을 열 때) 1~3모둠 중 그 방법의 모둠
+function workGroup(m){ if(isTeacher) return M[m].group; return methodOfGroup(myGroup(), myCls())===m ? myGroup() : M[m].group; }   /* 강사 모드는 모둠을 고르지 않으므로 1~3모둠 칸 */
+const groupId = (m, cls, g)=> `g|${m}|${cls}|${g}`;
+// 강사 화면·발표 화면에 올릴 답: 이산화 탄소 방법은 지금 그 방법을 맡은 모둠의 칸만
+// 이 반에서 그 방법을 맡은 모둠들이 받은 포스트잇
+// 포스트잇은 받은 모둠(tg) 단위. 이 반에서 그 방법을 맡은 모둠들이 받은 것
+function notesFor(mid, cls){ const gs=groupsOf(mid,cls); return [...S.notes.values()].filter(n=>n.method===mid && clsOf(n)===cls && gs.includes(Number(n.tg)||0)); }
+function onBoard(d, mid, cls){ return clsOf(d)===cls && d.method===mid &&
+  (M[mid].kind==="solar" || (groupsOf(mid,cls).includes(gOf(d)) && d.id===groupId(mid,cls,gOf(d)))); }
+// 답이 있는 모둠까지 포함한 모둠 목록(모둠 수를 줄여도 태양빛 답이 사라지지 않게), 모둠 미정(0)은 맨 뒤
+function shownGroups(cls, list){ const s=new Set(groupList(cls)); list.forEach(d=>{ if(gOf(d)) s.add(gOf(d)); });
+  const gs=[...s].sort((a,b)=>a-b); if(list.some(d=>!gOf(d))) gs.push(0); return gs; }
+function myGroup(){ return Number(me.group)||0; }
+function myCls(){ return Number(me.cls)||0; }
+function viewCls(){ return isTeacher? tCls : myCls(); }       // 화면에 보여줄 반
+function ctl(){ return S.control[viewCls()] || {}; }          // 그 반의 힌트·공유 상태
+function gallOpen(){ return !!ctl().gallery; }
+const clsOf = d=> Number(d.cls)||0;
+
+/* ---------- HOME ---------- */
+function renderHome(){
+  const nameIn = h("input",{class:"field",id:"nm",placeholder:"예: 김지구",value:me.name||"",maxlength:"20",autocomplete:"off",oninput:e=>{me.name=e.target.value.trim(); saveMe();}});
+  if(S.v!==null && myGroup()>groupCount(myCls())){ me.group=""; saveMe(); }   // 선생님이 모둠 수를 줄였을 때
+  const grpSel = h("select",{class:"field",id:"gp",onchange:e=>{me.group=e.target.value; saveMe(); render();}},
+    h("option",{value:""},"모둠"), groupList(myCls()).map(n=>h("option",{value:n, selected:String(me.group)===String(n)},n+"모둠")));
+  const clsSel = h("select",{class:"field",id:"cl","aria-label":"반",onchange:e=>{
+      const n=e.target.value; e.target.value=String(FIXED_CLS||"");
+      if(n && Number(n)!==FIXED_CLS) window.open(CLASS_HUB+n, "_blank"); }},
+    FIXED_CLS? null : h("option",{value:""},"반"), [1,2,3,4,5].map(n=>h("option",{value:n, selected:n===FIXED_CLS},n+"반")));
+  const need = ()=>{ if(isTeacher) return false; if(!consented()){ openConsent(); return true; } if(!me.cls){ clsSel.focus(); return true; } if(!me.group){ grpSel.focus(); return true; } if(!me.name){ nameIn.focus(); nameIn.placeholder="이름을 적어 주세요"; return true; } return false; };
+
+  // teacher login
+  // 강사 로그인: 오른쪽 위 [강사]를 누르면 모둠·이름 블록 자리가 비밀번호 블록으로 바뀜(로그인 버튼과 로그아웃 버튼이 겹치지 않게)
+  const pwIn = h("input",{class:"field",id:"pw",type:"password",placeholder:"강사 비밀번호",autocomplete:"current-password"});
+  const pwMsg = h("span",{class:"no-msg",style:"font-size:13px;color:var(--rust)"});
+  const pwForm = h("form",{class:"pwrow",onsubmit:async e=>{ e.preventDefault(); const ok = await call("checkTeacher", pwIn.value).catch(()=>false); if(ok){ pw=pwIn.value; ls.set("geo-pw",pw); ls.set("geo-pw-day",today_()); isTeacher=true; pwMode=false; go({name:"home"}); } else pwMsg.textContent="비밀번호가 달라요"; }},
+    pwIn, h("button",{class:"btn small primary",type:"submit"},"확인"));
+  const teacherBtn = h("button",{class:"btn small",onclick:()=>{ pwMode=true; render(); }},"강사");
+  // 강사로 로그인하면 모둠·이름 칸 대신 '강사 모드' 블록
+  const whoBox = (!isTeacher && pwMode)
+    ? h("div",{class:"who teacher-mode"},
+        h("div",{class:"who-h"}, h("div",{class:"tm-h"}, h("strong",null,"강사 로그인")),
+          h("button",{class:"btn small",onclick:()=>{ pwMode=false; render(); }},"취소")),
+        pwForm, pwMsg)
+    : isTeacher
+    ? h("div",{class:"who teacher-mode"},
+        h("div",{class:"tm-h"}, h("strong",null,"강사 모드"), h("span",{class:"muted"}, tCls+"반")),
+        h("div",{class:"tm-acts"},
+          h("button",{class:"btn small primary",onclick:()=>go({name:"teacher"})},"강사 화면"),
+          h("button",{class:"btn small",onclick:askLogout},"강사 로그아웃")))
+    : h("div",{class:"who"},
+        h("div",{class:"who-h"}, h("label",{for:me.cls?"gp":"cl"}, me.cls? "모둠과 이름을 먼저 적어 주세요" : "우리 반을 고르면 그 반 화면이 새 탭으로 열려요"), teacherBtn),
+        h("div",{class:"row"}, clsSel, me.cls? grpSel : h("span"), me.cls? nameIn : h("span")));
+
+  const hero = h("div",{class:"hero"},
+    h("div",null,
+      h("div",{class:"eyebrow"},"생쓰 캠프 · 3·4교시"),
+      h("div",{class:"title-row"}, h("h1",null,"지구공학 생각 노트"))),
+    whoBox);
+
+  const solar = h("div",{class:"cards"}, METHODS.filter(m=>m.kind==="solar").map(m=>
+    h("button",{class:"mcard",onclick:()=>{ if(!need()) go({name:"work",method:m.id}); }},
+      h("div",{class:"art",html:ART[m.id]}), h("div",{class:"t"},m.title))));
+  const co2 = h("div",{class:"cards"}, METHODS.filter(m=>m.kind==="co2").map(m=>{
+    const c = isTeacher? tCls : myCls();
+    const mine = !isTeacher && methodOfGroup(myGroup(), c)===m.id, lock = !mine && !isTeacher && !!me.group;
+    return h("button",{class:"mcard"+(mine?" mine":""),disabled:lock,onclick:()=>{ if(!need() && (mine||isTeacher)) go({name:"work",method:m.id}); }},
+      mine? h("span",{class:"tag mine"},"우리 모둠") : null,
+      h("div",{class:"art",html:ART[m.id]}), h("div",{class:"t"},m.title," ",h("span",{class:"grp"},gNames(m.id,c))));
+  }));
+  const galBtn = h("button",{class:"btn primary",onclick:()=>{ if(!need()||isTeacher) go({name:"gallery"}); }},"모둠 결과 둘러보기 →");
+  const syncGal = ()=>{ const open=gallOpen()||isTeacher; galBtn.disabled=!open; };
+  syncGal(); refreshers.push(syncGal);
+
+  // 개인정보 안내·동의: 동의 전에는 첫 화면 위에 띄우고, 동의는 이 기기에 기억함
+  // 개인정보 안내 + 모둠·이름 입력 + 동의를 한 창에서 받고, 동의하는 순간 '동의기록'에 남김
+  const chk = h("input",{type:"checkbox",id:"agree"});
+  const cGrp = h("select",{class:"field",id:"c-gp","aria-label":"모둠"});
+  const fillGroups = ()=>{ const v=cGrp.value||String(me.group||"");
+    cGrp.replaceChildren(h("option",{value:""},"모둠"), ...groupList(myCls()).map(n=>h("option",{value:n,selected:String(v)===String(n)},n+"모둠"))); };
+  fillGroups(); refreshers.push(fillGroups);   // 선생님이 모둠 수를 4·5로 정하면 선택지도 늘어남
+  const cName = h("input",{class:"field",id:"c-nm",placeholder:"이름",maxlength:"20",autocomplete:"off",value:me.name||""});
+  const cMsg = h("p",{class:"no-msg",hidden:true});
+  const okBtn = h("button",{class:"btn primary",onclick:async()=>{
+    const g=cGrp.value, n=cName.value.trim();
+    const miss = !g? "모둠을 골라 주세요." : !n? "이름을 적어 주세요." : !chk.checked? "동의에 체크해 주세요." : "";
+    if(miss){ cMsg.textContent=miss; cMsg.hidden=false; (!g? cGrp : !n? cName : chk).focus(); return; }
+    me.group=g; me.name=n; saveMe(); whoPending=false;   // 방금 적은 사람이므로 '○모둠 ○○ 학생인가요?'를 묻지 않음
+    const at=Date.now(); ls.set("geo-consent",CONSENT_VER); ls.set("geo-consent-at",at); ls.set("geo-epoch", S.v===null? "?" : S.epoch);
+    modal.remove(); render();
+    const cm=consentMeta();   // 바로 기록. 실패하면 첫 저장 때 다시 보냄
+    if(cm) call("recordConsent",{ver:cm.ver,agreedAt:at,key:me.key,cls:myCls(),group:myGroup(),name:me.name}).then(()=>consentLogged(cm)).catch(()=>{});
+  }},"동의하고 시작하기");
+  const modal = h("div",{class:"consent",role:"dialog","aria-modal":"true","aria-labelledby":"consent-h"},
+    h("div",{class:"box"},
+      h("h2",{id:"consent-h"},"시작하기 전에 읽어 주세요"),
+      h("ul",null,
+        h("li",null,"입력한 반·모둠·이름과 작성한 답·포스트잇은 수업 기록을 위해 선생님의 구글 시트에 저장돼요. 구글 서버는 미국에 있어요."),
+        h("li",null,"작성한 내용은 이름과 함께 같은 반 친구들과 선생님에게 보여요."),
+        h("li",null,"저장된 내용은 2026년 12월 31일까지 보관한 뒤 삭제해요."),
+        h("li",null,"동의하지 않으면 노트를 쓰지 않고 수업에 말로 참여할 수 있어요.")),
+      h("a",{class:"more",href:PRIVACY_URL,target:"_blank",rel:"noopener"},"개인정보 처리방침 전체 보기 ↗"),
+      h("div",{class:"crow"}, h("span",{class:"ccls"},myCls()+"반"), cGrp, cName),
+      h("label",{class:"agree",for:"agree"}, chk, "위 내용을 읽고 동의합니다."),
+      cMsg,
+      h("div",{class:"acts"},
+        h("button",{class:"btn small",onclick:()=>{ modal.remove(); pwMode=true; render(); }},"강사 로그인"),
+        h("span",{class:"grow"}),
+        h("button",{class:"btn",onclick:()=>{ cMsg.textContent="괜찮아요. 노트를 쓰지 않고 수업에 말로 참여하면 돼요."; cMsg.hidden=false; }},"동의하지 않아요"),
+        okBtn)));
+  function openConsent(){ if(!me.cls) return; if(!modal.isConnected){ chk.checked=false; cMsg.hidden=true; document.body.append(modal); } cGrp.focus(); }
+  if(!isTeacher && !pwMode && !consented()) openConsent();
+  else if(!pwMode && whoPending) askWho();
+  if(pwMode && !isTeacher) setTimeout(()=>pwIn.focus(),0);
+
+  app.append(hero,
+    h("div",{class:"section-h"},h("h2",null,"태양빛 반사"),h("span",{class:"chip"},"선생님과 함께")), solar,
+    h("div",{class:"section-h"},h("h2",null,"이산화탄소 잡기"),h("span",{class:"chip",style:"background:var(--violet-soft);color:var(--violet)"},"모둠 활동")), co2,
+    h("div",{class:"gal-card"}, h("div",null,h("h3",null,"다른 모둠 결과 둘러보기")), galBtn));
+}
+
+/* ---------- WORK (2x2) ---------- */
+let workTick = null;
+function renderWork(mid){
+  const m = M[mid]; const id = answerId(mid); const isGroup = m.kind==="co2";
+  const wCls = isTeacher && isGroup? tCls : myCls(), wGrp = isGroup? workGroup(mid) : myGroup();
+  const cur = ()=> S.answers.get(id) || {};
+  const pending = {}; let timer=null, saving=false, lastSaved=cur().updatedAt||0;
+  const saveEls = [];
+  async function flush(){
+    timer=null; if(saving){ timer=setTimeout(flush,600); return; }
+    const patch = {...pending}; if(!Object.keys(patch).length) return;
+    for(const k in patch) delete pending[k];
+    saving=true; paintSave();
+    const cm = consentMeta();
+    const ok = await write("saveAnswer", id, patch, {method:mid, kind:m.kind, cls:wCls, group:wGrp, name:me.name||"", consent:cm}, isTeacher?0:myCls());
+    if(ok) consentLogged(cm);
+    saving=false;
+    if(ok) lastSaved=Date.now(); else { for(const k in patch) if(pending[k]===undefined) pending[k]=patch[k]; timer=setTimeout(flush, 5000 + Math.floor(Math.random()*5000)); }
+    paintSave();
+  }
+  function paintSave(){ saveEls.forEach(s=>s.textContent = (saving||timer)? "저장 중…" : ago(lastSaved)); }
+  clearInterval(workTick); workTick=setInterval(paintSave, 15000);
+
+  const areas = {};
+  function ta(field, ph){
+    const t = h("textarea",{id:"ta-"+field, placeholder:ph, maxlength:"3000", readonly:isTeacher,   /* 강사 모드는 미리보기만 */
+      oninput:e=>{ pending[field]=e.target.value; clearTimeout(timer); timer=setTimeout(flush, 5000); paintSave(); },
+      onblur:()=>{ if(timer){ clearTimeout(timer); flush(); } }});
+    t.value = cur()[field] || ""; areas[field]=t; return t;
+  }
+  const saveTag = ()=>{ const s=h("span",{class:"save"}); saveEls.push(s); return s; };
+
+  const consHint = h("div"), valueHint = h("div");
+  let lastC=null, lastV=null;
+  function paintHints(){
+    const c = !!(ctl().hint||{})[mid], v = !!(ctl().reveal||{})[mid];
+    if(c!==lastC){ lastC=c; consHint.replaceChildren();
+      if(c){ consHint.className="hint open cons pop"; consHint.append(h("b",null,"생각의 실마리"), h("ul",null, m.cons.map(x=>h("li",null,x)))); }
+      else { consHint.className="hint locked"; consHint.textContent="막막하면 조금 기다려 보세요. 선생님이 힌트 질문을 열어 줄 거예요."; } }
+    if(v!==lastV){ lastV=v; valueHint.replaceChildren();
+      if(v){ valueHint.className="hint open pop"; valueHint.append(h("b",null,"생각의 실마리"), m.value); }
+      else { valueHint.className="hint locked"; valueHint.textContent="막막하면 조금 기다려 보세요. 선생님이 힌트 질문을 열어 줄 거예요."; } }
+  }
+  paintHints();
+
+  /* 시뮬레이션: 체험실의 이 방법 화면을 작은 화면 모드로 끼워 넣음.
+     체험실이 '준비됨' 신호를 보내지 않으면(8초) 원래 그림과 '새 창에서 열기'로 바꿈 */
+  const labUrl = LAB_URL+"?m="+mid+"&embed=1";
+  const labFrame = h("iframe",{src:labUrl,title:m.title+" 시뮬레이션",allow:"fullscreen"});
+  const labBox = h("div",{class:"labbox"}, h("div",{class:"labwait"},"시뮬레이션을 불러오는 중…"), labFrame);
+  let labOk=false;
+  const onLab = ev=>{ if(!ev.data||ev.source!==labFrame.contentWindow) return;
+    if(ev.data.geolab==="ready"){ labOk=true; const w=labBox.querySelector(".labwait"); if(w) w.remove(); } };
+  window.addEventListener("message", onLab);
+  setTimeout(()=>{ if(labOk||!labBox.isConnected) return;
+    labBox.replaceChildren(h("div",{class:"illus",html:ART[mid],style:"height:100%"}));
+    bigBtn.replaceWith(h("a",{class:"btn small",href:LAB_URL+"?m="+mid,target:"_blank",rel:"noopener"},"새 창에서 열기 ↗")); }, 8000);
+  let scrim=null;
+  const setBig = on=>{ q1.classList.toggle("big",on); bigBtn.textContent=on?"원래 크기로":"크게 보기";
+    if(on){ scrim=h("div",{class:"simscrim",onclick:()=>setBig(false)}); document.body.append(scrim); }
+    else if(scrim){ scrim.remove(); scrim=null; } };
+  const bigBtn = h("button",{class:"btn small",onclick:()=>setBig(!q1.classList.contains("big"))},"크게 보기");
+  document.addEventListener("keydown", function esc(e){ if(!q1.isConnected){ document.removeEventListener("keydown",esc); return; } if(e.key==="Escape"&&q1.classList.contains("big")) setBig(false); });
+  /* 태양빛 반사 3가지(우주·하늘·지면)는 제목 양옆 ‹ › 로 서로 넘겨 봄(쓰던 답은 먼저 저장) */
+  let carNav = [];
+  function titleWithCarousel(){
+    if(isGroup) return [h("h3",null,m.title)];
+    const sol = METHODS.filter(x=>x.kind==="solar").map(x=>x.id), i = sol.indexOf(mid);
+    /* 캐러셀: 지금 화면(.quad.work)을 제자리에 고정해 남겨 두고(iframe이 다시 불리지 않게 DOM에서 빼지 않음),
+       새 화면을 그린 뒤 두 화면을 같은 시간·같은 곡선으로 함께 밀어 옮김. 끝나면 옛 화면을 지움(render·아래 마무리 코드) */
+    const move = d=>{ const next=sol[i+d]; if(!next) return;   /* 끝에서 처음으로 돌아가지 않음 */
+      if(document.body.classList.contains("carmove")) return;   /* 움직이는 중에는 또 누르지 못함 */
+      if(timer){ clearTimeout(timer); flush(); }
+      const qd=document.querySelector(".quad.work"), reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if(qd&&!reduce){ window.scrollTo(0,0); const rc=qd.getBoundingClientRect();   /* go()가 맨 위로 올리므로 먼저 올리고 잼 */
+        Object.assign(qd.style,{position:"fixed",left:rc.left+"px",top:rc.top+"px",width:rc.width+"px",height:rc.height+"px",margin:"0"});
+        qd.classList.add("carold"); window.__carKeep=qd; window.__carDir=d; document.body.classList.add("carmove"); }
+      go({name:"work",method:next}); };
+    /* 넘기기 버튼은 화면 양쪽 여백에(고정 위치). 제목 옆에는 몇 번째인지 점만 */
+    carNav = [i>0? h("button",{class:"carnav prev","aria-label":"이전 방법",title:"이전 방법",onclick:()=>move(-1)},"‹") : null,
+              i<sol.length-1? h("button",{class:"carnav next","aria-label":"다음 방법",title:"다음 방법",onclick:()=>move(1)},"›") : null].filter(Boolean);
+    return [h("h3",null,m.title), h("span",{class:"cardots","aria-hidden":"true"}, ...sol.map(x=>h("i",{class:x===mid?"on":""})))];
+  }
+  const q1 = h("section",{class:"q sim"},
+    h("div",{class:"q-h"},
+      h("div",{style:"display:flex;gap:10px;align-items:center;min-width:0"}, ...titleWithCarousel(),
+        h("span",{class:"chip",style:isGroup?"background:var(--violet-soft);color:var(--violet)":""}, isGroup? wGrp+"모둠" : "선생님과 함께")),
+      bigBtn),
+    labBox);
+  const q2 = h("section",{class:"q principle"},
+    h("div",{class:"q-h"},h("div",{style:"display:flex;gap:10px;align-items:center;min-width:0;flex-wrap:wrap"},h("h3",null,h("span",{class:"dot"}),"과학적 원리는 무엇일까?"),h("button",{class:"btn small",onclick:openGH},"'온실 효과와 지구 온난화' 시뮬레이션 ▸")),saveTag()),
+    ta("principle","'온실 효과와 지구 온난화' 시뮬레이션의 어떤 화살표가 어떻게 바뀌는지로 설명해 보세요."));
+  const LK = ()=>h("span",{class:"lk"},"막막하면 조금 기다려 보세요");
+  const q3 = h("section",{class:"q pc pro-c"},
+    h("div",{class:"q-h"},h("h3",null,h("span",{class:"dot"}),"장점"),saveTag()),
+    h("div",{class:"qbody"}, ta("pros","이 방법이 지구 온난화를 해결하는 데 유리한 점")));
+  const q3b = h("section",{class:"q pc con-c"},
+    h("div",{class:"q-h"},h("h3",null,h("span",{class:"dot"}),"단점",LK()),saveTag()),
+    h("div",{class:"qbody"}, ta("cons","걱정되는 점과 보완 방법"), consHint));
+  const q4 = h("section",{class:"q value"},
+    h("div",{class:"q-h"},h("h3",null,h("span",{class:"dot"}),"부가적 가치",LK()),saveTag()),
+    h("p",{class:"muted",style:"margin:0;font-size:13px"},"이 기술이 기후 말고 다른 곳에도 도움이 될 수 있을까요? 새로운 산업, 생활, 생태계와 연결해 보세요."),
+    h("div",{class:"qbody"}, ta("value","생각한 아이디어를 적어 보세요."), valueHint));
+
+  app.append(
+    h("div",{class:"bar"},
+      h("button",{class:"btn",onclick:()=>{ if(timer){clearTimeout(timer); flush();} go({name:"home"}); }},"← 처음으로"),
+      h("div",{class:"grow"}),
+      isTeacher? h("span",{class:"chip",style:"background:var(--sun-soft);color:var(--sun)"},"강사 모드 · 미리보기(입력 안 됨)") :
+      isGroup? h("span",{class:"muted",style:"font-size:13px"},"모둠원이 함께 쓰는 칸이에요 · 친구가 쓴 내용이 몇 초 안에 보여요") : null,
+      isTeacher? null : h("span",{class:"chip"}, (me.cls?me.cls+"반 · ":"")+(me.group?me.group+"모둠 · ":"")+(me.name||"이름 없음")),
+      isTeacher? h("button",{class:"btn primary",onclick:()=>go({name:"teacher",method:mid})},"강사 화면") : null),
+    h("div",{class:"quad work"}, q1, q3, q3b, q2, q4), ...carNav);
+  wrapEl.classList.toggle("hascar", carNav.length>0);
+  /* 캐러셀: 새 화면을 그린 뒤 같은 프레임에서 두 화면을 함께 출발(Web Animations, 같은 시간·곡선). 새 화면은 첫 그림 전에 옆으로 비켜 둠 */
+  if(window.__carDir){ const d=window.__carDir, qd=app.querySelector(".quad.work:not(.carold)"), old=window.__carKeep; window.__carDir=0;
+    let fin=false; const done=()=>{ if(fin) return; fin=true; if(old&&old.parentNode) old.remove(); window.__carKeep=null; document.body.classList.remove("carmove"); };
+    if(qd&&old&&qd.animate){ const E="cubic-bezier(.4,0,.2,1)", far=(d*100)+"vw", back=(-d*100)+"vw"; qd.style.transform="translateX("+far+")";
+      requestAnimationFrame(()=>{ qd.style.transform="";
+        const a=qd.animate([{transform:"translateX("+far+")"},{transform:"translateX(0)"}],{duration:500,easing:E});
+        old.animate([{transform:"translateX(0)"},{transform:"translateX("+back+")"}],{duration:500,easing:E,fill:"forwards"});
+        a.onfinish=done; }); } else done();
+    setTimeout(done,1500); }
+  paintSave();
+
+  refreshers.push(()=>{
+    paintHints();
+    const d = cur();
+    for(const [f,t] of Object.entries(areas)){
+      if(document.activeElement===t || pending[f]!==undefined || saving) continue;
+      const v = d[f]||""; if(t.value!==v) t.value=v;
+    }
+  });
+}
+
+/* 6번 '온실 효과와 지구 온난화'를 큰 창으로(원리 칸에서 화살표를 다시 보려고). 주소는 체험실 주소에서 만듦 */
+function openGH(){
+  /* 원리 칸은 쓸 수 있는 채로, 6번 탭 ①의 그림+농도 슬라이더(radiation/?embed&mini=1)를 오른쪽 열(장점·단점·부가적 가치) 위에 띄움. 다시 누르거나 [닫기]·Esc로 닫음 */
+  const prev=document.querySelector(".ghside"); if(prev){ prev.__close(); return; }
+  const a=document.querySelector(".quad.work .pro-c"), b=document.querySelector(".quad.work .q.value"); if(!a||!b) return;
+  const url = LAB_URL.replace(/geoengineering\/?$/,"radiation/")+"?embed&mini=1";
+  const place = ()=>{ const r1=a.getBoundingClientRect(), r2=b.getBoundingClientRect();
+    Object.assign(wrap.style,{left:r1.left+"px",top:r1.top+"px",width:r1.width+"px",height:(r2.bottom-r1.top)+"px"}); };
+  const close = ()=>{ wrap.remove(); removeEventListener("resize",place); document.removeEventListener("keydown",esc); };
+  const esc = e=>{ if(e.key==="Escape") close(); };
+  const wrap = h("section",{class:"ghside",role:"region","aria-label":"온실 효과와 지구 온난화 시뮬레이션"},
+    h("div",{class:"gh-h"},h("strong",null,"'온실 효과와 지구 온난화' 시뮬레이션"),
+      h("button",{class:"gh-x",onclick:()=>close(),"aria-label":"시뮬레이션 닫기",title:"닫기"},"✕ 닫기")),
+    h("div",{class:"gh-b"},h("iframe",{src:url,title:"온실 효과와 지구 온난화"})));
+  wrap.__close=close;
+  document.body.append(wrap); place(); addEventListener("resize",place); document.addEventListener("keydown",esc);
+}
+
+/* ---------- TEACHER ---------- */
+let tSel = "space", gFilter=0;
+let pwMode = false;   // 첫 화면에서 강사 비밀번호 블록을 보이는 중
+function renderTeacher(){
+  if(!isTeacher){ go({name:"home"}); return; }
+  if(view.method){ tSel=view.method; view.method=null; }
+  const tabs = h("div",{class:"tabs",role:"tablist"});
+  const ctrl = h("div",{class:"ctrl"});
+  const grid = h("div",{class:"tgrid"});
+  const gbar = h("div",{class:"gbar"});
+  const clsBar = h("div",{class:"clsbar",role:"tablist","aria-label":"반 선택"});
+  const title = h("h1",{style:"font-size:30px"});
+  const galT = h("button",{class:"toggle",onclick:()=>setControl({gallery:!gallOpen()})},h("span",{class:"sw"}),"결과 공유");
+  // 방법 탭 두 줄은 한 번만 만들고 안의 탭만 다시 그림. 이산화 탄소 줄 오른쪽에 결과 공유·둘러보기(반 전체 설정)
+  const solarGrid = h("div",{class:"tabgrid"}), co2Grid = h("div",{class:"tabgrid"});
+  tabs.append(
+    h("div",{class:"tabrow"}, h("span",{class:"tablab"},"태양빛 반사"), solarGrid, h("span",{class:"tabside"})),
+    h("div",{class:"tabrow"}, h("span",{class:"tablab"},"이산화탄소 잡기"), co2Grid,
+      h("div",{class:"tabside"}, galT, h("button",{class:"btn small primary",onclick:()=>go({name:"gallery"})},"둘러보기 →"))));
+  // 질문 스위치는 한 번만 만들고, 누를 때마다 그때의 상태를 읽어 반대로 바꿈
+  const hintT = h("button",{class:"toggle",onclick:()=>setControl({hint:{[tSel]:!(ctl().hint||{})[tSel]}})},h("span",{class:"sw"}),"단점 질문 보여주기");
+  const revT  = h("button",{class:"toggle",onclick:()=>setControl({reveal:{[tSel]:!(ctl().reveal||{})[tSel]}})},h("span",{class:"sw"}),"부가적 가치 질문 보여주기");
+  const qText = h("span",{class:"muted",style:"font-size:13px;flex:1;min-width:180px"});
+  // 다른 모둠이 남긴 포스트잇: 이산화 탄소 방법일 때 맨 아래
+  const notesBox = h("div",{class:"tcol",style:"margin-top:14px"});
+  ctrl.append(hintT, revT, qText);
+  const filled = d=>FIELDS.some(([f])=>(d[f]||"").trim());
+  const TRASH_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>';   // 탭의 × 버튼: 처음 누르면 확인 상태, 4초 안에 한 번 더 누르면 지움
+  // 모둠 수: 오른쪽 위 드롭다운. 줄일 때 답이 있는 모둠이 빠지면 4초 안에 같은 값을 한 번 더 골라야 바뀜
+  let gcArm = 0, gcTimer = null;
+  const gcSel = h("select",{class:"field gcsel","aria-label":"모둠 수",onchange:e=>{
+    const k=Number(e.target.value), gn=groupCount(tCls);
+    if(k===gn) return;
+    const lost = k<gn && [...S.answers.values()].some(d=>clsOf(d)===tCls && d.kind==="co2" && gOf(d)>k && filled(d));
+    if(lost && gcArm!==k){ gcArm=k; e.target.value=String(gn); clearTimeout(gcTimer);
+      showBanner(k+"모둠으로 줄이면 "+(k+1)+"모둠 이후의 모둠 답이 화면에서 빠져요(시트에는 남음). 4초 안에 "+k+"모둠을 한 번 더 고르면 줄어요.");
+      gcTimer=setTimeout(()=>{ gcArm=0; showBanner(hasGAS?"":previewMsg); },4000); return; }
+    gcArm=0; clearTimeout(gcTimer); showBanner(hasGAS?"":previewMsg); setControl({groups:k}); }},
+    [3,4,5].map(k=>h("option",{value:k},k+"모둠")));
+  const gcBox = h("label",{class:"gcbox"}, h("span",null,"모둠 수"), gcSel);
+  const gChip = g=> h("span",{class:"gchip g"+g}, g? g+"모둠" : "모둠 미정");
+
+  // 모둠별로 묶어서 보여주기 (전체 보기일 때 모둠 제목 + 색 띠)
+  function grouped(items, card){
+    const list = gFilter? items.filter(d=>gOf(d)===gFilter) : items;
+    if(!list.length) return null;
+    if(gFilter) return h("div",{class:"alist"}, list.map(card));
+    const gs = shownGroups(tCls, list).filter(g=>list.some(d=>gOf(d)===g));
+    return h("div",{class:"alist"}, gs.map(g=>{
+      const mine = list.filter(d=>gOf(d)===g);
+      return h("div",{class:"gsec g"+g}, h("div",{class:"ghead"}, gChip(g), h("span",{class:"n"}, mine.length+"개")), mine.map(card));
+    }));
+  }
+  const nameOf = d=> d.kind==="co2"? ((d.lastBy||d.name)? "마지막 작성: "+(d.lastBy||d.name) : "") : (d.name||"이름 없음");
+  // 답 카드: field가 있으면 마우스를 올렸을 때 × (한 번 누르면 확인, 4초 안에 한 번 더 누르면 그 칸만 지움)
+  // 답 카드 하나 지우기: 휴지통을 누르면 그 자리가 "지울까요? [취소] [지우기]"로 바뀌고, 고를 때까지 그대로
+  let ansArm = null;
+  const card = (d, label, cls, text, field)=>{
+    const key = d.id+"|"+field, armed = ansArm===key;
+    const x = !field? null : armed
+      ? h("span",{class:"ans-confirm"}, "지울까요?",
+          h("button",{class:"btn small",onclick:e=>{ e.stopPropagation(); ansArm=null; paint(); }},"취소"),
+          h("button",{class:"btn small danger-solid",onclick:async e=>{ e.stopPropagation(); ansArm=null; await write("clearAnswerField", pw, d.id, field); }},"지우기"))
+      : h("button",{class:"ans-x",title:"이 답 지우기","aria-label":"이 답 지우기",onclick:e=>{ e.stopPropagation(); ansArm=key; paint(); }, html:TRASH_SVG});
+    return h("div",{class:"ans g"+gOf(d)+(armed?" armed":"")},
+      h("span",{class:"who"}, h("span",null,nameOf(d)), label? h("span",{class:"pclab "+cls},label) : null),
+      text, x);
+  };
+
+  function paint(){
+    const inCls = [...S.answers.values()].filter(d=>clsOf(d)===tCls);
+    clsBar.replaceChildren(...CLASSES.map(c=>{
+      const n = new Set([...S.answers.values()].filter(d=>clsOf(d)===c && d.kind==="solar" && filled(d)).map(d=>d.group+"|"+d.name)).size;
+      return h("button",{class:"cbtn","aria-pressed":String(tCls===c),onclick:()=>{ tCls=c; gFilter=0; paint(); }}, c+"반", h("small",null, n? n+"명 참여" : "아직 없음"));
+    }));
+    clsBar.hidden = CLASSES.length<2;
+    title.textContent = tCls+"반 학생 답 모아 보기";
+    const GROUPS = groupList(tCls), gn = GROUPS.length;
+    if(document.activeElement!==gcSel) gcSel.value=String(gn);
+    const tabOf = m=>{
+      const rs = inCls.filter(d=>d.method===m.id && filled(d));
+      const sub = m.kind==="co2"? (()=>{ const gs=groupsOf(m.id,tCls), k=gs.filter(g=>rs.some(d=>onBoard(d,m.id,tCls) && gOf(d)===g)).length; return k? "모둠 답안 "+k+"/"+gs.length : "아직 비어 있음"; })()
+        : rs.length+"명 · "+GROUPS.map(g=>g+"모둠 "+rs.filter(d=>gOf(d)===g).length).join(" / ");
+      // 방법 전체 지우기: 휴지통 → 확인 모달
+      const x = h("button",{class:"tab-x",title:"이 방법의 답안·포스트잇 지우기","aria-label":m.title+" 답안·포스트잇 지우기",onclick:e=>{
+        e.stopPropagation();
+        confirmModal("'"+m.title+"'의 답안을 지울까요?", tCls+"반의 이 방법 답안과 포스트잇이 모두 지워져요. 되돌릴 수 없어요.", "지우기",
+          ()=>write("wipeMethod", pw, m.id, tCls)); }, html:TRASH_SVG});
+      return h("div",{class:"tabwrap"},
+        h("button",{class:"tab",role:"tab","aria-selected":String(tSel===m.id),onclick:()=>{ tSel=m.id; paint(); }},
+          m.kind==="co2"? [m.title," ",h("span",{class:"grp"},gNames(m.id,tCls))] : m.title, h("small",null, sub)),
+        x);
+    };
+    solarGrid.replaceChildren(...METHODS.filter(m=>m.kind==="solar").map(tabOf));
+    co2Grid.replaceChildren(...METHODS.filter(m=>m.kind==="co2").map(tabOf));
+    const m=M[tSel], rv=!!(ctl().reveal||{})[tSel], hv=!!(ctl().hint||{})[tSel];
+    galT.setAttribute("aria-pressed", String(gallOpen()));
+    hintT.setAttribute("aria-pressed", String(hv)); revT.setAttribute("aria-pressed", String(rv));
+    qText.textContent = "질문: "+m.value;
+    if(m.kind==="solar"){
+      gbar.hidden=false;
+      gbar.replaceChildren(h("span",{class:"muted",style:"font-size:13px;font-weight:600"},"모둠별 보기"),
+        ...[0,...GROUPS].map(g=>h("button",{class:"gbtn"+(g?" g"+g:""),"aria-pressed":String(gFilter===g),onclick:()=>{ gFilter=g; paint(); }}, g? g+"모둠" : "전체")));
+    } else gbar.hidden=true;
+    const gf = m.kind==="solar"? gFilter : 0;
+    const rows = inCls.filter(d=>onBoard(d,tSel,tCls))
+      .sort((a,b)=>(gOf(a)||9)-(gOf(b)||9) || (a.updatedAt||0)-(b.updatedAt||0));
+    const inView = rows.filter(d=>!gf || gOf(d)===gf);
+    const empty = t=>h("div",{class:"empty"},t||"아직 올라온 답이 없어요.");
+    const col = (field,label,dotVar)=>{
+      const items = rows.filter(d=>(d[field]||"").trim());
+      const n = items.filter(d=>!gf || gOf(d)===gf).length;
+      return h("div",{class:"tcol"},
+        h("h3",null,h("span",null,h("span",{class:"dot",style:`background:var(${dotVar});margin-right:8px`}),label),h("span",{class:"n"},n+"개")),
+        grouped(items, d=>card(d,null,"",d[field],field)) || empty());
+    };
+    const pcItems = rows.filter(d=>(d.pros||"").trim()||(d.cons||"").trim());
+    const pcCard = d=> h("div",{style:"display:grid;gap:6px"},
+      (d.pros||"").trim()? card(d,"장점","pro",d.pros,"pros") : null,
+      (d.cons||"").trim()? card(d,"단점","con",d.cons,"cons") : null);
+    let fourth = null;
+    notesBox.hidden = m.kind!=="co2";
+    // 작성 현황: 동의 명단의 학생(모둠)까지 넣어, 아직 안 쓴 학생(모둠)도 보이게
+    const mark = d=> FIELDS.map(([f,l])=>((d[f]||"").trim()?"● ":"○ ")+l).join("   ");
+    const roster = rosterOf(tCls);
+    if(m.kind==="co2"){
+      const ns=notesFor(tSel,tCls).sort((a,b)=>a.at-b.at), gs=groupsOf(tSel,tCls);
+      notesBox.replaceChildren(
+        h("h3",null,"다른 모둠이 덧붙인 생각",h("span",{class:"n"},ns.length+"장")),
+        !ns.length? empty("공유를 열면 다른 모둠 학생들이 생각을 덧붙여요.")
+        : gs.length<2? h("div",{class:"notes"}, ns.map(noteEl))
+        : h("div",{style:"display:grid;gap:10px"}, gs.map(g=>{ const got=ns.filter(n=>Number(n.tg)===g);
+            return h("div",{class:"gsec"}, h("div",{class:"ghead"}, h("span",{class:"gchip g"+g}, g+"모둠에 덧붙인 생각"), h("span",{class:"n"}, got.length+"장")),
+              got.length? h("div",{class:"notes"}, got.map(noteEl)) : empty("아직 없음")); })));
+      // 맡은 모둠마다: 네 칸 상태 + 모둠원(동의 명단 기준)
+      const items = gs.map(g=> rows.find(d=>gOf(d)===g) || {id:"none|"+g, group:g, kind:"co2"});
+      const started = items.filter(d=>filled(d)).length;
+      fourth = h("div",{class:"tcol"}, h("h3",null,"작성 현황",h("span",{class:"n"},"쓴 모둠 "+started+" / "+gs.length)),
+        grouped(items, d=>{ const mem=roster.filter(r=>r.group===gOf(d)).map(r=>r.name);
+          return card(d,null,"", (filled(d)? mark(d) : "아직 안 씀")+"\n모둠원: "+(mem.length? mem.join(", ") : "아직 없음")); }) || empty());
+    } else {
+      // 동의 명단의 학생마다: 이 방법의 답이 있으면 네 칸 상태, 없으면 '아직 안 씀'
+      const items = rows.slice();
+      for(const r of roster) if(!items.some(d=>d.name===r.name)) items.push({id:"none|"+r.name, name:r.name, group:r.group, kind:"solar"});
+      const inV = items.filter(d=>!gf || gOf(d)===gf), wrote = inV.filter(d=>filled(d)).length;
+      fourth = h("div",{class:"tcol"}, h("h3",null,"작성 현황",h("span",{class:"n"},"쓴 학생 "+wrote+" / "+inV.length+"명")),
+        grouped(items, d=>card(d,null,"", filled(d)? mark(d) : "아직 안 씀")) || empty("아직 동의한 학생이 없어요."));
+    }
+    grid.replaceChildren(col("principle","원리","--sea"),
+      h("div",{class:"tcol"}, h("h3",null,h("span",null,h("span",{class:"dot",style:"background:var(--sage);margin-right:8px"}),"장점 · 단점"),h("span",{class:"n"},pcItems.filter(d=>!gf||gOf(d)===gf).length+"명")),
+        grouped(pcItems, pcCard) || empty()),
+      col("value","부가적 가치","--sun"), ...(fourth? [fourth] : []));
+  }
+  paint(); refreshers.push(paint);
+
+  app.append(
+    h("div",{class:"bar"}, h("button",{class:"btn",onclick:()=>go({name:"home"})},"← 학생 화면 보기"),
+      h("div",{class:"grow"},h("div",{class:"eyebrow"},"강사 화면"),title),
+      gcBox,
+      h("button",{class:"btn primary",onclick:()=>go({name:"present"})},"발표 화면 ▶"),
+      h("button",{class:"btn small",onclick:askLogout},"강사 로그아웃"),
+      h("button",{class:"btn small icon-btn",title:"데이터 정리",'aria-label':"데이터 정리",onclick:openResetModal,html:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>'})),
+    clsBar, tabs, ctrl, gbar, grid, notesBox);
+}
+
+/* 확인 모달: [취소] [지우기] 중 하나를 고를 때까지 기다림. 다른 창 위에도 뜸 */
+function confirmModal(title, msg, okLabel, onOk, okClass){
+  const close = ()=>{ wrap.remove(); document.removeEventListener("keydown", esc, true); };
+  const esc = e=>{ if(e.key==="Escape"){ e.stopPropagation(); close(); } };
+  const ok = h("button",{class:"btn "+(okClass||"danger-solid"),onclick:async()=>{ ok.disabled=true; close(); await onOk(); }}, okLabel||"지우기");
+  const wrap = h("div",{class:"consent confirm",role:"alertdialog","aria-modal":"true","aria-labelledby":"cf-h",onclick:e=>{ if(e.target===wrap) close(); }},
+    h("div",{class:"box",style:"max-width:440px"},
+      h("h2",{id:"cf-h",style:"font-size:22px"},title),
+      msg? h("p",{class:"muted",style:"margin:0;font-size:15px"},msg) : null,
+      h("div",{class:"acts"}, h("span",{class:"grow"}), h("button",{class:"btn",onclick:close},"취소"), ok)));
+  document.addEventListener("keydown", esc, true);
+  document.body.append(wrap);
+  setTimeout(()=>ok.focus(),0);
+}
+/* 데이터 정리 모달(강사 화면 오른쪽 위 휴지통 버튼): 모두 지우기, 답·포스트잇만 지우기, 이 기기의 이름·로그인 지우기 */
+function openResetModal(){
+  document.querySelectorAll(".consent").forEach(x=>x.remove());
+  const close = ()=>{ wrap.remove(); document.removeEventListener("keydown", esc); };
+  const esc = e=>{ if(e.key==="Escape") close(); };
+  const wrap = h("div",{class:"consent",role:"dialog","aria-modal":"true","aria-labelledby":"reset-h",onclick:e=>{ if(e.target===wrap) close(); }},
+    h("div",{class:"box"},
+      h("div",{style:"display:flex;align-items:center;gap:8px"}, h("h2",{id:"reset-h",style:"flex:1"},"데이터 정리"),
+        h("button",{class:"btn small","aria-label":"닫기",onclick:close},"닫기 ✕")),
+      resetBox()));
+  document.addEventListener("keydown", esc);
+  document.body.append(wrap);
+}
+/* 데이터 정리: 상황별 카드 세 장을 세로로. 위 두 장은 칸에 '초기화'를 적어야 실행 */
+function resetBox(){
+  // 서버 초기화 카드: withConsent true = 동의기록까지(보관 시트로 옮김), false = 답·포스트잇만
+  const card = (title, desc, label, withConsent, done)=>{
+    const inp = h("input",{class:"field",placeholder:"초기화",style:"width:120px;flex:0 0 auto",autocomplete:"off","aria-label":title+": 칸에 '초기화'를 적기"});
+    const msg = h("span",{class:"muted",style:"font-size:13px"});
+    const btn = h("button",{class:"btn small danger",type:"submit"},label);
+    const form = h("form",{class:"nform",style:"align-items:center;flex-wrap:wrap",onsubmit:async e=>{ e.preventDefault();
+        if(inp.value.trim()!=="초기화"){ msg.textContent="칸에 '초기화'라고 적어야 실행돼요."; inp.focus(); return; }
+        btn.disabled=true; msg.textContent="지우는 중…";
+        const ok = await write("resetAll", pw, withConsent);
+        btn.disabled=false; inp.value=""; msg.textContent = ok? done : ""; if(ok) pHidden.clear(); }},
+      inp, btn, msg);
+    return h("div",{class:"rcard"}, h("h3",null,title), h("p",{class:"muted"},desc), form);
+  };
+  // 이 기기(강사가 쓰는 기기)에 남은 기록 지우기: 동의·모둠·이름·포스트잇 주인 표시·강사 로그인. 확인 창을 거쳐 실행
+  const devBtn = h("button",{class:"btn small danger",onclick:()=>confirmModal("이 기기의 이름·로그인을 지울까요?",
+    "이 기기에 남은 모둠·이름·동의와 강사 로그인이 지워지고 처음 화면으로 돌아가요. 답안은 그대로예요.", "지우기", ()=>{
+    ["geo-me","geo-pw","geo-pw-day","geo-consent","geo-consent-at","geo-consent-logged"].forEach(k=>ls.del(k));
+    me = {key:rid(), cls:FIXED_CLS}; saveMe(); pw=""; isTeacher=false;
+    go({name:"home"}); })},"이 기기의 이름·로그인 지우기");
+  return h("div",{class:"rbody rcards"},
+    card("모두 지우기 (캠프 전 정리)", "답·포스트잇과 동의기록을 지워요. 동의기록은 '동의기록 (보관 …)' 시트로 옮겨 둬요. 시험 활동을 마친 뒤 캠프 전에 써요.",
+      "모두 지우기", true, "모두 지웠어요. 동의기록은 보관 시트로 옮겼어요."),
+    card("답·포스트잇만 지우기", "동의기록은 남겨요. 캠프 중에 활동을 처음부터 다시 할 때 써요.",
+      "답·포스트잇만 지우기", false, "답·포스트잇을 지웠어요. 동의기록은 남겨 두었어요."),
+    h("div",{class:"muted rnote"}, h("b",null,"위 두 가지로 지운 답·포스트잇은 되돌릴 수 없어요."),
+      h("ul",null,
+        h("li",null,"모둠은 5모둠으로 돌아가고, 4·5모둠이 맡을 방법은 새로 정해져요."),
+        h("li",null,"결과 공유와 질문 보여주기는 모두 꺼져요."),
+        h("li",null,"학생 기기는 다음에 열면 동의 창부터 다시 시작해요."))),
+    h("div",{class:"rcard rdev"}, h("h3",null,"이 기기의 이름·로그인 지우기"),
+      h("p",{class:"muted"},"이 기기에 남은 모둠·이름·동의와 강사 로그인을 지워요. 답안은 그대로예요. 같은 모둠·이름을 다시 적으면 이어서 쓸 수 있어요."),
+      h("div",null,devBtn)));
+}
+
+/* ---------- PRESENT (발표 화면: 모둠별 포스트잇 보드) ---------- */
+const PFIELDS = [["principle","원리","과학적 원리는 무엇일까?"],["pros","장점","지구 온난화를 해결하는 데 유리한 점"],["cons","단점","걱정되는 점과 보완 방법"],["value","부가적 가치","기후 말고 또 어디에 도움이 될까?"]];
+let pField = 0, pNames = true;
+const pHidden = new Set();   // 발표 화면에서만 가린 포스트잇 (지우지 않음)
+let pSpot = null;            // 확대 보기 조작 (키보드에서 사용)
+function renderPresent(){
+  if(!isTeacher){ go({name:"home"}); return; }
+  const root = h("div",{class:"present"});
+  const head = h("div",{class:"p-head"});
+  const qline = h("div",{class:"p-q"});
+  const board = h("div",{class:"p-board"});
+  // 오른쪽 위 스위치들: 한 번만 만들고 상태만 바꿈(강사 화면의 질문 스위치와 같은 설정)
+  const pHintT = h("button",{class:"toggle",onclick:()=>setControl({hint:{[tSel]:!(ctl().hint||{})[tSel]}})},h("span",{class:"sw"}),"단점 질문");
+  const pRevT  = h("button",{class:"toggle",onclick:()=>setControl({reveal:{[tSel]:!(ctl().reveal||{})[tSel]}})},h("span",{class:"sw"}),"부가적 가치 질문");
+  const pNameT = h("button",{class:"toggle",onclick:()=>{ pNames=!pNames; paint(); }},h("span",{class:"sw"}),"이름");
+  const pTools = h("div",{class:"p-tools"}, pHintT, pRevT, pNameT,
+    h("button",{class:"btn",onclick:()=>{ if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); go({name:"teacher"}); }},"닫기 ✕"));
+  const pTitle = h("div",{class:"p-title"}), pFields = h("div",{class:"p-fields",role:"tablist"});
+  head.append(pTitle, pFields, pTools);
+  const spot = h("div",{class:"p-spot",hidden:true,onclick:()=>{ if(!spot.dataset.swiped) closeSpot(); }});
+  let seq = [], spotIdx = -1;     // 보드에 붙은 순서대로 모은 포스트잇, 확대 중인 번호
+  function closeSpot(){ spotIdx=-1; spot.hidden=true; spot.replaceChildren(); }
+  function drawSpot(){
+    if(spotIdx<0 || !seq.length){ closeSpot(); return; }
+    if(spotIdx>=seq.length) spotIdx=seq.length-1;
+    const it=seq[spotIdx], stop=e=>e.stopPropagation();
+    const edge = d=> spotIdx+d<0 || spotIdx+d>=seq.length;          // 이 질문의 끝인가
+    const nav=(d,lab,txt)=> h("button",{class:"p-nav"+(edge(d)?" jump":""),disabled:edge(d) && nextField(d)<0,"aria-label":edge(d)? (d>0?"다음 질문":"이전 질문") : lab,
+      title:edge(d)? (d>0?"다음 질문으로":"이전 질문으로") : lab, onclick:e=>{ stop(e); move(d); }},txt);
+    spot.replaceChildren(
+      h("div",{class:"p-spot-top",onclick:stop},
+        h("span",{class:"p-qtag "+PFIELDS[pField][0]}, PFIELDS[pField][1]),
+        h("span",{class:"p-count"}, (spotIdx+1)+" / "+seq.length),
+        it.tag? h("span",{class:"gchip g"+it.g}, it.tag) : null,
+        h("span",{class:"p-spot-help"},"포스트잇을 누르거나 ← → 로 넘기기 · Esc 닫기"),
+        h("button",{class:"p-close","aria-label":"확대 닫기",onclick:e=>{ stop(e); closeSpot(); }},"✕")),
+      h("div",{class:"p-spot-row"},
+        nav(-1,"이전 포스트잇","‹"),
+        h("div",{class:"p-spot-note c"+it.c,title:"누르면 다음 포스트잇",onclick:e=>{ stop(e); move(1); }}, h("div",{class:"p-txt"},it.text), pNames && it.who? h("div",{class:"p-who"},it.who):null),
+        nav(1,"다음 포스트잇","›")));
+    spot.hidden=false;
+  }
+  // 이 질문에서 더 넘길 포스트잇이 없으면, 포스트잇이 있는 다음(이전) 질문으로 이어서 넘어감
+  function nextField(d){
+    for(let f=pField+d; f>=0 && f<PFIELDS.length; f+=d) if(countField(f)>0) return f;
+    return -1;
+  }
+  function move(d){
+    const n=spotIdx+d;
+    if(n>=0 && n<seq.length){ spotIdx=n; drawSpot(); return; }
+    const f=nextField(d); if(f<0) return;
+    pField=f; paint(); spotIdx = d>0? 0 : seq.length-1; drawSpot();
+  }
+  // 스와이프(전자칠판·태블릿)
+  let sx=null;
+  spot.addEventListener("pointerdown", e=>{ sx=e.clientX; });
+  spot.addEventListener("pointerup", e=>{ if(sx==null) return; const dx=e.clientX-sx; sx=null; if(Math.abs(dx)>70){ spot.dataset.swiped="1"; move(dx<0?1:-1); setTimeout(()=>{ delete spot.dataset.swiped; },50); } });
+  const openAt = i=>{ spotIdx=i; drawSpot(); };
+  pSpot = { isOpen:()=>spotIdx>=0, move, close:closeSpot };
+  const hue = key=>{ let x=2166136261; for(const ch of String(key)){ x^=ch.charCodeAt(0); x=Math.imul(x,16777619)>>>0; } return x; };
+  const note = (text, who, g, i, key)=>{
+    const k=hue(key||text), c=1+((i+g*2)%5), r=[-1.4,0.9,-0.5,1.3,-1,0.6,-1.7,1.1][k%8];
+    const idx=seq.length; seq.push({text, who, c, g, tag: g? g+"모둠" : ""});
+    return h("div",{class:"p-note c"+c, style:`--r:${r}deg`, role:"button", tabindex:"0",
+        onclick:()=>openAt(idx), onkeydown:e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openAt(idx); } }},
+      key? h("button",{class:"p-x","aria-label":"발표 화면에서 가리기",title:"발표 화면에서 가리기",onclick:e=>{ e.stopPropagation(); pHidden.add(key); paint(); }},"×") : null,
+      h("div",{class:"p-txt"},text), pNames && who? h("div",{class:"p-who"},who) : null);
+  };
+  const fit = (texts)=>{  // 답 개수와 길이에 맞춰 글자 크기 조절
+    const n=texts.length||1, avg=texts.reduce((a,t)=>a+t.length,0)/n;
+    let fs = n<=4? 24 : n<=8? 21 : n<=14? 18 : 16;
+    if(avg>60) fs-=1; if(avg>110) fs-=1;
+    board.style.setProperty("--fs", fs+"px");
+    board.style.setProperty("--nw", Math.round(fs*9.5)+"px");
+  };
+
+  function countField(fi){
+    const m=M[tSel], f=PFIELDS[fi][0];
+    const a=[...S.answers.values()].filter(d=>onBoard(d,tSel,tCls) && (d[f]||"").trim() && !pHidden.has(d.id+"|"+f)).length;
+    const n=f==="value" && m.kind==="co2"? notesFor(tSel,tCls).filter(x=>!pHidden.has(x.id)).length : 0;
+    return a+n;
+  }
+  function paint(){
+    const m = M[tSel], [field,label,q] = PFIELDS[pField];
+    seq = [];
+    const keyOf = d=> d.id+"|"+field;
+    const all = [...S.answers.values()].filter(d=>onBoard(d,tSel,tCls) && (d[field]||"").trim())
+      .sort((a,b)=>(a.updatedAt||0)-(b.updatedAt||0));
+    const rows = all.filter(d=>!pHidden.has(keyOf(d)));
+    const hiddenN = all.length-rows.length;
+    const notesAll = field==="value" && m.kind==="co2"? notesFor(tSel,tCls) : [];
+    // 제목과 질문 탭만 다시 그림. 오른쪽 스위치 묶음(pTools)은 그대로 두어야 스위치가 부드럽게 움직임
+    pTitle.replaceChildren(
+        h("span",null,tCls+"반"), h("span",{class:"sep"},"·"),
+        h("select",{class:"p-method","aria-label":"방법 고르기",onchange:e=>{ tSel=e.target.value; paint(); }},
+          METHODS.map(x=>h("option",{value:x.id,selected:x.id===tSel}, x.kind==="co2"? x.title+" ("+groupsOf(x.id,tCls).map(g=>g+"모둠").join(", ")+")" : x.title))));
+    pFields.replaceChildren(...PFIELDS.map(([f,l],i)=>{
+        const n=[...S.answers.values()].filter(d=>onBoard(d,tSel,tCls) && (d[f]||"").trim()).length;
+        return h("button",{class:"p-ftab "+f,role:"tab","aria-selected":String(i===pField),onclick:()=>{ pField=i; paint(); }}, l, h("span",null,n));
+      }));
+    pHintT.setAttribute("aria-pressed", String(!!(ctl().hint||{})[tSel]));
+    pRevT.setAttribute("aria-pressed", String(!!(ctl().reveal||{})[tSel]));
+    pNameT.setAttribute("aria-pressed", String(pNames));
+    const showQ = field!=="value" || (ctl().reveal||{})[tSel];
+    qline.replaceChildren(h("span",{class:"p-qlab "+field},label), h("span",null, field==="value" && showQ? m.value : q),
+      ...(hiddenN? [h("span",{class:"p-hidden"}," 가린 포스트잇 "+hiddenN+"장", h("button",{onclick:()=>{ [...pHidden].filter(k=>k.endsWith("|"+field)).forEach(k=>pHidden.delete(k)); paint(); }},"다시 보이기"))] : []));
+
+    if(m.kind==="solar"){
+      fit(rows.map(d=>d[field]));
+      const gs=shownGroups(tCls, rows);
+      board.className="p-board cols"+gs.length;
+      board.replaceChildren(...gs.map(g=>{
+        const mine=rows.filter(d=>gOf(d)===g);
+        return h("section",{class:"p-col g"+g},
+          h("div",{class:"p-colhead"}, h("span",{class:"gchip g"+g}, g? g+"모둠":"모둠 미정"), h("span",{class:"p-n"}, mine.length+"명")),
+          h("div",{class:"p-notes"}, mine.length? mine.map((d,i)=>note(d[field], d.name, g, i, keyOf(d))) : h("div",{class:"p-empty"},"아직 없음")));
+      }));
+    } else {
+      const ns = notesAll.filter(n=>!pHidden.has(n.id)).sort((a,b)=>a.at-b.at);
+      fit([...rows.map(d=>d[field]), ...ns.map(n=>n.text)]);
+      const gs = groupsOf(tSel,tCls);   // 이 방법을 맡은 모둠들 (1~3모둠 하나 + 배정된 4·5모둠)
+      const pn = (n,i)=> note(n.text, (n.name||"")+(n.group?" · "+n.group+"모둠":""), Number(n.group)||0, i, n.id);
+      const bigs = g=>{ const mine=rows.filter(d=>gOf(d)===g);
+        return mine.length? mine.map((d,i)=>{ const el=note(d[field], "", g, i, keyOf(d)); el.classList.add("big"); return el; }) : [h("div",{class:"p-empty"},"아직 작성 전")]; };
+      if(gs.length<2){   // 한 모둠만 맡은 방법: 왼쪽 모둠의 생각, 오른쪽 받은 의견
+        const g=gs[0]||m.group;
+        board.className="p-board group";
+        board.replaceChildren(
+          h("section",{class:"p-col g"+g}, h("div",{class:"p-colhead"}, h("span",{class:"gchip g"+g}, g+"모둠의 생각")), h("div",{class:"p-notes"}, bigs(g))),
+          field==="value"? h("section",{class:"p-col others"},
+            h("div",{class:"p-colhead"}, h("span",{class:"p-n"},"다른 모둠이 덧붙인 생각 "+ns.length+"장")),
+            h("div",{class:"p-notes"}, ns.length? ns.map(pn) : h("div",{class:"p-empty"},"공유를 열면 다른 모둠이 생각을 덧붙여요"))) : h("span"));   /* null을 넘기면 화면에 'null' 글자가 찍힘 */
+      } else {           // 두 모둠이 맡은 방법: 모둠마다 한 열, 부가적 가치에서는 그 모둠이 받은 포스트잇을 열 아래에
+        board.className="p-board cols"+gs.length;
+        board.replaceChildren(...gs.map(g=>{ const got=ns.filter(n=>Number(n.tg)===g);
+          return h("section",{class:"p-col g"+g},
+            h("div",{class:"p-colhead"}, h("span",{class:"gchip g"+g}, g+"모둠의 생각")), h("div",{class:"p-notes"}, bigs(g)),
+            field==="value"? h("div",{class:"p-colhead"}, h("span",{class:"p-n"},"다른 모둠이 덧붙인 생각 "+got.length+"장")) : null,
+            field==="value"? h("div",{class:"p-notes"}, got.length? got.map(pn) : h("div",{class:"p-empty"},"아직 없음")) : null); }));
+      }
+    }
+  }
+  const repaint = ()=>{ paint(); if(spotIdx>=0) drawSpot(); };
+  paint(); refreshers.push(repaint);
+  root.append(head, qline, board, spot);
+  app.append(root);
+}
+document.addEventListener("keydown", e=>{
+  if(view.name!=="present" || /INPUT|SELECT|TEXTAREA/.test((e.target.tagName||""))) return;
+  const spotOpen = pSpot && pSpot.isOpen();
+  if(e.key==="ArrowRight"||e.key==="ArrowLeft"){
+    e.preventDefault();
+    const d = e.key==="ArrowRight"? 1 : -1;
+    if(spotOpen) pSpot.move(d);                       // 확대 중이면 다음/이전 포스트잇
+    else { pField=(pField+d+PFIELDS.length)%PFIELDS.length; render(); }   // 아니면 질문 넘기기
+  }
+  else if(e.key==="Escape"){ if(spotOpen) pSpot.close(); else go({name:"teacher"}); }
+});
+
+/* ---------- GALLERY ---------- */
+let noteColor = 1;
+function noteEl(n){
+  const canDel = isTeacher || n.key===me.key;
+  const r = ((Number(n.at)||0)%5-2)*0.8;
+  return h("div",{class:"note c"+(n.color||1),style:`--r:${r}deg`},
+    n.text, h("small",null,(n.name||"")+(n.group? " · "+n.group+"모둠":"")),
+    canDel? h("button",{class:"x","aria-label":"포스트잇 떼기",onclick:()=>write("deleteNote", n.id, me.key, pw)},"×") : null);
+}
+function renderGallery(){
+  // 모둠마다 카드 한 장: 모둠 → 맡은 방법 → 네 칸 답 → 그 모둠에 다른 모둠이 덧붙인 생각(포스트잇)
+  const c = viewCls();
+  const cols = groupList(c).map(g=>{
+    const mid = methodOfGroup(g,c), m = M[mid];
+    if(!m) return null;
+    const body = h("div",{style:"display:grid;gap:8px"});
+    const notes = h("div",{class:"notes"});
+    const mine = myGroup()===g && !isTeacher;
+    const input = h("input",{class:"field",id:"note-g"+g,maxlength:"80",placeholder:"또 다른 가치는…"});
+    const sendBtn = h("button",{class:"btn small primary",type:"submit"},"붙이기");
+    const colors = h("div",{class:"colors"},[1,2,3,4].map(k=>h("button",{type:"button","aria-label":"포스트잇 색 "+k,"aria-pressed":String(noteColor===k),style:`background:var(--note${k})`,
+      onclick:e=>{ noteColor=k; e.currentTarget.parentNode.querySelectorAll("button").forEach((b,i)=>b.setAttribute("aria-pressed",String(i+1===k))); }})));
+    const form = h("form",{class:"nform",onsubmit:async e=>{ e.preventDefault(); const t=input.value.trim(); if(!t) return;
+      sendBtn.disabled=true; const cm = consentMeta();
+      const ok = await write("addNote",{method:mid,tg:g,text:t,name:me.name||"",cls:c,group:isTeacher?0:myGroup(),key:me.key,color:noteColor,consent:cm});
+      if(ok) consentLogged(cm);
+      sendBtn.disabled=false; if(ok) input.value=""; }}, input, sendBtn);
+    let lastSig="";
+    const paint = ()=>{
+      const d = S.answers.get(groupId(mid, c, g))||{};
+      const ns=[...S.notes.values()].filter(n=>n.method===mid && clsOf(n)===c && Number(n.tg)===g).sort((a,b)=>a.at-b.at);
+      const sig = JSON.stringify([d.updatedAt, ns.map(n=>n.id)]); if(sig===lastSig) return; lastSig=sig;
+      body.replaceChildren(...[["principle","원리","principle"],["pros","장점","pro"],["cons","단점","con"],["value","부가적 가치","value"]].map(([f,l,k])=>
+        h("div",{class:"gblock"},h("div",{class:"lab "+k},l),h("p",{class:(d[f]||"").trim()?"":"muted"},(d[f]||"").trim()||"아직 작성 전"))));
+      notes.replaceChildren(...(ns.length? ns.map(noteEl) : [h("span",{class:"muted",style:"font-size:13px"},"첫 포스트잇을 붙여 보세요.")]));
+    };
+    paint(); refreshers.push(paint);
+    return h("section",{class:"gcol g"+g+(mine?" mine":"")},
+      h("div",{class:"head"},h("div",{class:"mini",html:ART[mid]}),h("div",null,h("span",{class:"gchip g"+g},g+"모둠"+(mine?" · 우리":"")),h("h3",null,m.title))),
+      body,
+      h("div",{class:"board"},h("div",{class:"lab value",style:"font-size:12px;font-weight:700"},"다른 모둠이 덧붙인 생각"),notes,
+        mine? h("span",{class:"muted",style:"font-size:13px"},"우리 모둠에는 다른 모둠 친구들이 생각을 덧붙여요.") : h("div",{style:"display:grid;gap:6px"},form,colors)));
+  });
+  const galWrap = h("div",{class:"gal n"+groupCount(c)},cols);
+  const lock = h("div",{class:"gal-card"},h("div",null,h("h3",null,"아직 둘러보기 전이에요"),h("span",{class:"muted"},"모든 모둠이 다 쓰면 선생님이 열어 줄 거예요.")));
+  const sync = ()=>{ const open=gallOpen()||isTeacher; galWrap.hidden=!open; lock.hidden=open; };
+  sync(); refreshers.push(sync);
+  app.append(
+    h("div",{class:"bar"}, h("button",{class:"btn",onclick:()=>go({name:"home"})},"← 처음으로"),
+      h("div",{class:"grow"},h("div",{class:"eyebrow"},c+"반 · 이산화탄소 잡기"),h("h1",{style:"font-size:30px"},"모둠 결과 둘러보기")),
+      isTeacher? h("button",{class:"btn primary",onclick:()=>go({name:"teacher"})},"강사 화면"):null),
+    lock, galWrap);
+}
+
+/* 기기를 돌려 쓸 때: 페이지를 열면 이 기기에 저장된 모둠·이름이 맞는지 한 번 물음.
+   다른 사람이면 이 기기의 모둠·이름·동의를 지우고 동의 창부터 다시(앞 학생의 답을 덮어쓰지 않게).
+   render가 떠 있는 창을 지우므로, 답할 때까지 첫 화면을 그릴 때마다 다시 띄움(renderHome) */
+let whoPending = true;
+function askWho(){
+  if(isTeacher || S.v===null || document.getElementById("who-h") || !consented() || !me.group || !me.name) return;
+  const close = ()=>{ whoPending=false; wrap.remove(); };
+  const other = ()=>{ close();
+    ["geo-consent","geo-consent-at","geo-consent-logged"].forEach(k=>ls.del(k));
+    me = {key:rid(), cls:FIXED_CLS}; saveMe(); go({name:"home"}); };
+  const yes = h("button",{class:"btn primary",onclick:close},"네, 맞아요");
+  const wrap = h("div",{class:"consent confirm",role:"alertdialog","aria-modal":"true","aria-labelledby":"who-h"},
+    h("div",{class:"box",style:"max-width:440px"},
+      h("h2",{id:"who-h",style:"font-size:22px"},me.group+"모둠 "+me.name+" 학생인가요?"),
+      h("p",{class:"muted",style:"margin:0;font-size:15px"},"이 기기에 남아 있는 이름이에요. 다른 사람이면 [다른 사람이에요]를 눌러 새로 적어 주세요."),
+      h("div",{class:"acts"}, h("button",{class:"btn",onclick:other},"다른 사람이에요"), h("span",{class:"grow"}), yes)));
+  document.body.append(wrap);
+  setTimeout(()=>yes.focus(),0);
+}
+
+/* ---------- boot ---------- */
+if(!hasGAS){ showBanner(previewMsg); window.__geo={S}; }
+// 연결된 시트의 반(파일 이름의 N반)이 주소의 반과 다르면 알림(주소를 잘못 적었을 때)
+else call("info").then(o=>{ if(o && Number(o.cls)!==FIXED_CLS) showBanner("이 화면은 "+FIXED_CLS+"반인데 연결된 시트는 "+(o.cls||"?")+"반이에요. 선생님께 알려 주세요."); }).catch(()=>{});   /* 미리보기에서만: 시험용으로 상태를 엶 */
+render();
+(async ()=>{
+  if(pw){ isTeacher = !!(await call("checkTeacher", pw).catch(()=>false)); if(!isTeacher){ pw=""; ls.set("geo-pw",""); } if(isTeacher) render(); }
+  await poll();
+  setInterval(poll, 15000 + Math.floor(Math.random()*5000));
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) poll(); });
+})();
+})();
+
+</script>
+</body>
+</html>
