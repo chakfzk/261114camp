@@ -953,9 +953,10 @@ function renderTeacher(){
 
   // 모둠별로 묶어서 보여주기 (전체 보기일 때 모둠 제목 + 색 띠)
   function grouped(items, card){
-    const list = gFilter? items.filter(d=>gOf(d)===gFilter) : items;
+    const gf = M[tSel].kind==="solar"? gFilter : 0;   /* '모둠별 보기'는 태양빛 반사에만 있음. 이산화 탄소 방법에서는 걸지 않음 */
+    const list = gf? items.filter(d=>gOf(d)===gf) : items;
     if(!list.length) return null;
-    if(gFilter) return h("div",{class:"alist"}, list.map(card));
+    if(gf) return h("div",{class:"alist"}, list.map(card));
     const gs = shownGroups(tCls, list).filter(g=>list.some(d=>gOf(d)===g));
     return h("div",{class:"alist"}, gs.map(g=>{
       const mine = list.filter(d=>gOf(d)===g);
