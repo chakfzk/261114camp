@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- 아이폰 Safari에서 링크로 넘어가면 구글이 "파일을 열 수 없습니다"를 띄우는 경우가 있어, 앞 페이지 정보를 넘기지 않음(직접 입력과 같게) -->
+<meta name="referrer" content="no-referrer">
+<title>지구공학 생각 노트 (시험용 반 선택)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gothic+A1:wght@400;600;700&display=swap">
+<style>
+/* Layout: 랜딩 페이지와 같은 헤더 + 반 버튼 5개(넓으면 한 줄, 폰은 2~3열) */
+:root{
+  --bg:#eef3f4; --paper:#ffffff; --ink:#15323a; --muted:#5b7279; --line:#cfdcdf;
+  --accent:#0f7d8c; --green:#3d7a2e; --green-soft:#e2f0dc;
+  --f-display:"Do Hyeon","Gothic A1",system-ui,sans-serif;
+  --f-body:"Gothic A1",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1b1e; --paper:#162a2f; --ink:#e3eef0; --muted:#93abb1; --line:#28434a;
+  --accent:#5cc6d2; --green:#9fd38a; --green-soft:#223a1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1b1e; --paper:#162a2f; --ink:#e3eef0; --muted:#93abb1; --line:#28434a;
+  --accent:#5cc6d2; --green:#9fd38a; --green-soft:#223a1d; color-scheme:dark}
+
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding-block:40px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;
+  padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,5vw,3rem);line-height:1.1;margin:0;text-wrap:balance}
+.back{color:var(--muted);text-decoration:none;font-size:.95rem}
+.back:hover{color:var(--accent)}
+.chip{font-size:.72rem;font-weight:600;letter-spacing:.02em;padding:2px 8px;border-radius:99px;background:var(--green-soft);color:var(--green);white-space:nowrap}
+.ask{font-weight:700;font-size:1.15rem;margin:0 0 14px}
+.classes{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.cls{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:132px;
+  background:var(--paper);border:1px solid var(--line);border-radius:12px;color:inherit;text-decoration:none;
+  transition:border-color .15s,transform .15s}
+a.cls:hover{border-color:var(--green);transform:translateY(-2px)}
+a.cls:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.cls b{font-family:var(--f-display);font-weight:400;font-size:2.6rem;line-height:1}
+.cls small{font-size:.85rem;color:var(--muted)}
+.cls.off{opacity:.5}
+.msg{margin:18px 0 0;color:var(--muted);font-size:.95rem}
+@media (max-width:640px){ .classes{grid-template-columns:repeat(3,minmax(0,1fr))} .cls{min-height:104px} }
+@media (prefers-reduced-motion:reduce){.cls{transition:none} a.cls:hover{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <a class="back" href="../../">← 생각을 쓰는 캠프 - 과학</a>
+      <h1>지구공학 생각 노트</h1>
+    </div>
+    <span class="chip">시험용</span>
+  </header>
+
+  <p class="ask">우리 반을 고르세요</p>
+  <ol class="classes" id="classes"></ol>
+  <p class="msg" id="msg" hidden></p>
+</div>
+
+<script>
+/* 반별 웹앱 주소: Apps Script [배포]에서 받은 주소(…/exec 까지)를 그대로 적습니다.
+   주소를 바꾸면 이 파일만 고치면 되고, 생각 노트 웹앱 5개는 고치지 않아도 됩니다. */
+// 시험용(note/try/): 반 선택 페이지(note/)를 그대로 복사하고, 1반만 GitHub 판 화면(note/app/)으로 연결. 랜딩에는 연결하지 않음
+const URLS = {
+  1: "../app/?c=1",   // 1반: GitHub 판(서버는 '1반 (시험)' 사본 시트)
+  2: "",
+  3: "",
+  4: "",
+  5: ""
+};
+const target = n => URLS[n] || "";
+
+// 생각 노트의 반 드롭다운에서 왔을 때(?c=3): 바로 그 반으로
+const want = Number(new URLSearchParams(location.search).get("c"));
+if (target(want)) location.replace(target(want));
+else {
+  const list = document.getElementById("classes");
+  for (const n of [1, 2, 3, 4, 5]) {
+    const li = document.createElement("li");
+    const url = target(n);
+    const el = document.createElement(url ? "a" : "div");
+    el.className = "cls" + (url ? "" : " off");
+    if (url) { el.href = url; el.rel = "noreferrer"; } else el.setAttribute("aria-disabled", "true");
+    el.innerHTML = "<b>" + n + "반</b><small>" + (url ? "들어가기" : "준비 중") + "</small>";
+    li.append(el); list.append(li);
+  }
+  if (want >= 1 && want <= 5) {
+    const m = document.getElementById("msg");
+    m.textContent = want + "반 주소가 아직 준비되지 않았어요. 선생님께 알려 주세요.";
+    m.hidden = false;
+  }
+}
+</script>
+</body>
+</html>
