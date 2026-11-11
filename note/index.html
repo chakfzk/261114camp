@@ -64,15 +64,11 @@ a.cls:focus-visible{outline:3px solid var(--green);outline-offset:2px}
 </div>
 
 <script>
-/* 반별 웹앱 주소: Apps Script [배포]에서 받은 주소(…/exec 까지)를 그대로 적습니다.
-   주소를 바꾸면 이 파일만 고치면 되고, 생각 노트 웹앱 5개는 고치지 않아도 됩니다. */
-const URLS = {
-  1: "https://script.google.com/macros/s/AKfycbyBRnMzgNz3GOGVVOwWG40m6UTRjlgEP6gdBfbXXaVuGM4oSmiYejx8XNIAOZPSIC1Z/exec",   // 1반
-  2: "",   // 2반 ~~~~~~~
-  3: "",   // 3반 ~~~~~~~
-  4: "",   // 4반 ~~~~~~~
-  5: ""    // 5반 ~~~~~~~
-};
+/* 반별 생각 노트: 화면은 GitHub 판(app/?c=N) 하나. 반별 서버(Apps Script) 주소는 app/index.html의 API_URLS에 적음.
+   그 반의 서버 주소를 받아 연결한 반만 여기서 켬(1) */
+const READY = { 1: 1, 2: 0, 3: 0, 4: 0, 5: 0 };
+const URLS = {};
+for (const n of [1, 2, 3, 4, 5]) URLS[n] = READY[n] ? "app/?c=" + n : "";
 const target = n => URLS[n] || "";
 
 // 생각 노트의 반 드롭다운에서 왔을 때(?c=3): 바로 그 반으로
