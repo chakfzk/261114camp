@@ -68,6 +68,9 @@ Features.diagram=function(){
  const w=narrow?440:800,h=520;
  const r=(x,y,ww,hh,fill)=>'<rect x="'+x+'" y="'+y+'" width="'+ww+'" height="'+hh+'" rx="5" fill="'+fill+'" stroke="#4a6a70" stroke-width="2"/>';
  const text=(x,y,t,ax=x,ay=y)=>'<text data-anchor-x="'+ax+'" data-anchor-y="'+ay+'" x="'+x+'" y="'+y+'" text-anchor="middle" fill="#2a4d44" font-size="17">'+t+'</text>';
+ /* 선을 따라 움직이는 글자: 개수 n = 양. 속도는 모든 선에서 같게(초당 70) — 경로 길이로 시간을 정함(M·H·V·L만) */
+ const pathLen=d=>{let x=0,y=0,L=0;const t=d.match(/[MHVL]|-?[\d.]+/g);for(let i=0;i<t.length;){const c=t[i++];if(c==='M'){x=+t[i++];y=+t[i++];}else if(c==='H'){const nx=+t[i++];L+=Math.abs(nx-x);x=nx;}else if(c==='V'){const ny=+t[i++];L+=Math.abs(ny-y);y=ny;}else if(c==='L'){const nx=+t[i++],ny=+t[i++];L+=Math.hypot(nx-x,ny-y);x=nx;y=ny;}else i++;}return L;};
+ const movers=(d,n,word='CO₂',c='#8147b8',bg='#f1e6fa')=>{if(n<1)return '';const dur=Math.max(2,pathLen(d)/70);let s='';const wd=word.length*12+12;for(let i=0;i<n;i++)s+='<g class="diagram-mover" pointer-events="none"><rect x="'+(-wd/2)+'" y="-10" width="'+wd+'" height="20" rx="10" fill="'+bg+'" stroke="'+c+'" stroke-width="1.2"/><text x="0" y="4.5" text-anchor="middle" font-size="12" font-weight="700" fill="'+c+'">'+word+'</text><animateMotion dur="'+dur.toFixed(2)+'s" begin="'+(-dur*i/n).toFixed(2)+'s" repeatCount="indefinite" path="'+d+'"/></g>';return s;};
  const flow=(d,c='#9363b7',sw=4)=>'<path class="diagram-flow" d="'+d+'" fill="none" stroke="'+c+'" stroke-width="'+sw.toFixed(1)+'" marker-end="url(#scene-tip)"/>';   /* sw: 화살표 굵기(양) */
  let content='';
  if(state.id===1){
@@ -90,7 +93,10 @@ Features.diagram=function(){
   content+=flow('M'+(w*.05)+' 235 H'+x0,'#9363b7',8);
   /* 굵기: 들어오는 공기 속 CO₂ 8 = 포집 8×0.75a + 포집 안 됨 8×(1−0.75a). 0이면 장치로 내려가는 화살표 없음 */
   if(a){content+=flow('M'+x0+' 235 H'+(x0+unit*.4)+' V305','#9363b7',8*.75*a);content+=flow(pipe,'#9363b7',Math.min(8,1.5+8*.75*a));}
-  content+=flow('M'+(x0+unit*.4)+' 235 V115 H'+(w*.93),'#9363b7',8*(1-.75*a));content+=text(w*.75,92,'포집되지 않은 CO₂',w*.90,115);
+  content+=flow('M'+(x0+unit*.4)+' 235 V115 H'+(w*.93),'#9363b7',8*(1-.75*a));
+  /* 움직이는 'CO₂' 글자 수: 포집 round(3a)(관을 따라) + 포집 안 됨 4−round(3a) */
+  const nCap=Math.round(3*a);
+  content+=movers('M'+(w*.05)+' 235 H'+(x0+unit*.4),2)+movers('M'+(x0+unit*.4)+' 235 V305 V338 H'+collect+' V260 H'+well+' V475 H'+storage,nCap)+movers('M'+(x0+unit*.4)+' 235 V115 H'+(w*.93),4-nCap);content+=text(w*.75,92,'포집되지 않은 CO₂',w*.90,115);
   content+='<g data-storage-rock="true">';for(let i=0;i<5;i++){const rx=storage-20+i*10,ry=474+Math.sin(i)*4;content+='<path d="M'+rx+' '+(ry-8)+' l8-3 5 10 -6 8 -10-4Z" fill="'+(i<Math.round(a*5)?'#e2d7c7':'#827c77')+'" stroke="#575b58" stroke-width="1.5"/>';}content+='</g>';
   content+=text(w*.12,277,'공기 속 CO₂')+text(w*.41,163,'포집 장치')+text(collect,185,'CO₂를 물에 녹이기')+text(storage,435,'암석 속 광물로 고정');
  }else{
@@ -110,6 +116,8 @@ Features.diagram=function(){
   /* 굵기 = 플랑크톤 양(0이어도 자연 상태의 흡수는 있음). 침강은 늘 흡수보다 가늘게 */
   content+=flow('M'+(w*.62)+' 100 V258 L'+(w*.56)+' 300','#9363b7',3+7*a)+text(w*.62,84,'CO₂');
   content+=flow('M'+(w*.53)+' 325 L'+(w*.56)+' 370','#ab8c65',2.5+4.5*a);for(let i=0;i<7;i++)content+='<circle cx="'+(w*.56+Math.sin(i*2.4)*7)+'" cy="'+(376+Math.cos(i*1.7)*5)+'" r="2.5" fill="#a78b68"/>';content+=flow('M'+(w*.56)+' 386 L'+(w*.61)+' 450','#ab8c65',2+3*a);
+  /* 움직이는 글자 수 = 양: 흡수 1~5, 탄소(유기물~침강) 1~3(늘 흡수보다 적게) */
+  content+=movers('M'+(w*.62)+' 100 V258 L'+(w*.56)+' 300',1+Math.round(4*a))+movers('M'+(w*.53)+' 325 L'+(w*.56)+' 378 L'+(w*.61)+' 450',1+Math.round(2*a),'탄소','#7a5c3a','#f3eadf');   /* 유기물~침강을 한 줄로 따라감(짧은 선에서 글자가 겹치지 않게) */
   content+=text(w*.43,344,'식물 플랑크톤',w*.45,307)+text(w*.36,408,'유기물(탄소 포함)',w*.56,376)+text(w*.55,463,'일부 유기물의 침강',w*.61,450);
  }
  $('diagram').innerHTML='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+Features.data()[0]+' 원리"><defs><marker id="scene-tip" markerUnits="userSpaceOnUse" markerWidth="30" markerHeight="30" refX="24" refY="12" orient="auto"><path d="M2 2 L24 12 L2 22" fill="none" stroke="context-stroke" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs><rect width="'+w+'" height="'+h+'" fill="#e8f0f3"/>'+content+'</svg>';
