@@ -66,7 +66,7 @@ a.cls:focus-visible{outline:3px solid var(--green);outline-offset:2px}
 <script>
 /* 반별 생각 노트: 화면은 GitHub 판(app/?c=N) 하나. 반별 서버(Apps Script) 주소는 app/index.html의 API_URLS에 적음.
    그 반의 서버 주소를 받아 연결한 반만 여기서 켬(1) */
-const READY = { 1: 1, 2: 0, 3: 0, 4: 0, 5: 0 };
+const READY = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 };
 const URLS = {};
 for (const n of [1, 2, 3, 4, 5]) URLS[n] = READY[n] ? "app/?c=" + n : "";
 const target = n => URLS[n] || "";
